@@ -21,6 +21,10 @@ export default function TrustedContact() {
         setContacts((currentContacts) => [...currentContacts, {name: "", mobNumber: ""}]);
     };
 
+    const removeContact = (index: number) => {
+        setContacts((currentContacts) => currentContacts.filter((_, contactIndex) => contactIndex !== index));
+    }
+
     return(
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.header}>
@@ -51,6 +55,13 @@ export default function TrustedContact() {
                         keyboardType="phone-pad"
                         style={styles.input}
                     />
+                    <Pressable
+                        onPress={() => removeContact(index)}
+                        accessibilityLabel={`Remove contact ${index + 1}`}
+                        style={({pressed}) => [styles.removeButton, pressed && styles.pressed]}
+                    >
+                        <Text style={styles.removeText}>Remove</Text>
+                    </Pressable>
                 </View>
             ))}
 
@@ -182,4 +193,15 @@ const styles = StyleSheet.create({
     pressed: {
         opacity: 0.7,
     },
+    removeButton:{
+        alignItems: "center",
+        backgroundColor: "#E53E3E",
+        borderRadius: 10,  
+    },
+    removeText:{
+        color: "#FFFFFF",
+        fontSize: 14,
+        fontWeight: "700",
+        padding: 10,
+    }
 });
