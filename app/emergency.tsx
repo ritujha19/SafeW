@@ -23,9 +23,7 @@ export default function Emergency() {
   return (
     <View style={styles.container}> 
         <Text>Are you in Immediate Danger?</Text>
-        <Pressable style={styles.button} onPress={() => router.navigate('/trustedContact')}>
-            <Text>Trusted Contact</Text>
-        </Pressable>
+        
         <Pressable style={styles.button} onPress={() => show()}>
             <Text>Emergency Helpline number</Text>
         </Pressable>

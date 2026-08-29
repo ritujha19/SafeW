@@ -5,14 +5,20 @@ import {
   TextInput,
 } from "react-native";
 import React from "react";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { setLoggedIn } from "../auth";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const router = useRouter();
+
   const handleLogin = () => {
+    setLoggedIn(true);
     alert(`email: ${email} logged in successfully`);
+    router.navigate("/profile");
   };
+
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center",  }}>
       <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
