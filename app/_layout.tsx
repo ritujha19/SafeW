@@ -26,5 +26,7 @@ export default function RootLayout() {
     <Stack.Screen name="location" options={{ title: "Location" }} />
     <Stack.Screen name="login" options={{ title: "Login" }} />
     <Stack.Screen name="trustedContact" options={{ title: "Trusted Contacts" }} />
+    <Stack.Screen name="learn/index" options={{ title: "Learn & Prepare" }} />
+    <Stack.Screen name="learn/whatCounts" options={{ title: "Know What Counts" }} />
   </Stack>;
 }

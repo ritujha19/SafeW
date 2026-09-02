@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const styles = StyleSheet.create({
   container: {
@@ -34,10 +35,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Index() {
+function Index() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <Text style={styles.subtitle}>Your safety matters.</Text>
 
       <Pressable
@@ -76,12 +78,18 @@ export default function Index() {
           styles.Button,
           pressed && styles.pressedButton,
         ]}
-        onPress={() => {
-          console.log("learn & prepare Button pressed");
-        }}
+        onPress={() => router.navigate("./learn")}
       >
         <Text style={styles.buttonText}>📚 Learn & Prepare </Text>
       </Pressable>
     </View>
+  );
+}
+
+export default function App() {
+  return(
+    <SafeAreaProvider>
+      <Index />
+    </SafeAreaProvider>
   );
 }
