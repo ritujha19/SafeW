@@ -39,6 +39,11 @@ export default function Learn() {
             }}>
                 <Text style={styles.content}>Know what counts </Text>
             </Pressable>
+            <Pressable style={styles.buttons} onPress={() => {
+                router.navigate("/learn/warningSigns");
+            }}>
+                <Text style={styles.content}>know the warning signs </Text>
+            </Pressable>
         </View>
     )
 }

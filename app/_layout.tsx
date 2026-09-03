@@ -28,5 +28,6 @@ export default function RootLayout() {
     <Stack.Screen name="trustedContact" options={{ title: "Trusted Contacts" }} />
     <Stack.Screen name="learn/index" options={{ title: "Learn & Prepare" }} />
     <Stack.Screen name="learn/whatCounts" options={{ title: "Know What Counts" }} />
+    <Stack.Screen name="learn/warningSigns" options={{ title: "Know the Warning Signs" }} />
   </Stack>;
 }
