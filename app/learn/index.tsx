@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  card:{
+  card: {
     borderWidth: 1,
     borderColor: "#67a2e1",
     borderRadius: 10,
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#0f4e92",
   },
-  cardList:{
+  cardList: {
     marginTop: 14,
     color: "#3f87d4",
   },
@@ -91,6 +91,14 @@ export default function Learn() {
         }}
       >
         <Text style={styles.content}>Safety Essentials</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => {
+          router.navigate("/learn/prepareYourself");
+        }}
+      >
+        <Text style={styles.content}>Prepare Yourself</Text>
       </Pressable>
     </View>
   );
