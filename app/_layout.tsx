@@ -48,6 +48,10 @@ export default function RootLayout() {
         name="learn/prepareYourself"
         options={{ title: "Prepare Yourself" }}
       />
+      <Stack.Screen
+        name="womenRights/index"
+        options={{ title: "Women's Rights" }}
+      />
     </Stack>
   );
 }

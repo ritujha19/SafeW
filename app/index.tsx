@@ -1,8 +1,8 @@
 import { useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import {
-    SafeAreaProvider,
-    useSafeAreaInsets,
+  SafeAreaProvider,
+  useSafeAreaInsets,
 } from "react-native-safe-area-context";
 
 type ActionCardProps = {
@@ -51,9 +51,6 @@ function Index() {
       }}
     >
       <View className="mb-8">
-        <Text className="text-sm font-bold uppercase tracking-widest text-indigo-600">
-          SAFE-W
-        </Text>
         <Text className="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
           Your safety matters.
         </Text>
@@ -96,18 +93,18 @@ function Index() {
           onPress={() => console.log("ai Button pressed")}
         />
         <ActionCard
-          title="Women's Rights"
-          description="Learn about your rights and the support available to you."
-          icon="+"
-          className="border-l-4 border-amber-500"
-          onPress={() => console.log("women's rights Button pressed")}
-        />
-        <ActionCard
           title="Learn & Prepare"
           description="Practice real-life safety situations and build confidence."
           icon="+"
           className="border-l-4 border-emerald-600"
           onPress={() => router.navigate("./learn")}
+        />
+        <ActionCard
+          title="Women's Rights"
+          description="Learn about your rights and the support available to you."
+          icon="+"
+          className="border-l-4 border-amber-500"
+          onPress={() => router.navigate("./womenRights")}
         />
       </View>
     </ScrollView>
