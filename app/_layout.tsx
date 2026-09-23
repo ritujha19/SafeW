@@ -52,6 +52,18 @@ export default function RootLayout() {
         name="womenRights/index"
         options={{ title: "Women's Rights" }}
       />
+      <Stack.Screen
+        name="womenRights/constitutionRights"
+        options={{ title: "Constitutional Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/protectionFromViolence"
+        options={{ title: "Protection from Violence" }}
+      />
+      <Stack.Screen
+        name="womenRights/workplaceRights"
+        options={{ title: "Workplace Rights" }}
+      />
     </Stack>
   );
 }

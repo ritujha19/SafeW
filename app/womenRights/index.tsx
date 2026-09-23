@@ -1,5 +1,5 @@
-// import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, ScrollView} from "react-native";
+import { useRouter } from "expo-router";
+import { Pressable, StyleSheet, Text, ScrollView } from "react-native";
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f5f8fb" },
@@ -47,52 +47,66 @@ const styles = StyleSheet.create({
 });
 
 export default function womenRights() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const router = useRouter();
   return (
-    <ScrollView style={styles.container}
-    
-        contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <Text style={styles.content}>
-        Understanding your legal rights can help you know what protections and remedies are available to you.
-        </Text>
-        <Text style={styles.important}>Explore your rights</Text>
-        <Pressable style={styles.buttons} onPress={() => console.log("Constitutional Rights Button pressed")}>
-            <Text style={styles.content}>
-                Constitutional Rights
-            </Text>
-        </Pressable>
-        <Pressable style={styles.buttons} onPress={() => console.log("Protection from Violence Button pressed")}>
-            <Text style={styles.content}>
-                Protection from Violence
-            </Text>
-        </Pressable><Pressable style={styles.buttons} onPress={() => console.log("Workplace Rights Button pressed")}>
-            <Text style={styles.content}>
-                Workplace Rights
-            </Text>
-        </Pressable><Pressable style={styles.buttons} onPress={() => console.log("Family & Marriage Rights Button pressed")}>
-            <Text style={styles.content}>
-                Family & Marriage Rights
-            </Text>
-        </Pressable><Pressable style={styles.buttons} onPress={() => console.log("Digital Rights Button pressed")}>
-            <Text style={styles.content}>
-               Digital Rights
-            </Text>
-        </Pressable>
-        <Pressable style={styles.buttons} onPress={() => console.log("Rights When Seeking Help Button pressed")}>
-            <Text style={styles.content}>
-              Rights When Seeking Help
-            </Text>
-        </Pressable>
-        <Pressable style={styles.buttons} onPress={() => console.log("Rights of Children Button pressed")}>
-            <Text style={styles.content}>
-             Rights of Children
-            </Text>
-        </Pressable>
-        <Pressable style={styles.buttons} onPress={() => console.log("Free Legal Aids Button pressed")} >
-            <Text style={styles.content}>
-                Free Legal Aids
-            </Text>
-        </Pressable>
+        Understanding your legal rights can help you know what protections and
+        remedies are available to you.
+      </Text>
+      <Text style={styles.important}>Explore your rights</Text>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => router.navigate("/womenRights/constitutionRights")}
+      >
+        <Text style={styles.content}>Constitutional Rights</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => router.navigate("/womenRights/protectionFromViolence")}
+      >
+        <Text style={styles.content}>Protection from Violence</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => router.navigate("/womenRights/workplaceRights")}
+      >
+        <Text style={styles.content}>Workplace Rights</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => console.log("Family & Marriage Rights Button pressed")}
+      >
+        <Text style={styles.content}>Family & Marriage Rights</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => console.log("Digital Rights Button pressed")}
+      >
+        <Text style={styles.content}>Digital Rights</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => console.log("Rights When Seeking Help Button pressed")}
+      >
+        <Text style={styles.content}>Rights When Seeking Help</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => console.log("Rights of Children Button pressed")}
+      >
+        <Text style={styles.content}>Rights of Children</Text>
+      </Pressable>
+      <Pressable
+        style={styles.buttons}
+        onPress={() => console.log("Free Legal Aids Button pressed")}
+      >
+        <Text style={styles.content}>Free Legal Aids</Text>
+      </Pressable>
     </ScrollView>
   );
 }
-
