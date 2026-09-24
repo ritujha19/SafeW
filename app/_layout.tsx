@@ -64,6 +64,33 @@ export default function RootLayout() {
         name="womenRights/workplaceRights"
         options={{ title: "Workplace Rights" }}
       />
+      <Stack.Screen
+        name="womenRights/familyMarriageRights"
+        options={{ title: "Family & Marriage Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/digitalRights"
+        options={{ title: "Digital Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/rightsWhenSeekingHelp"
+        options={{ title: "Rights When Seeking Help" }}
+      />
+      <Stack.Screen
+        name="womenRights/rightsOfChildren"
+        options={{ title: "Rights of Children" }}
+      />
+      <Stack.Screen
+        name="womenRights/freeLegalAids"
+        options={{ title: "Free Legal Aids" }}
+      />
+      <Stack.Screen name="womenRights/viewMore/legalAgeOfMarriage" options={{ title: "Legal Age of Marriage" }} />
+      <Stack.Screen name="womenRights/viewMore/marriageRegistration" options={{ title: "Marriage Registration" }} />
+      <Stack.Screen name="womenRights/viewMore/rightsWithinMarriage" options={{ title: "Rights Within Marriage" }} />
+      <Stack.Screen name="womenRights/viewMore/divorceRights" options={{ title: "Divorce Rights" }} />
+      <Stack.Screen name="womenRights/viewMore/maintenance" options={{ title: "Maintenance" }} />
+      <Stack.Screen name="womenRights/viewMore/propertyInheritance" options={{ title: "Property & Inheritance" }} />
+      <Stack.Screen name="womenRights/viewMore/coparcenaryRights" options={{ title: "Equal Coparcenary Rights for Daughters" }} />
     </Stack>
   );
 }

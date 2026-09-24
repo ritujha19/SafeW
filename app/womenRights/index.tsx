@@ -79,31 +79,31 @@ export default function womenRights() {
       </Pressable>
       <Pressable
         style={styles.buttons}
-        onPress={() => console.log("Family & Marriage Rights Button pressed")}
+        onPress={() => router.navigate("/womenRights/familyMarriageRights")}
       >
         <Text style={styles.content}>Family & Marriage Rights</Text>
       </Pressable>
       <Pressable
         style={styles.buttons}
-        onPress={() => console.log("Digital Rights Button pressed")}
+        onPress={() => router.navigate("/womenRights/digitalRights")}
       >
         <Text style={styles.content}>Digital Rights</Text>
       </Pressable>
       <Pressable
         style={styles.buttons}
-        onPress={() => console.log("Rights When Seeking Help Button pressed")}
+        onPress={() => router.navigate("/womenRights/rightsSeekingHelp")}
       >
         <Text style={styles.content}>Rights When Seeking Help</Text>
       </Pressable>
       <Pressable
         style={styles.buttons}
-        onPress={() => console.log("Rights of Children Button pressed")}
+        onPress={() => router.navigate("/womenRights/rightsOfChildren")}
       >
         <Text style={styles.content}>Rights of Children</Text>
       </Pressable>
       <Pressable
         style={styles.buttons}
-        onPress={() => console.log("Free Legal Aids Button pressed")}
+        onPress={() => router.navigate("/womenRights/freeLegalAids")}
       >
         <Text style={styles.content}>Free Legal Aids</Text>
       </Pressable>

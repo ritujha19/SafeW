@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 type LegalSection = {
   law: string;
@@ -314,36 +308,32 @@ export default function PropertyInheritanceRights() {
       style={styles.container}
       contentContainerStyle={{ paddingBottom: 30 }}
     >
-      <Text style={styles.sectionTitle}>
-        🏠 Property & Inheritance Rights
-      </Text>
+      <Text style={styles.sectionTitle}>🏠 Property & Inheritance Rights</Text>
 
       <Text style={styles.content}>
-        A woman&asop;s rights in property can arise from ownership,
-        inheritance, joint ownership or succession. The exact rules
-        depend on the applicable law, the type of property and whether
-        the person who owned the property left a valid will.
+        A woman&apos;s rights in property can arise from ownership, inheritance,
+        joint ownership or succession. The exact rules depend on the applicable
+        law, the type of property and whether the person who owned the property
+        left a valid will.
       </Text>
 
       <View style={styles.lawNote}>
         <Text style={styles.lawNoteTitle}>
-          ⚖️ Parents&asop; property vs husband&asop;s property
+          ⚖️ Parents&apos; property vs husband&apos;s property
         </Text>
 
         <Text style={styles.lawNoteText}>
-          A woman can have inheritance rights in her parents&asop; property
-          and may also have inheritance rights in her husband&asop;s estate.
-          These are separate legal questions.
+          A woman can have inheritance rights in her parents&apos; property and
+          may also have inheritance rights in her husband&apos;s estate. These
+          are separate legal questions.
         </Text>
 
-        <Text style={styles.note}>
-          Important
-        </Text>
+        <Text style={styles.note}>Important</Text>
 
         <Text style={styles.lawNoteText}>
-          Marriage does not automatically make a woman a co-owner of
-          every property owned by her husband. Likewise, inheritance
-          shares are not automatically the same for every family.
+          Marriage does not automatically make a woman a co-owner of every
+          property owned by her husband. Likewise, inheritance shares are not
+          automatically the same for every family.
         </Text>
       </View>
 
@@ -359,40 +349,26 @@ export default function PropertyInheritanceRights() {
               onPress={() => toggleAccordion(id)}
             >
               <View style={styles.accordionContent}>
-                <Text style={styles.articleLabel}>
-                  {item.section}
-                </Text>
+                <Text style={styles.articleLabel}>{item.section}</Text>
 
-                <Text style={styles.accordionText}>
-                  {item.law}
-                </Text>
+                <Text style={styles.accordionText}>{item.law}</Text>
               </View>
 
-              <Text style={styles.arrow}>
-                {isExpanded ? "▼" : "▶"}
-              </Text>
+              <Text style={styles.arrow}>{isExpanded ? "▼" : "▶"}</Text>
             </Pressable>
 
             {isExpanded && (
               <View style={styles.expandedContent}>
-                <Text style={styles.nestedTitle}>
-                  {item.title}
-                </Text>
+                <Text style={styles.nestedTitle}>{item.title}</Text>
 
-                <Text style={styles.expandedText}>
-                  {item.meaning}
-                </Text>
+                <Text style={styles.expandedText}>{item.meaning}</Text>
 
                 {item.important && (
                   <>
-                    <Text style={styles.nestedTitle}>
-                      Important
-                    </Text>
+                    <Text style={styles.nestedTitle}>Important</Text>
 
                     <View style={styles.importantBox}>
-                      <Text style={styles.importantText}>
-                        {item.important}
-                      </Text>
+                      <Text style={styles.importantText}>{item.important}</Text>
                     </View>
                   </>
                 )}
@@ -404,9 +380,7 @@ export default function PropertyInheritanceRights() {
                     // Add navigation to the detailed section page later.
                   }}
                 >
-                  <Text style={styles.viewMoreText}>
-                    View More →
-                  </Text>
+                  <Text style={styles.viewMoreText}>View More →</Text>
                 </Pressable>
               </View>
             )}
@@ -415,34 +389,29 @@ export default function PropertyInheritanceRights() {
       })}
 
       <View style={styles.lawNote}>
-        <Text style={styles.lawNoteTitle}>
-          📌 Remember
-        </Text>
+        <Text style={styles.lawNoteTitle}>📌 Remember</Text>
 
         <Text style={styles.lawNoteText}>
-          A woman&asop;s property rights can be affected by the applicable
-          succession law, a valid will, the nature of the property and
-          the identity of the surviving heirs.
+          A woman&apos;s property rights can be affected by the applicable
+          succession law, a valid will, the nature of the property and the
+          identity of the surviving heirs.
         </Text>
 
-        <Text style={styles.note}>
-          Need legal help?
-        </Text>
+        <Text style={styles.note}>Need legal help?</Text>
 
         <Text style={styles.lawNoteText}>
-          If there is a dispute about property, inheritance or
-          ownership, legal-aid services or a qualified lawyer can
-          help determine which law and procedure apply.
+          If there is a dispute about property, inheritance or ownership,
+          legal-aid services or a qualified lawyer can help determine which law
+          and procedure apply.
         </Text>
       </View>
 
       <View style={styles.sourceBox}>
         <Text style={styles.sourceText}>
-          SafeW provides general legal information for awareness and
-          education. Property and succession law can depend heavily
-          on individual facts and the applicable legal framework.
-          This information is not a substitute for advice from a
-          qualified legal professional.
+          SafeW provides general legal information for awareness and education.
+          Property and succession law can depend heavily on individual facts and
+          the applicable legal framework. This information is not a substitute
+          for advice from a qualified legal professional.
         </Text>
       </View>
     </ScrollView>
