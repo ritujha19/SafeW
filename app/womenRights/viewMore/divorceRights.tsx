@@ -470,11 +470,11 @@ export default function DivorceRights() {
             >
               <View style={styles.accordionContent}>
                 <Text style={styles.lawLabel}>
-                  {item.section}
+                  {item.title}
                 </Text>
 
                 <Text style={styles.accordionText}>
-                  {item.title}
+                  {item.section}
                 </Text>
               </View>
 

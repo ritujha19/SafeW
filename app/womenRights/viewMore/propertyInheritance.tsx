@@ -349,9 +349,9 @@ export default function PropertyInheritanceRights() {
               onPress={() => toggleAccordion(id)}
             >
               <View style={styles.accordionContent}>
-                <Text style={styles.articleLabel}>{item.section}</Text>
+                <Text style={styles.articleLabel}>{item.law}</Text>
 
-                <Text style={styles.accordionText}>{item.law}</Text>
+                <Text style={styles.accordionText}>{item.section}</Text>
               </View>
 
               <Text style={styles.arrow}>{isExpanded ? "▼" : "▶"}</Text>
@@ -372,16 +372,6 @@ export default function PropertyInheritanceRights() {
                     </View>
                   </>
                 )}
-
-                <Pressable
-                  accessibilityRole="button"
-                  style={styles.viewMoreButton}
-                  onPress={() => {
-                    // Add navigation to the detailed section page later.
-                  }}
-                >
-                  <Text style={styles.viewMoreText}>View More →</Text>
-                </Pressable>
               </View>
             )}
           </View>

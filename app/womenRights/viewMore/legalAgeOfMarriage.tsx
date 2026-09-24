@@ -400,11 +400,11 @@ export default function LegalAgeMarriage() {
             >
               <View style={styles.sectionButtonContent}>
                 <Text style={styles.sectionNumber}>
-                  📖 {item.section}
+                  📖 {item.title}
                 </Text>
 
                 <Text style={styles.sectionTitle}>
-                  {item.title}
+                  {item.section}
                 </Text>
               </View>
 

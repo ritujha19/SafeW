@@ -73,7 +73,7 @@ export default function RootLayout() {
         options={{ title: "Digital Rights" }}
       />
       <Stack.Screen
-        name="womenRights/rightsWhenSeekingHelp"
+        name="womenRights/rightsSeekingHelp"
         options={{ title: "Rights When Seeking Help" }}
       />
       <Stack.Screen
@@ -84,13 +84,34 @@ export default function RootLayout() {
         name="womenRights/freeLegalAids"
         options={{ title: "Free Legal Aids" }}
       />
-      <Stack.Screen name="womenRights/viewMore/legalAgeOfMarriage" options={{ title: "Legal Age of Marriage" }} />
-      <Stack.Screen name="womenRights/viewMore/marriageRegistration" options={{ title: "Marriage Registration" }} />
-      <Stack.Screen name="womenRights/viewMore/rightsWithinMarriage" options={{ title: "Rights Within Marriage" }} />
-      <Stack.Screen name="womenRights/viewMore/divorceRights" options={{ title: "Divorce Rights" }} />
-      <Stack.Screen name="womenRights/viewMore/maintenance" options={{ title: "Maintenance" }} />
-      <Stack.Screen name="womenRights/viewMore/propertyInheritance" options={{ title: "Property & Inheritance" }} />
-      <Stack.Screen name="womenRights/viewMore/coparcenaryRights" options={{ title: "Equal Coparcenary Rights for Daughters" }} />
+      <Stack.Screen
+        name="womenRights/viewMore/legalAgeOfMarriage"
+        options={{ title: "Legal Age of Marriage" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/marriageRegistration"
+        options={{ title: "Marriage Registration" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/rightsWithinMarriage"
+        options={{ title: "Rights Within Marriage" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/divorceRights"
+        options={{ title: "Divorce Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/maintenance"
+        options={{ title: "Maintenance" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/propertyInheritance"
+        options={{ title: "Property & Inheritance" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/coparcenaryRights"
+        options={{ title: "Equal Coparcenary Rights for Daughters" }}
+      />
     </Stack>
   );
 }

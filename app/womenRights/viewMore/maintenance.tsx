@@ -444,11 +444,11 @@ export default function MaintenanceRights() {
             >
               <View style={styles.accordionContent}>
                 <Text style={styles.articleLabel}>
-                  {item.section}
+                  {item.law}
                 </Text>
 
                 <Text style={styles.accordionText}>
-                  {item.law}
+                  {item.section}
                 </Text>
               </View>
 

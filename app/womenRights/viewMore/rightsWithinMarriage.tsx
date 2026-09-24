@@ -348,9 +348,9 @@ const legalSections: LegalSection[] = [
               onPress={() => toggleAccordion(id)}
             >
               <View style={styles.accordionContent}>
-                <Text style={styles.lawLabel}>{item.section}</Text>
+                <Text style={styles.lawLabel}>{item.title}</Text>
 
-                <Text style={styles.accordionText}>{item.title}</Text>
+                <Text style={styles.accordionText}>{item.section}</Text>
               </View>
 
               <Text style={styles.arrow}>{isExpanded ? "▼" : "▶"}</Text>
