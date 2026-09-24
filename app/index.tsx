@@ -1,120 +1,200 @@
-import { useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
 import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+  type IconName,
+  LordIcon,
+  type LordIconHandle,
+  LottieAnim,
+  type LottieSource,
+} from "@/components/Media";
+import { PressableScale } from "@/components/PressableScale";
+import { Body, Display, Heading } from "@/components/Typography";
+import { lordicon, lottie } from "@/constants/media";
+import { colors, shadow } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { useRef } from "react";
+import { ScrollView, Text, View } from "react-native";
+import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type ActionCardProps = {
-  title: string;
-  description: string;
-  icon: string;
-  className: string;
-  onPress: () => void;
-};
+/* ---------------------------- small pieces ---------------------------- */
 
-function ActionCard({
+const toolAccents = {
+  dusk: { chip: "bg-dusk-50", icon: colors.dusk[600] },
+  haven: { chip: "bg-haven-soft", icon: colors.havenDark },
+  marigold: { chip: "bg-marigold-soft", icon: colors.marigoldDark },
+} as const;
+
+function ToolCard({
   title,
   description,
   icon,
-  className,
+  source,
+  accent,
   onPress,
-}: ActionCardProps) {
+}: {
+  title: string;
+  description: string;
+  icon: IconName;
+  source?: LottieSource;
+  accent: keyof typeof toolAccents;
+  onPress: () => void;
+}) {
+  const iconRef = useRef<LordIconHandle>(null);
+  const a = toolAccents[accent];
   return (
-    <Pressable
-      className={`rounded-2xl bg-white p-5 shadow-sm ${className}`}
+    <PressableScale
+      className="flex-row items-center rounded-[26px] border border-mist bg-white p-4"
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      onPressIn={() => iconRef.current?.play()}
       onPress={onPress}
-      style={({ pressed }) => ({ opacity: pressed ? 0.78 : 1 })}
     >
-      <View className="mb-4 h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
-        <Text className="text-2xl">{icon}</Text>
+      <View
+        className={`mr-4 h-14 w-14 items-center justify-center rounded-2xl ${a.chip}`}
+      >
+        <LordIcon
+          ref={iconRef}
+          source={source}
+          fallback={icon}
+          size={34}
+          color={a.icon}
+        />
       </View>
-      <Text className="text-lg font-bold text-slate-900">{title}</Text>
-      <Text className="mt-1 text-sm leading-5 text-slate-500">
-        {description}
-      </Text>
-    </Pressable>
+      <View className="flex-1 pr-2">
+        <Heading>{title}</Heading>
+        <Body size="sm" className="mt-0.5">
+          {description}
+        </Body>
+      </View>
+      <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+    </PressableScale>
   );
 }
 
-function Index() {
+/* -------------------------------- screen ------------------------------- */
+
+export default function Home() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   return (
     <ScrollView
-      className="flex-1 bg-slate-50"
+      className="flex-1 bg-paper"
       contentContainerStyle={{
-        paddingTop: insets.top + 24,
-        paddingBottom: insets.bottom + 32,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        paddingBottom: insets.bottom + 28,
       }}
+      showsVerticalScrollIndicator={false}
     >
-      <View className="mb-8">
-        <Text className="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
-          Your safety matters.
-        </Text>
-        <Text className="mt-3 text-base leading-6 text-slate-500">
+      {/* One orchestrated entrance: headline, then the SOS card, then the rest. */}
+      <Animated.View entering={FadeInDown.duration(450)} className="mb-5 mt-1">
+        <Display size="xl">Your safety matters.</Display>
+        <Body className="mt-3 mb-5">
           Get support, learn practical safety skills, and stay connected to the
           people you trust.
-        </Text>
-      </View>
+        </Body>
+      </Animated.View>
 
-      <Pressable
-        className="mb-5 rounded-2xl bg-red-600 p-5 shadow-sm"
-        onPress={() => router.navigate("/emergency")}
-        style={({ pressed }) => ({ opacity: pressed ? 0.82 : 1 })}
-      >
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1 pr-4">
-            <Text className="text-sm font-bold uppercase tracking-widest text-red-100">
-              Need help now?
-            </Text>
-            <Text className="mt-2 text-2xl font-extrabold text-white">
-              I&apos;m in danger
-            </Text>
-            <Text className="mt-1 text-sm leading-5 text-red-100">
-              Open emergency support and contact options.
+     <Animated.View entering={ZoomIn.delay(140).springify().damping(16)}>
+  <PressableScale
+    haptic="heavy"
+    pressedScale={0.985}
+    accessibilityRole="button"
+    accessibilityLabel="I'm in danger. Open emergency support."
+    onPress={() => router.navigate("/emergency")}
+    wrapperStyle={[
+      shadow.lift,
+      { borderRadius: 28 },
+    ]}
+    style={{ borderRadius: 28, overflow: "hidden" }}
+  >
+    <LinearGradient
+      colors={[colors.beacon, colors.beaconDark]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        minHeight: 150,
+        justifyContent: "center",
+      }}
+    >
+      <View className="flex-row items-center justify-between">
+        {/* Left Content */}
+        <View className="flex-1 pr-3">
+          <Text className="font-bodyMedium text-[13px] text-white/85">
+            Need help right now?
+          </Text>
+          <Text className="mt-1 font-display text-[26px] leading-[30px] text-white">
+            I&apos;m in danger
+          </Text>
+          <Text className="mt-2 font-body text-[13px] leading-5 text-white/90">
+            Open emergency support and contact options.
+          </Text>
+        </View>
+
+        {/* Right SOS Icon Container */}
+        <View className="relative h-[110px] w-[110px] items-center justify-center">
+          {/* Subtle Outer Glow / Ring */}
+          <View className="absolute inset-0 rounded-full border-2 border-white/25" />
+
+          {/* Lottie Animation Centered */}
+          <View className="absolute items-center justify-center">
+            <LottieAnim
+              source={lottie.sosPulse}
+              size={120}
+              reducedProgress={0.4}
+            />
+          </View>
+
+          {/* Core White SOS Badge */}
+          <View className="h-[64px] w-[64px] items-center justify-center rounded-full bg-white shadow-md">
+            <Text className="font-display text-[20px] font-bold text-beacon-dark">
+              SOS
             </Text>
           </View>
-          <Text className="text-4xl">!</Text>
         </View>
-      </Pressable>
-
-      <Text className="mb-3 text-sm font-bold uppercase tracking-widest text-slate-500">
-        Your tools
-      </Text>
-      <View className="gap-4">
-        <ActionCard
-          title="Safety Assistant"
-          description="Get guidance when you feel unsure about a situation."
-          icon="?"
-          className="border-l-4 border-indigo-600"
-          onPress={() => console.log("ai Button pressed")}
-        />
-        <ActionCard
-          title="Learn & Prepare"
-          description="Practice real-life safety situations and build confidence."
-          icon="+"
-          className="border-l-4 border-emerald-600"
-          onPress={() => router.navigate("./learn")}
-        />
-        <ActionCard
-          title="Women's Rights"
-          description="Learn about your rights and the support available to you."
-          icon="+"
-          className="border-l-4 border-amber-500"
-          onPress={() => router.navigate("./womenRights")}
-        />
       </View>
-    </ScrollView>
-  );
-}
+    </LinearGradient>
+  </PressableScale>
+</Animated.View>
 
-export default function App() {
-  return (
-    <SafeAreaProvider>
-      <Index />
-    </SafeAreaProvider>
+      <Animated.View
+        entering={FadeInDown.delay(360).duration(420)}
+        className="mt-6"
+      >
+        <Heading size="lg" className="mb-3 mt-10">
+          Your tools
+        </Heading>
+        <View className="gap-3">
+          <ToolCard
+            title="Safety Assistant"
+            description="Get guidance when you feel unsure about a situation."
+            icon="chatbubble-ellipses-outline"
+            source={lordicon.assistant}
+            accent="dusk"
+            onPress={() => console.log("ai Button pressed")}
+          />
+          <ToolCard
+            title="Learn & Prepare"
+            description="Practice real-life safety situations and build confidence."
+            icon="school-outline"
+            source={lordicon.learn}
+            accent="haven"
+            onPress={() => router.navigate("/learn")}
+          />
+          <ToolCard
+            title="Women's Rights"
+            description="Learn about your rights and the support available to you."
+            icon="scale-outline"
+            source={lordicon.rights}
+            accent="marigold"
+            onPress={() => router.navigate("/womenRights")}
+          />
+        </View>
+      </Animated.View>
+    </ScrollView>
   );
 }

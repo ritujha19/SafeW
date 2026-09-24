@@ -1,36 +1,87 @@
+import { BrandMark, HeaderProfileButton } from "@/components/Header";
+import { colors } from "@/constants/theme";
+import { BricolageGrotesque_600SemiBold } from "@expo-google-fonts/bricolage-grotesque/600SemiBold";
+import { BricolageGrotesque_700Bold } from "@expo-google-fonts/bricolage-grotesque/700Bold";
+import { Figtree_400Regular } from "@expo-google-fonts/figtree/400Regular";
+import { Figtree_500Medium } from "@expo-google-fonts/figtree/500Medium";
+import { Figtree_700Bold } from "@expo-google-fonts/figtree/700Bold";
+import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
-import { Pressable, Text } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 import { isLoggedIn } from "../auth";
 import "../global.css";
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const router = useRouter();
+
+  const [fontsLoaded] = useFonts({
+    BricolageGrotesque_600SemiBold,
+    BricolageGrotesque_700Bold,
+    Figtree_400Regular,
+    Figtree_500Medium,
+    Figtree_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
 
   const handleProfilePress = () => {
     router.navigate(isLoggedIn ? "/profile" : "/login");
   };
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.paper },
+        headerShadowVisible: false,
+        headerTintColor: colors.midnight,
+        headerTitleStyle: {
+          fontFamily: "BricolageGrotesque_700Bold",
+          fontSize: 18,
+          color: colors.midnight,
+        },
+        contentStyle: { backgroundColor: colors.paper },
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
           title: "SAFE-W",
+          headerTitle: () => <BrandMark />,
           headerRight: () => (
-            <Pressable onPress={handleProfilePress}>
-              <Text style={{ fontSize: 24, padding: 10 }}>👤</Text>
-            </Pressable>
+            <HeaderProfileButton onPress={handleProfilePress} />
           ),
         }}
       />
-      <Stack.Screen name="createAcc" options={{ title: "Create Account " }} />
-      <Stack.Screen name="emergency" options={{ title: "Emergency" }} />
+      <Stack.Screen name="createAcc" options={{ title: "Create Account" }} />
+      <Stack.Screen
+        name="emergency"
+        options={{
+          title: "Emergency",
+          // Dark screen: the header matches the top of its gradient.
+          headerStyle: { backgroundColor: colors.midnight },
+          headerTintColor: "#FFFFFF",
+          headerTitleStyle: {
+            fontFamily: "BricolageGrotesque_700Bold",
+            fontSize: 18,
+            color: "#FFFFFF",
+          },
+        }}
+      />
       <Stack.Screen name="location" options={{ title: "Location" }} />
       <Stack.Screen name="login" options={{ title: "Login" }} />
+      <Stack.Screen name="profile" options={{ title: "Your Account" }} />
       <Stack.Screen
         name="trustedContact"
         options={{ title: "Trusted Contacts" }}
       />
+
       <Stack.Screen name="learn/index" options={{ title: "Learn & Prepare" }} />
       <Stack.Screen
         name="learn/whatCounts"
@@ -48,6 +99,7 @@ export default function RootLayout() {
         name="learn/prepareYourself"
         options={{ title: "Prepare Yourself" }}
       />
+
       <Stack.Screen
         name="womenRights/index"
         options={{ title: "Women's Rights" }}
@@ -84,6 +136,7 @@ export default function RootLayout() {
         name="womenRights/freeLegalAids"
         options={{ title: "Free Legal Aids" }}
       />
+
       <Stack.Screen
         name="womenRights/viewMore/legalAgeOfMarriage"
         options={{ title: "Legal Age of Marriage" }}
@@ -111,6 +164,18 @@ export default function RootLayout() {
       <Stack.Screen
         name="womenRights/viewMore/coparcenaryRights"
         options={{ title: "Equal Coparcenary Rights for Daughters" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/dowryProhibition"
+        options={{ title: "Dowry Prohibition" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/rightsInSharedHousehold"
+        options={{ title: "Rights in a Shared Household" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/rightsAfterDivorce"
+        options={{ title: "Rights After Divorce" }}
       />
     </Stack>
   );
