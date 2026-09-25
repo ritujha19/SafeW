@@ -1,4 +1,35 @@
 import * as Location from "expo-location";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
+
+import { auth } from "./firebase";
+
+// `displayName` is optional so existing callers (if any) still work.
+// createAcc.tsx passes the username the person typed, so their name shows
+// up on the Firebase user record instead of being silently dropped.
+export const signUp = async (
+  email: string,
+  password: string,
+  displayName?: string,
+) => {
+  const credential = await createUserWithEmailAndPassword(auth, email, password);
+  if (displayName) {
+    await updateProfile(credential.user, { displayName });
+  }
+  return credential;
+};
+
+export const login = async (email: string, password: string) => {
+  return signInWithEmailAndPassword(auth, email, password);
+};
+
+export const logout = async () => {
+  return signOut(auth);
+};
 
 export let isLoggedIn = false;
 
