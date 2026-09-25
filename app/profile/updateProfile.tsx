@@ -1,10 +1,5 @@
 import { useRouter } from "expo-router";
-import {
-  updateEmail,
-  updateProfile as updateFirebaseProfile,
-  updatePassword,
-  reload,
-} from "firebase/auth";
+import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import React, { useState } from "react";
 import { Alert, Text, TextInput, View } from "react-native";
 
@@ -18,10 +13,8 @@ export default function UpdateProfile() {
   const currentUser = auth.currentUser;
 
   const [name, setName] = useState(currentUser?.displayName ?? "");
-  const [email, setEmail] = useState(currentUser?.email ?? "");
-  const [password, setPassword] = useState("");
-  const [showPasswordField, setShowPasswordField] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   async function handleUpdateProfile() {
     if (!currentUser) {
@@ -34,51 +27,56 @@ export default function UpdateProfile() {
       return;
     }
 
-    if (showPasswordField && !password.trim()) {
-      Alert.alert("Password required", "Please enter a new password.");
-      return;
-    }
+    try {
+      setSaving(true);
 
-    if (showPasswordField && password.trim().length < 6) {
+      await updateProfile(currentUser, {
+        displayName: name.trim(),
+      });
+
       Alert.alert(
-        "Password too short",
-        "Use at least 6 characters for the new password.",
+        "Profile updated",
+        "Your profile has been updated successfully.",
+      );
+
+      router.back();
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Unable to update your profile.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleResetPassword() {
+    const email = currentUser?.email;
+
+    if (!email) {
+      Alert.alert(
+        "Email unavailable",
+        "No email address is associated with this account.",
       );
       return;
     }
 
     try {
-      setSaving(true);
+      setResettingPassword(true);
 
-      await updateFirebaseProfile(currentUser, {
-        displayName: name.trim(),
-        
-      });
+      await sendPasswordResetEmail(auth, email);
 
-      if (email.trim() !== (currentUser.email ?? "")) {
-        await updateEmail(currentUser, email.trim());
-      }
-
-      if (showPasswordField && password.trim()) {
-        await updatePassword(currentUser, password.trim());
-      }
-      await reload(currentUser);
-      
       Alert.alert(
-        "Profile updated",
-        "Your profile has been updated successfully.",
+        "Reset email sent",
+        `A password reset link has been sent to ${email}. Check your inbox and follow the instructions to create a new password.`,
       );
-      router.back();
     } catch (error) {
       console.error(error);
-      const message =
-        error instanceof Error &&
-        error.message.includes("requires-recent-login")
-          ? "Please log in again and try updating your password."
-          : "Unable to update your profile.";
-      Alert.alert("Error", message);
+
+      Alert.alert(
+        "Unable to send email",
+        "We couldn't send the password reset email. Please try again.",
+      );
     } finally {
-      setSaving(false);
+      setResettingPassword(false);
     }
   }
 
@@ -87,12 +85,15 @@ export default function UpdateProfile() {
       <Heading size="lg">Update Profile</Heading>
 
       <Body className="mt-2">
-        Update your name and contact details, or change your password when
-        needed.
+        Update your name or reset your password using your email.
       </Body>
 
+      {/* Name */}
       <View className="mt-6">
-        <Text className="mb-2 font-bodyBold text-dusk-900">Name</Text>
+        <Text className="mb-2 font-bodyBold text-dusk-900">
+          Name
+        </Text>
+
         <TextInput
           value={name}
           onChangeText={setName}
@@ -102,51 +103,57 @@ export default function UpdateProfile() {
         />
       </View>
 
+      {/* Email */}
       <View className="mt-6">
-        <Text className="mb-2 font-bodyBold text-dusk-900">Email</Text>
+        <Text className="mb-2 font-bodyBold text-dusk-900">
+          Email
+        </Text>
+
         <TextInput
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Enter your email"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          className="rounded-2xl border border-mist bg-white px-4 py-3 text-base"
+          value={currentUser?.email ?? ""}
+          editable={false}
+          className="rounded-2xl border border-mist bg-gray-100 px-4 py-3 text-base"
         />
       </View>
-      <Button
-        variant="soft"
-        label={showPasswordField ? "Hide password change" : "Forgot Password"}
-        className="mt-6"
-        onPress={() => setShowPasswordField((value) => !value)}
-        disabled={saving}
-      />
 
-      {showPasswordField ? (
-        <View className="mt-6">
-          <Text className="mb-2 font-bodyBold text-dusk-900">New password</Text>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your new password"
-            secureTextEntry
-            className="rounded-2xl border border-mist bg-white px-4 py-3 text-base"
-          />
-        </View>
-      ) : null}
+      {/* Reset Password */}
+      <View className="mt-6">
+        <Text className="mb-2 font-bodyBold text-dusk-900">
+          Password
+        </Text>
 
+       <Button
+  variant="soft"
+  label={
+    resettingPassword
+      ? "Sending..."
+      : "Reset Password"
+  }
+  onPress={handleResetPassword}
+  disabled={resettingPassword || saving}
+/>
+
+<Text className="mt-2 text-sm text-gray-500">
+  A password reset link will be sent to your email. If you don&asop;t see it in
+  your inbox, please check your Spam or Junk folder.
+</Text>
+      </View>
+
+      {/* Save */}
       <Button
         label={saving ? "Saving..." : "Update Profile"}
         className="mt-6"
         onPress={handleUpdateProfile}
-        disabled={saving}
+        disabled={saving || resettingPassword}
       />
 
+      {/* Cancel */}
       <Button
         variant="outline"
         label="Cancel"
         className="mt-3"
         onPress={() => router.back()}
-        disabled={saving}
+        disabled={saving || resettingPassword}
       />
     </Screen>
   );

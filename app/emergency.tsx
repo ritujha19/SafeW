@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Linking, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -31,22 +32,26 @@ const call = (number: string) => {
 export default function Emergency() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-
+  const [sharingLocation, setSharingLocation] = useState(false);
   const handleShareLocation = async () => {
+  try {
+    setSharingLocation(true);
+
     const result = await requestAndShareCurrentLocation();
 
     if (!result.success) {
-      alert("Location permission is needed before sharing your location.");
+      alert("Location permission is needed before sharing.");
       return;
     }
 
-    const contacts = trustedContacts.length
-      ? trustedContacts.map((contact) => contact.name || "Trusted contact").join(", ")
-      : "No trusted contacts saved yet";
-
-    console.log("Sharing location with:", contacts, result.location);
     router.navigate("/profile/location");
-  };
+  } catch (error) {
+    console.error("Location sharing error:", error);
+    alert("Unable to get your location. Please try again.");
+  } finally {
+    setSharingLocation(false);
+  }
+};
 
   return (
     <LinearGradient
@@ -120,12 +125,13 @@ export default function Emergency() {
 
         <View className="mt-8">
           <Button
-            variant="light"
-            icon="location"
-            label="Share my location"
-            haptic="medium"
-            onPress={handleShareLocation}
-          />
+  variant="light"
+  icon="location"
+  label={sharingLocation ? "Getting location..." : "Share my location"}
+  haptic="medium"
+  onPress={handleShareLocation}
+  disabled={sharingLocation}
+/>
           <Body tone="soft" size="sm" className="mt-3 text-center">
             {trustedContacts.length > 0
               ? `${trustedContacts.length} trusted contact${trustedContacts.length === 1 ? "" : "s"} saved`

@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import type { ReactNode } from "react";
+import {useFocusEffect, useRouter } from "expo-router";
+import {useCallback, useState, type ReactNode } from "react";
 import { Text, View } from "react-native";
 import {
   requestAndShareCurrentLocation,
@@ -55,8 +55,16 @@ function SetupRow({
 
 export default function Profile() {
   const router = useRouter();
-  const user = auth.currentUser;
-  const name = user?.displayName ?? "there";
+  const [name, setName] = useState(auth.currentUser?.displayName ?? "User");
+  useFocusEffect(
+  useCallback(() => {
+    const currentUser = auth.currentUser;
+
+    if (currentUser) {
+      setName(currentUser.displayName ?? "User");
+    }
+  }, [])
+);
   const [status] = Location.useForegroundPermissions();
   const permissionGranted = status?.status === "granted";
 
