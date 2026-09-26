@@ -30,7 +30,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email.trim(), password);
-router.navigate("/profile/profile");
+      router.replace("/profile/profile");
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {
@@ -51,7 +51,11 @@ router.navigate("/profile/profile");
           <Body>New to SAFE-W? </Body>
           <Link
             href="/profile/createAcc"
-            style={{ fontFamily: "Figtree_700Bold", fontSize: 16, color: colors.dusk[600] }}
+            style={{
+              fontFamily: "Figtree_700Bold",
+              fontSize: 16,
+              color: colors.dusk[600],
+            }}
           >
             Create an account
           </Link>
@@ -59,7 +63,11 @@ router.navigate("/profile/profile");
       }
     >
       {error ? (
-        <Callout tone="danger" icon="alert-circle-outline" title="Couldn't log in">
+        <Callout
+          tone="danger"
+          icon="alert-circle-outline"
+          title="Couldn't log in"
+        >
           {error}
         </Callout>
       ) : null}

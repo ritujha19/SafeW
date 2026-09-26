@@ -1,17 +1,16 @@
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import { Linking, ScrollView, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { requestAndShareCurrentLocation, trustedContacts } from "@/auth";
+import { trustedContacts } from "@/auth";
 import { Button } from "@/components/Button";
 import { LottieAnim } from "@/components/Media";
 import { PressableScale } from "@/components/PressableScale";
 import { Body, Display } from "@/components/Typography";
 import { lottie } from "@/constants/media";
 import { colors, shadow } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { Linking, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const helplines = [
   {
@@ -32,26 +31,6 @@ const call = (number: string) => {
 export default function Emergency() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [sharingLocation, setSharingLocation] = useState(false);
-  const handleShareLocation = async () => {
-  try {
-    setSharingLocation(true);
-
-    const result = await requestAndShareCurrentLocation();
-
-    if (!result.success) {
-      alert("Location permission is needed before sharing.");
-      return;
-    }
-
-    router.navigate("/profile/location");
-  } catch (error) {
-    console.error("Location sharing error:", error);
-    alert("Unable to get your location. Please try again.");
-  } finally {
-    setSharingLocation(false);
-  }
-};
 
   return (
     <LinearGradient
@@ -60,21 +39,28 @@ export default function Emergency() {
     >
       <StatusBar style="light" />
       <ScrollView
-        contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 32 }}
+        contentContainerStyle={{
+          padding: 24,
+          paddingBottom: insets.bottom + 32,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <Display size="xl" tone="white">
           Are you in immediate danger?
         </Display>
         <Body tone="soft" className="mt-3">
-          If you can, call 112 now. You can also share your location with the people you trust.
+          If you can, call 112 now. You can also share your location with the
+          people you trust.
         </Body>
-
-        {/* The one big action */}
+        =
         <View className="items-center py-4">
           <View className="h-[300px] w-[300px] items-center justify-center">
             <View style={{ position: "absolute" }}>
-              <LottieAnim source={lottie.emergencyPulse} size={300} reducedProgress={0.35} />
+              <LottieAnim
+                source={lottie.emergencyPulse}
+                size={300}
+                reducedProgress={0.35}
+              />
             </View>
             <PressableScale
               haptic="heavy"
@@ -94,7 +80,6 @@ export default function Emergency() {
             Emergency Response Support System (ERSS)
           </Body>
         </View>
-
         {/* Other helplines */}
         <View className="mt-4 gap-3">
           {helplines.map((line) => (
@@ -122,16 +107,13 @@ export default function Emergency() {
             </PressableScale>
           ))}
         </View>
-
         <View className="mt-8">
           <Button
-  variant="light"
-  icon="location"
-  label={sharingLocation ? "Getting location..." : "Share my location"}
-  haptic="medium"
-  onPress={handleShareLocation}
-  disabled={sharingLocation}
-/>
+            variant="light"
+            icon="location"
+            label="Share your location"
+            onPress={() => router.navigate("/profile/location")}
+          />
           <Body tone="soft" size="sm" className="mt-3 text-center">
             {trustedContacts.length > 0
               ? `${trustedContacts.length} trusted contact${trustedContacts.length === 1 ? "" : "s"} saved`

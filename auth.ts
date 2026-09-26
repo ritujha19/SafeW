@@ -1,4 +1,6 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
+import { db } from "./firestore";
 import * as Location from "expo-location";
 import {
   createUserWithEmailAndPassword,
@@ -51,22 +53,22 @@ export const setTrustedContacts = (contacts: TrustedContact[]) => {
       name.trim().length > 0 || mobNumber.trim().length > 0,
   );
 };
-const getTrustedContactsKey = () => {
+const getTrustedContactsRef = () => {
   const user = auth.currentUser;
 
   if (!user) {
     return null;
   }
 
-  return `trustedContacts_${user.uid}`;
+  return doc(db, "users", user.uid, "private", "trustedContacts");
 };
 
 export const saveTrustedContacts = async (
   contacts: TrustedContact[],
 ) => {
-  const key = getTrustedContactsKey();
+  const contactRef = getTrustedContactsRef();
 
-  if (!key) {
+  if (!contactRef) {
     throw new Error("No user is currently logged in.");
   }
 
@@ -75,36 +77,57 @@ export const saveTrustedContacts = async (
       name.trim().length > 0 || mobNumber.trim().length > 0,
   );
 
-  await AsyncStorage.setItem(
-    key,
-    JSON.stringify(validContacts),
-  );
+  // Check whether this user already has contacts in Firestore.
+  const existingSnapshot = await getDoc(contactRef);
 
-  setTrustedContacts(validContacts);
+  const existingContacts: TrustedContact[] =
+    existingSnapshot.exists()
+      ? existingSnapshot.data().contacts ?? []
+      : [];
+
+  // Merge contacts from this device with contacts already in Firestore.
+  const mergedContacts = [...existingContacts];
+
+  for (const contact of validContacts) {
+    const alreadyExists = mergedContacts.some(
+      (existingContact) =>
+        existingContact.mobNumber.trim() === contact.mobNumber.trim(),
+    );
+
+    if (!alreadyExists) {
+      mergedContacts.push(contact);
+    }
+  }
+
+  await setDoc(contactRef, {
+    contacts: mergedContacts,
+  });
+
+  setTrustedContacts(mergedContacts);
 };
 
 export const loadTrustedContacts = async () => {
-  const key = getTrustedContactsKey();
+  const contactRef = getTrustedContactsRef();
 
-  if (!key) {
+  if (!contactRef) {
     setTrustedContacts([]);
     return [];
   }
 
-  const savedContacts = await AsyncStorage.getItem(key);
+  const snapshot = await getDoc(contactRef);
 
-  if (!savedContacts) {
+  if (!snapshot.exists()) {
     setTrustedContacts([]);
     return [];
   }
 
-  const contacts: TrustedContact[] = JSON.parse(savedContacts);
+  const contacts: TrustedContact[] =
+    snapshot.data().contacts ?? [];
 
   setTrustedContacts(contacts);
 
   return contacts;
 };
-
 export type SharedLocationState = {
   latitude: number | null;
   longitude: number | null;

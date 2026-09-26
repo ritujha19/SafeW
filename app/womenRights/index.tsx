@@ -16,9 +16,7 @@ const rights: { title: string; icon: IconName; route: string }[] = [
   { title: "Workplace Rights", icon: "briefcase-outline", route: "/womenRights/workplaceRights" },
   { title: "Family & Marriage Rights", icon: "home-outline", route: "/womenRights/familyMarriageRights" },
   { title: "Digital Rights", icon: "phone-portrait-outline", route: "/womenRights/digitalRights" },
-  // Matches the name registered in app/_layout.tsx (the old button pointed at
-  // "rightsSeekingHelp", which didn't match any registered screen).
-  { title: "Rights When Seeking Help", icon: "help-buoy-outline", route: "/womenRights/rightsWhenSeekingHelp" },
+  { title: "Rights When Seeking Help", icon: "help-buoy-outline", route: "/womenRights/rightsSeekingHelp" },
   { title: "Rights of Children", icon: "happy-outline", route: "/womenRights/rightsOfChildren" },
 ];
 
@@ -35,7 +33,6 @@ export default function WomenRights() {
         are available to you.
       </Body>
 
-      {/* The one action-oriented entry gets more weight */}
       <PressableScale
         accessibilityRole="button"
         accessibilityLabel="Free legal aid"

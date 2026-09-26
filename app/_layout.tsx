@@ -104,7 +104,7 @@ const handleProfilePress = () => {
       <Stack.Screen name="womenRights/workplaceRights" options={{ title: "Workplace Rights" }} />
       <Stack.Screen name="womenRights/familyMarriageRights" options={{ title: "Family & Marriage Rights" }} />
       <Stack.Screen name="womenRights/digitalRights" options={{ title: "Digital Rights" }} />
-      <Stack.Screen name="womenRights/rightsWhenSeekingHelp" options={{ title: "Rights When Seeking Help" }} />
+      <Stack.Screen name="womenRights/rightsSeekingHelp" options={{ title: "Rights When Seeking Help" }} />
       <Stack.Screen name="womenRights/rightsOfChildren" options={{ title: "Rights of Children" }} />
       <Stack.Screen name="womenRights/freeLegalAids" options={{ title: "Free Legal Aids" }} />
 

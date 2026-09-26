@@ -1,4 +1,4 @@
-import { trustedContacts, sharedLocationState } from "@/auth";
+import { trustedContacts, sharedLocationState, setSharedLocationState } from "@/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
@@ -34,6 +34,7 @@ const formatTimestamp = (value: unknown) =>
 
 export default function LocationScreen() {
   const [location, setLocation] = useState(sharedLocationState);
+
   const [permission, setPermission] =
     useState<Location.LocationPermissionResponse | null>(null);
 
@@ -41,13 +42,70 @@ export default function LocationScreen() {
     "I need help. Please check my location.",
   );
 
+  const [gettingLocation, setGettingLocation] = useState(true);
   const [sending, setSending] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
-      setLocation(sharedLocationState);
+      let active = true;
 
-      Location.getForegroundPermissionsAsync().then(setPermission);
+      const getCurrentLocation = async () => {
+        try {
+          setGettingLocation(true);
+
+          const permissionResult =
+            await Location.getForegroundPermissionsAsync();
+
+          if (!active) return;
+
+          setPermission(permissionResult);
+
+          if (permissionResult.status !== "granted") {
+            setGettingLocation(false);
+            return;
+          }
+
+          // Get ONE fresh location when this screen opens.
+          const currentLocation =
+            await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced,
+            });
+
+          if (!active) return;
+
+          const newLocation = {
+            latitude: currentLocation.coords.latitude,
+            longitude: currentLocation.coords.longitude,
+            accuracy: currentLocation.coords.accuracy,
+            timestamp: currentLocation.timestamp,
+            address: null,
+          };
+
+          setLocation(newLocation);
+
+          // Save the exact fresh coordinates so the rest of the app
+          // can use the same location if needed.
+          setSharedLocationState(currentLocation, null);
+        } catch (error) {
+          console.error("Location error:", error);
+
+          if (active) {
+            alert(
+              "Unable to get your current location. Please try again.",
+            );
+          }
+        } finally {
+          if (active) {
+            setGettingLocation(false);
+          }
+        }
+      };
+
+      getCurrentLocation();
+
+      return () => {
+        active = false;
+      };
     }, []),
   );
 
@@ -64,6 +122,13 @@ export default function LocationScreen() {
       return;
     }
 
+    if (!hasLocation) {
+      alert(
+        "Your current location is not available yet. Please wait a moment and try again.",
+      );
+      return;
+    }
+
     if (trustedContacts.length === 0) {
       alert(
         "Please add at least one trusted contact before sharing your location.",
@@ -76,43 +141,34 @@ export default function LocationScreen() {
       return;
     }
 
+    const phoneNumbers = trustedContacts
+      .map((contact) => contact.mobNumber.trim())
+      .filter((number) => number.length > 0);
+
+    if (phoneNumbers.length === 0) {
+      alert("Your trusted contacts do not have valid phone numbers.");
+      return;
+    }
+
     try {
       setSending(true);
 
-      // Get a fresh location before sending.
-      const currentLocation = await Location.getCurrentPositionAsync({});
+      // Use the SAME fresh location obtained when this screen opened.
+      const latitude = location.latitude;
+      const longitude = location.longitude;
 
-      const latitude = currentLocation.coords.latitude;
-      const longitude = currentLocation.coords.longitude;
-
-      setLocation({
-        ...sharedLocationState,
-        latitude,
-        longitude,
-        accuracy: currentLocation.coords.accuracy,
-        timestamp: currentLocation.timestamp,
-      });
-
-      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-
-      const finalMessage = `${message.trim()}\n\n📍 My current location:\n${mapsLink}`;
-
-      const phoneNumbers = trustedContacts
-        .map((contact) => contact.mobNumber.trim())
-        .filter((number) => number.length > 0);
-
-      if (phoneNumbers.length === 0) {
-        alert("Your trusted contacts do not have valid phone numbers.");
+      if (latitude === null || longitude === null) {
+        alert("Current location is unavailable.");
         return;
       }
 
-      const isAvailable = await SMS.isAvailableAsync();
+      const mapsLink =
+        `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
-      if (!isAvailable) {
-        alert("SMS is not available on this device.");
-        return;
-      }
+      const finalMessage =
+        `${message.trim()}\n\n📍 My current location:\n${mapsLink}`;
 
+      // Open the native SMS composer with the location already prepared.
       await SMS.sendSMSAsync(phoneNumbers, finalMessage);
     } catch (error) {
       console.error("SMS sharing error:", error);
@@ -151,7 +207,9 @@ export default function LocationScreen() {
 
         <View
           className={`mt-1 flex-row items-center rounded-full px-3 py-1.5 ${
-            permissionGranted ? "bg-haven-soft" : "bg-marigold-soft"
+            permissionGranted
+              ? "bg-haven-soft"
+              : "bg-marigold-soft"
           }`}
         >
           <Ionicons
@@ -175,9 +233,11 @@ export default function LocationScreen() {
                 : "text-marigold-dark"
             }`}
           >
-            {permissionGranted
-              ? "Location access: granted"
-              : "Location access: not granted"}
+            {gettingLocation
+              ? "Getting your current location..."
+              : permissionGranted
+                ? "Location access: granted"
+                : "Location access: not granted"}
           </Text>
         </View>
       </View>
@@ -186,7 +246,7 @@ export default function LocationScreen() {
       {hasLocation ? (
         <View className="mb-5 rounded-[24px] border border-mist bg-white px-5 py-2">
           <Heading className="pb-1 pt-3">
-            Shared location
+            Current location
           </Heading>
 
           <Row
@@ -208,18 +268,19 @@ export default function LocationScreen() {
             label="Timestamp"
             value={formatTimestamp(location.timestamp)}
           />
-
-          <Row
-            label="Address"
-            value={location.address ?? "Address unavailable"}
-          />
         </View>
       ) : (
         <View className="mb-5 rounded-[24px] bg-dusk-50 p-5">
-          <Heading>No location shared yet</Heading>
+          <Heading>
+            {gettingLocation
+              ? "Getting your location..."
+              : "No location available"}
+          </Heading>
 
           <Body size="sm" className="mt-1">
-            Please allow location access before sharing.
+            {gettingLocation
+              ? "Please wait while we get your current location."
+              : "Please allow location access and try again."}
           </Body>
         </View>
       )}
@@ -268,10 +329,16 @@ export default function LocationScreen() {
       {/* Send */}
       <Button
         icon="paper-plane-outline"
-        label={sending ? "Opening SMS..." : "Send Location"}
+        label={
+          gettingLocation
+            ? "Getting location..."
+            : sending
+              ? "Opening SMS..."
+              : "Send Location"
+        }
         haptic="medium"
         onPress={handleShare}
-        disabled={sending}
+        disabled={gettingLocation || sending || !hasLocation}
       />
     </Screen>
   );
