@@ -1,5 +1,6 @@
 import {
-  setTrustedContacts,
+  loadTrustedContacts,
+  saveTrustedContacts,
   type TrustedContact as SavedContact,
 } from "@/auth";
 import React from "react";
@@ -12,6 +13,23 @@ export default function TrustedContactsScreen() {
 
   // Keeps track of which contacts have already been saved
   const [savedStates, setSavedStates] = React.useState<boolean[]>([false]);
+
+  React.useEffect(() => {
+  const loadContacts = async () => {
+    try {
+      const savedContacts = await loadTrustedContacts();
+
+      if (savedContacts.length > 0) {
+        setContacts(savedContacts);
+        setSavedStates(savedContacts.map(() => true));
+      }
+    } catch (error) {
+      console.error("Unable to load trusted contacts:", error);
+    }
+  };
+
+  loadContacts();
+}, []);
 
   const updateContact = (
     index: number,
@@ -44,15 +62,19 @@ export default function TrustedContactsScreen() {
     );
   };
 
-  const saveContacts = () => {
-    setTrustedContacts(contacts);
+  const saveContacts = async () => {
+  try {
+    await saveTrustedContacts(contacts);
 
-    // Mark all current contacts as saved
     setSavedStates(contacts.map(() => true));
 
-    console.log("trusted contacts added", contacts);
-    alert("Trusted contacts saved for testing.");
-  };
+    console.log("trusted contacts saved", contacts);
+    alert("Trusted contacts saved successfully.");
+  } catch (error) {
+    console.error("Unable to save trusted contacts:", error);
+    alert("Unable to save trusted contacts. Please try again.");
+  }
+};
 
   return (
     <ScrollView

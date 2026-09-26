@@ -5,8 +5,8 @@ import {useFocusEffect, useRouter } from "expo-router";
 import {useCallback, useState, type ReactNode } from "react";
 import { Text, View } from "react-native";
 import {
+  logout,
   requestAndShareCurrentLocation,
-  setLoggedIn,
   sharedLocationState,
   trustedContacts,
 } from "@/auth";
@@ -169,18 +169,21 @@ export default function Profile() {
         </Body>
       )}
 
-      <Button
-        variant="outline"
-        icon="log-out-outline"
-        label="Logout"
-        className="mt-8"
-        onPress={() => {
-          setLoggedIn(false);
-          alert("Logged out successfully");
-          router.replace("/");
-        }}
-      />
-
+     <Button
+  variant="outline"
+  icon="log-out-outline"
+  label="Logout"
+  className="mt-8"
+  onPress={async () => {
+    try {
+      await logout();
+      router.replace("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Unable to log out. Please try again.");
+    }
+  }}
+/>
       <Label className="mt-8 text-center">
         Illustrations by Storyset. Animations by LottieFiles and Lordicon.
       </Label>

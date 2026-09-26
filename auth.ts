@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import {
   createUserWithEmailAndPassword,
@@ -49,6 +50,59 @@ export const setTrustedContacts = (contacts: TrustedContact[]) => {
     ({ name, mobNumber }) =>
       name.trim().length > 0 || mobNumber.trim().length > 0,
   );
+};
+const getTrustedContactsKey = () => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    return null;
+  }
+
+  return `trustedContacts_${user.uid}`;
+};
+
+export const saveTrustedContacts = async (
+  contacts: TrustedContact[],
+) => {
+  const key = getTrustedContactsKey();
+
+  if (!key) {
+    throw new Error("No user is currently logged in.");
+  }
+
+  const validContacts = contacts.filter(
+    ({ name, mobNumber }) =>
+      name.trim().length > 0 || mobNumber.trim().length > 0,
+  );
+
+  await AsyncStorage.setItem(
+    key,
+    JSON.stringify(validContacts),
+  );
+
+  setTrustedContacts(validContacts);
+};
+
+export const loadTrustedContacts = async () => {
+  const key = getTrustedContactsKey();
+
+  if (!key) {
+    setTrustedContacts([]);
+    return [];
+  }
+
+  const savedContacts = await AsyncStorage.getItem(key);
+
+  if (!savedContacts) {
+    setTrustedContacts([]);
+    return [];
+  }
+
+  const contacts: TrustedContact[] = JSON.parse(savedContacts);
+
+  setTrustedContacts(contacts);
+
+  return contacts;
 };
 
 export type SharedLocationState = {

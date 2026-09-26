@@ -1,7 +1,7 @@
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import { Image } from "react-native";
-import { login, setLoggedIn } from "@/auth";
+import { login } from "@/auth";
 import { AuthScaffold } from "@/components/AuthScaffold";
 import { Button } from "@/components/Button";
 import { Callout } from "@/components/Screen";
@@ -30,8 +30,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email.trim(), password);
-      setLoggedIn(true);
-      router.navigate("/profile/profile");
+router.navigate("/profile/profile");
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {

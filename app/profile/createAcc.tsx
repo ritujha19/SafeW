@@ -1,6 +1,6 @@
 import { Link, useRouter } from "expo-router";
 import React from "react";
-import { setLoggedIn, signUp } from "@/auth";
+import { signUp } from "@/auth";
 import { AuthScaffold } from "@/components/AuthScaffold";
 import { SignupIllustration } from "@/components/AuthIllustrations";
 import { Button } from "@/components/Button";
@@ -37,7 +37,6 @@ export default function CreateAccountPage() {
       // createUserWithEmailAndPassword also signs the person in, so we treat
       // a successful sign-up as a successful login and go straight to Profile.
       await signUp(email.trim(), password, username.trim());
-      setLoggedIn(true);
       router.navigate("/profile/profile");
     } catch (err) {
       setError(authErrorMessage(err));
