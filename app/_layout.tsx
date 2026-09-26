@@ -6,10 +6,11 @@ import { Figtree_700Bold } from "@expo-google-fonts/figtree/700Bold";
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BrandMark, HeaderProfileButton } from "@/components/Header";
 import { colors } from "@/constants/theme";
-import { isLoggedIn } from "../auth";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import "../global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -17,7 +18,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
 
-  const [fontsLoaded] = useFonts({
+    const [fontsLoaded] = useFonts({
     BricolageGrotesque_600SemiBold,
     BricolageGrotesque_700Bold,
     Figtree_400Regular,
@@ -25,15 +26,26 @@ export default function RootLayout() {
     Figtree_700Bold,
   });
 
+  const [user, setUser] = useState(auth.currentUser);
+const [authLoading, setAuthLoading] = useState(true);
+
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+    setAuthLoading(false);
+  });
 
-  const handleProfilePress = () => {
-    router.navigate(isLoggedIn ? "/profile/profile" : "/profile/login");
-  };
+  return unsubscribe;
+}, []);
+
+ if (!fontsLoaded || authLoading) return null;
+const handleProfilePress = () => {
+  router.navigate(user ? "/profile/profile" : "/profile/login");
+};
 
   return (
     <Stack

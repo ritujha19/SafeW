@@ -1,3 +1,4 @@
+import type { ImageSourcePropType } from "react-native";
 import type { ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,13 +7,16 @@ import { Body, Display } from "./Typography";
 
 export function AuthScaffold({
   illustrationNode,
+  illustration,
   fallback,
   title,
   subtitle,
   children,
   footer,
 }: {
+  /** A custom illustration component, e.g. <LoginIllustration />. Takes priority over `illustration`. */
   illustrationNode?: ReactNode;
+  illustration?: ImageSourcePropType;
   fallback: IconName;
   title: string;
   subtitle: string;
@@ -26,14 +30,11 @@ export function AuthScaffold({
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={{
-          padding: 24,
-          paddingBottom: insets.bottom + 32,
-        }}
+        contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 32 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {illustrationNode ?? <Illustration fallback={fallback} />}
+        {illustrationNode ?? <Illustration source={illustration} fallback={fallback} height={168} />}
         <Display size="lg" className="mt-3">
           {title}
         </Display>

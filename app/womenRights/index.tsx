@@ -1,112 +1,83 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, ScrollView } from "react-native";
+import { Pressable, View } from "react-native";
+import { type IconName, Illustration } from "@/components/Media";
+import { PressableScale } from "@/components/PressableScale";
+import { Screen } from "@/components/Screen";
+import { Body, Heading } from "@/components/Typography";
+import { illustrations } from "@/constants/media";
+import { colors } from "@/constants/theme";
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f8fb" },
-  contentContainer: { padding: 20, paddingBottom: 40 },
-  card: {
-    borderWidth: 1,
-    borderColor: "#67a2e1",
-    borderRadius: 10,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    marginBottom: 20,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#0f4e92",
-  },
-  cardList: {
-    marginTop: 14,
-    color: "#3f87d4",
-  },
-  content: {
-    fontSize: 16,
-    textAlign: "center",
-  },
-  buttons: {
-    alignItems: "center",
-    backgroundColor: "#67a2e1",
-    borderRadius: 10,
-    borderWidth: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    margin: 14,
-    padding: 10,
-    minHeight: 50,
-  },
-  important: {
-    fontWeight: "bold",
-    fontSize: 16,
-    textAlign: "center",
-    paddingBottom: 10,
-  },
-});
+type Route = Parameters<ReturnType<typeof useRouter>["navigate"]>[0];
 
-export default function womenRights() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+const rights: { title: string; icon: IconName; route: string }[] = [
+  { title: "Constitutional Rights", icon: "document-text-outline", route: "/womenRights/constitutionRights" },
+  { title: "Protection from Violence", icon: "shield-checkmark-outline", route: "/womenRights/protectionFromViolence" },
+  { title: "Workplace Rights", icon: "briefcase-outline", route: "/womenRights/workplaceRights" },
+  { title: "Family & Marriage Rights", icon: "home-outline", route: "/womenRights/familyMarriageRights" },
+  { title: "Digital Rights", icon: "phone-portrait-outline", route: "/womenRights/digitalRights" },
+  // Matches the name registered in app/_layout.tsx (the old button pointed at
+  // "rightsSeekingHelp", which didn't match any registered screen).
+  { title: "Rights When Seeking Help", icon: "help-buoy-outline", route: "/womenRights/rightsWhenSeekingHelp" },
+  { title: "Rights of Children", icon: "happy-outline", route: "/womenRights/rightsOfChildren" },
+];
+
+export default function WomenRights() {
   const router = useRouter();
+  const go = (route: string) => router.navigate(route as Route);
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      <Text style={styles.content}>
-        Understanding your legal rights can help you know what protections and
-        remedies are available to you.
-      </Text>
-      <Text style={styles.important}>Explore your rights</Text>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/constitutionRights")}
+    <Screen>
+      <Illustration source={illustrations.rights} fallback="scale-outline" tint="marigold" height={150} />
+
+      <Body tone="ink" className="mb-5 mt-2">
+        Understanding your legal rights can help you know what protections and remedies
+        are available to you.
+      </Body>
+
+      {/* The one action-oriented entry gets more weight */}
+      <PressableScale
+        accessibilityRole="button"
+        accessibilityLabel="Free legal aid"
+        onPress={() => go("/womenRights/freeLegalAids")}
+        className="mb-6 flex-row items-center rounded-[26px] bg-marigold-soft p-5"
       >
-        <Text style={styles.content}>Constitutional Rights</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/protectionFromViolence")}
-      >
-        <Text style={styles.content}>Protection from Violence</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/workplaceRights")}
-      >
-        <Text style={styles.content}>Workplace Rights</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/familyMarriageRights")}
-      >
-        <Text style={styles.content}>Family & Marriage Rights</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/digitalRights")}
-      >
-        <Text style={styles.content}>Digital Rights</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/rightsSeekingHelp")}
-      >
-        <Text style={styles.content}>Rights When Seeking Help</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/rightsOfChildren")}
-      >
-        <Text style={styles.content}>Rights of Children</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => router.navigate("/womenRights/freeLegalAids")}
-      >
-        <Text style={styles.content}>Free Legal Aids</Text>
-      </Pressable>
-    </ScrollView>
+        <View className="mr-4 h-14 w-14 items-center justify-center rounded-2xl bg-marigold">
+          <Ionicons name="scale" size={28} color={colors.midnight} />
+        </View>
+        <View className="flex-1 pr-2">
+          <Heading size="lg">Free legal aid</Heading>
+          <Body size="sm" tone="ink" className="mt-0.5">
+            Get free legal help if you can&apos;t afford a lawyer.
+          </Body>
+        </View>
+        <Ionicons name="chevron-forward" size={22} color={colors.marigoldDark} />
+      </PressableScale>
+
+      <Heading size="lg" className="mb-3">
+        Explore your rights
+      </Heading>
+      <View className="overflow-hidden rounded-[26px] border border-mist bg-white">
+        {rights.map((item, i) => (
+          <Pressable
+            key={item.route}
+            accessibilityRole="button"
+            accessibilityLabel={item.title}
+            onPress={() => go(item.route)}
+            className={`flex-row items-center px-4 py-4 active:bg-dusk-50 ${
+              i > 0 ? "border-t border-mist" : ""
+            }`}
+          >
+            <View className="mr-4 h-10 w-10 items-center justify-center rounded-xl bg-dusk-50">
+              <Ionicons name={item.icon} size={20} color={colors.dusk[600]} />
+            </View>
+            <Heading size="sm" className="flex-1 pr-2">
+              {item.title}
+            </Heading>
+            <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+          </Pressable>
+        ))}
+      </View>
+    </Screen>
   );
 }

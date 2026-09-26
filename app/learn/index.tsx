@@ -1,105 +1,106 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { type IconName, Illustration } from "@/components/Media";
+import { PressableScale } from "@/components/PressableScale";
+import { Screen } from "@/components/Screen";
+import { Body, Display, Heading } from "@/components/Typography";
+import { illustrations } from "@/constants/media";
+import { colors } from "@/constants/theme";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
+const steps = [
+  { word: "Notice", line: "Notice something concerning." },
+  { word: "Move", line: "Move toward safety." },
+  { word: "Tell", line: "Tell someone you trust." },
+];
+
+const topics: {
+  title: string;
+  description: string;
+  icon: IconName;
+  route: "/learn/whatCounts" | "/learn/warningSigns" | "/learn/safetyEssentials" | "/learn/prepareYourself";
+}[] = [
+  {
+    title: "Know what counts",
+    description: "What harassment, abuse and violence look like, and what to do.",
+    icon: "alert-circle-outline",
+    route: "/learn/whatCounts",
   },
-  card: {
-    borderWidth: 1,
-    borderColor: "#67a2e1",
-    borderRadius: 10,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    marginBottom: 20,
+  {
+    title: "Know the warning signs",
+    description: "Spot concerning patterns early, before they escalate.",
+    icon: "eye-outline",
+    route: "/learn/warningSigns",
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#0f4e92",
+  {
+    title: "Safety essentials",
+    description: "Trust your instincts, keep your boundaries, stay supported.",
+    icon: "shield-checkmark-outline",
+    route: "/learn/safetyEssentials",
   },
-  cardList: {
-    marginTop: 14,
-    color: "#3f87d4",
+  {
+    title: "Prepare yourself",
+    description: "Practice 15 real-life situations and check your instincts.",
+    icon: "play-circle-outline",
+    route: "/learn/prepareYourself",
   },
-  content: {
-    fontSize: 16,
-    textAlign: "center",
-  },
-  buttons: {
-    alignItems: "center",
-    backgroundColor: "#67a2e1",
-    borderRadius: 10,
-    borderWidth: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    margin: 14,
-    padding: 10,
-    minHeight: 50,
-  },
-  important: {
-    fontWeight: "bold",
-    fontSize: 16,
-    textAlign: "center",
-    paddingBottom: 10,
-  },
-});
+];
 
 export default function Learn() {
   const router = useRouter();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.content}>
-        Knowing what to look for can help you recognize risks earlier, make
-        informed decisions, and feel more prepared to protect yourself.
-      </Text>
-      <Text style={styles.important}>
+    <Screen>
+      <Illustration source={illustrations.learn} fallback="school-outline" tint="haven" height={150} />
+
+      <Body tone="ink" className="mt-2">
+        Knowing what to look for can help you recognize risks earlier, make informed
+        decisions, and feel more prepared to protect yourself.
+      </Body>
+      <Heading size="md" className="mb-5 mt-3">
         Learn these principles now, so you can remember them when you need them.
-      </Text>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>NOTICE → MOVE → TELL</Text>
-        <Text style={styles.cardList}>Notice something concerning. </Text>
-        <Text style={styles.cardList}>Move toward safety. </Text>
-        <Text style={styles.cardList}>Tell someone you trust.</Text>
+      </Heading>
+
+      {/* The principle to remember: a real sequence, so it is numbered. */}
+      <View className="mb-7 rounded-[28px] bg-midnight p-6">
+        <Display size="md" tone="white" className="mb-5">
+          Notice → Move → Tell
+        </Display>
+        {steps.map((step, i) => (
+          <View key={step.word} className={`flex-row items-center ${i > 0 ? "mt-4" : ""}`}>
+            <View className="mr-4 h-9 w-9 items-center justify-center rounded-full bg-marigold">
+              <Text className="font-display text-[17px] text-midnight">{i + 1}</Text>
+            </View>
+            <View className="flex-1">
+              <Text className="font-bodyBold text-[17px] text-white">{step.word}</Text>
+              <Text className="font-body text-[14px] leading-5 text-white/75">{step.line}</Text>
+            </View>
+          </View>
+        ))}
       </View>
 
-      <Pressable
-        style={styles.buttons}
-        onPress={() => {
-          router.navigate("/learn/whatCounts");
-        }}
-      >
-        <Text style={styles.content}>Know what counts </Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => {
-          router.navigate("/learn/warningSigns");
-        }}
-      >
-        <Text style={styles.content}>know the warning signs </Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => {
-          router.navigate("/learn/safetyEssentials");
-        }}
-      >
-        <Text style={styles.content}>Safety Essentials</Text>
-      </Pressable>
-      <Pressable
-        style={styles.buttons}
-        onPress={() => {
-          router.navigate("/learn/prepareYourself");
-        }}
-      >
-        <Text style={styles.content}>Prepare Yourself</Text>
-      </Pressable>
-    </View>
+      <View className="gap-3">
+        {topics.map((topic) => (
+          <PressableScale
+            key={topic.route}
+            accessibilityRole="button"
+            accessibilityLabel={topic.title}
+            onPress={() => router.navigate(topic.route)}
+            className="flex-row items-center rounded-[24px] border border-mist bg-white p-4"
+          >
+            <View className="mr-4 h-12 w-12 items-center justify-center rounded-2xl bg-haven-soft">
+              <Ionicons name={topic.icon} size={24} color={colors.havenDark} />
+            </View>
+            <View className="flex-1 pr-2">
+              <Heading>{topic.title}</Heading>
+              <Body size="sm" className="mt-0.5">
+                {topic.description}
+              </Body>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+          </PressableScale>
+        ))}
+      </View>
+    </Screen>
   );
 }
