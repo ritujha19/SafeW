@@ -140,7 +140,7 @@ export default function Home() {
             icon="chatbubble-ellipses-outline"
             source={lordicon.assistant}
             accent="dusk"
-            onPress={() => console.log("ai Button pressed")}
+            onPress={() => {router.navigate("/assistant")}}
           />
           <ToolCard
             title="Learn & Prepare"

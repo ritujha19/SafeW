@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1002685022635",
+    "project_id": "safew-173c0",
+    "storage_bucket": "safew-173c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002685022635:android:4b92ca1c202f3e73e9d2ee",
+        "android_client_info": {
+          "package_name": "com.safew.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYtv4i2453R_LvYY-2shfKqroVUkDcR1A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

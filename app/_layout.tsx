@@ -18,7 +18,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const router = useRouter();
 
-    const [fontsLoaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     BricolageGrotesque_600SemiBold,
     BricolageGrotesque_700Bold,
     Figtree_400Regular,
@@ -27,25 +27,25 @@ export default function RootLayout() {
   });
 
   const [user, setUser] = useState(auth.currentUser);
-const [authLoading, setAuthLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-    setAuthLoading(false);
-  });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
 
-  return unsubscribe;
-}, []);
+    return unsubscribe;
+  }, []);
 
- if (!fontsLoaded || authLoading) return null;
-const handleProfilePress = () => {
-  router.navigate(user ? "/profile/profile" : "/profile/login");
-};
+  if (!fontsLoaded || authLoading) return null;
+  const handleProfilePress = () => {
+    router.navigate(user ? "/profile/profile" : "/profile/login");
+  };
 
   return (
     <Stack
@@ -66,11 +66,16 @@ const handleProfilePress = () => {
         options={{
           title: "SAFE-W",
           headerTitle: () => <BrandMark />,
-          headerRight: () => <HeaderProfileButton onPress={handleProfilePress} />,
+          headerRight: () => (
+            <HeaderProfileButton onPress={handleProfilePress} />
+          ),
         }}
       />
       <Stack.Screen name="createAcc" options={{ title: "Create Account" }} />
-      <Stack.Screen name="updateProfile" options={{ title: "Update Profile" }} />
+      <Stack.Screen
+        name="updateProfile"
+        options={{ title: "Update Profile" }}
+      />
       <Stack.Screen
         name="emergency"
         options={{
@@ -87,37 +92,122 @@ const handleProfilePress = () => {
       />
       <Stack.Screen name="profile/location" options={{ title: "Location" }} />
       <Stack.Screen name="profile/login" options={{ title: "Login" }} />
-      <Stack.Screen name="profile/profile" options={{ title: "Your Account" }} />
-      <Stack.Screen name="profile/trustedContact" options={{ title: "Trusted Contacts" }} />
-      <Stack.Screen name="profile/updateProfile" options={{title: "Update Profile"}} />
-      <Stack.Screen name= "profile/createAcc" options={{title: "Create Account"}}/> 
+      <Stack.Screen
+        name="profile/profile"
+        options={{ title: "Your Account" }}
+      />
+      <Stack.Screen
+        name="profile/trustedContact"
+        options={{ title: "Trusted Contacts" }}
+      />
+      <Stack.Screen
+        name="profile/updateProfile"
+        options={{ title: "Update Profile" }}
+      />
+      <Stack.Screen
+        name="profile/createAcc"
+        options={{ title: "Create Account" }}
+      />
+      <Stack.Screen
+        name="assistant"
+        options={{ title: "Saaya · SAFE-W Agent", headerShown: false }}
+      />
 
       <Stack.Screen name="learn/index" options={{ title: "Learn & Prepare" }} />
-      <Stack.Screen name="learn/whatCounts" options={{ title: "Know What Counts" }} />
-      <Stack.Screen name="learn/warningSigns" options={{ title: "Know the Warning Signs" }} />
-      <Stack.Screen name="learn/safetyEssentials" options={{ title: "Safety Essentials" }} />
-      <Stack.Screen name="learn/prepareYourself" options={{ title: "Prepare Yourself" }} />
+      <Stack.Screen
+        name="learn/whatCounts"
+        options={{ title: "Know What Counts" }}
+      />
+      <Stack.Screen
+        name="learn/warningSigns"
+        options={{ title: "Know the Warning Signs" }}
+      />
+      <Stack.Screen
+        name="learn/safetyEssentials"
+        options={{ title: "Safety Essentials" }}
+      />
+      <Stack.Screen
+        name="learn/prepareYourself"
+        options={{ title: "Prepare Yourself" }}
+      />
 
-      <Stack.Screen name="womenRights/index" options={{ title: "Women's Rights" }} />
-      <Stack.Screen name="womenRights/constitutionRights" options={{ title: "Constitutional Rights" }} />
-      <Stack.Screen name="womenRights/protectionFromViolence" options={{ title: "Protection from Violence" }} />
-      <Stack.Screen name="womenRights/workplaceRights" options={{ title: "Workplace Rights" }} />
-      <Stack.Screen name="womenRights/familyMarriageRights" options={{ title: "Family & Marriage Rights" }} />
-      <Stack.Screen name="womenRights/digitalRights" options={{ title: "Digital Rights" }} />
-      <Stack.Screen name="womenRights/rightsSeekingHelp" options={{ title: "Rights When Seeking Help" }} />
-      <Stack.Screen name="womenRights/rightsOfChildren" options={{ title: "Rights of Children" }} />
-      <Stack.Screen name="womenRights/freeLegalAids" options={{ title: "Free Legal Aids" }} />
+      <Stack.Screen
+        name="womenRights/index"
+        options={{ title: "Women's Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/constitutionRights"
+        options={{ title: "Constitutional Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/protectionFromViolence"
+        options={{ title: "Protection from Violence" }}
+      />
+      <Stack.Screen
+        name="womenRights/workplaceRights"
+        options={{ title: "Workplace Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/familyMarriageRights"
+        options={{ title: "Family & Marriage Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/digitalRights"
+        options={{ title: "Digital Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/rightsSeekingHelp"
+        options={{ title: "Rights When Seeking Help" }}
+      />
+      <Stack.Screen
+        name="womenRights/rightsOfChildren"
+        options={{ title: "Rights of Children" }}
+      />
+      <Stack.Screen
+        name="womenRights/freeLegalAids"
+        options={{ title: "Free Legal Aids" }}
+      />
 
-      <Stack.Screen name="womenRights/viewMore/legalAgeOfMarriage" options={{ title: "Legal Age of Marriage" }} />
-      <Stack.Screen name="womenRights/viewMore/marriageRegistration" options={{ title: "Marriage Registration" }} />
-      <Stack.Screen name="womenRights/viewMore/rightsWithinMarriage" options={{ title: "Rights Within Marriage" }} />
-      <Stack.Screen name="womenRights/viewMore/divorceRights" options={{ title: "Divorce Rights" }} />
-      <Stack.Screen name="womenRights/viewMore/maintenance" options={{ title: "Maintenance" }} />
-      <Stack.Screen name="womenRights/viewMore/propertyInheritance" options={{ title: "Property & Inheritance" }} />
-      <Stack.Screen name="womenRights/viewMore/coparcenaryRights" options={{ title: "Equal Coparcenary Rights for Daughters" }} />
-      <Stack.Screen name="womenRights/viewMore/dowryProhibition" options={{ title: "Dowry Prohibition" }} />
-      <Stack.Screen name="womenRights/viewMore/rightsInSharedHousehold" options={{ title: "Rights in a Shared Household" }} />
-      <Stack.Screen name="womenRights/viewMore/rightsAfterDivorce" options={{ title: "Rights After Divorce" }} />
+      <Stack.Screen
+        name="womenRights/viewMore/legalAgeOfMarriage"
+        options={{ title: "Legal Age of Marriage" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/marriageRegistration"
+        options={{ title: "Marriage Registration" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/rightsWithinMarriage"
+        options={{ title: "Rights Within Marriage" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/divorceRights"
+        options={{ title: "Divorce Rights" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/maintenance"
+        options={{ title: "Maintenance" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/propertyInheritance"
+        options={{ title: "Property & Inheritance" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/coparcenaryRights"
+        options={{ title: "Equal Coparcenary Rights for Daughters" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/dowryProhibition"
+        options={{ title: "Dowry Prohibition" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/rightsInSharedHousehold"
+        options={{ title: "Rights in a Shared Household" }}
+      />
+      <Stack.Screen
+        name="womenRights/viewMore/rightsAfterDivorce"
+        options={{ title: "Rights After Divorce" }}
+      />
     </Stack>
   );
 }
