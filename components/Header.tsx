@@ -1,15 +1,18 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useRef } from "react";
-import { Pressable, Text, View } from "react-native";
 import { lordicon } from "@/constants/media";
 import { colors } from "@/constants/theme";
+import { useRef } from "react";
+import { Image, Pressable, Text, View } from "react-native";
 import { LordIcon, type LordIconHandle } from "./Media";
 
 export function BrandMark() {
   return (
     <View className="flex-row items-center">
-      <View className="mr-2 h-8 w-8 items-center justify-center rounded-[10px] bg-dusk-600">
-        <Ionicons name="shield-checkmark" size={18} color="#FFFFFF" />
+      <View className="mr-2 h-9 w-9 items-center justify-center rounded-[10px] bg-blue-900">
+        <Image
+          source={require("../assets/images/android-icon-monochrome.png")}
+          resizeMode="contain"
+          style={{ width: 50, height: 50}}
+        />
       </View>
       <Text className="font-display text-[21px] text-midnight">SAFE-W</Text>
     </View>
