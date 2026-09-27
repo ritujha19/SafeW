@@ -1,27 +1,28 @@
+import { PressableScale } from "@/components/PressableScale";
+import { Body, Heading, Label } from "@/components/Typography";
+import { useKeyboardBehavior } from "@/hooks/useKeyboardBehavior";
+import {
+  type SafewPageResource,
+  buildLocalSaayaFallback,
+  extractAndRecommendPages,
+} from "@/constants/safewPages";
+import { colors, shadow } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ComponentProps,
-} from "react";
+import { type ComponentRef, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   Text,
   TextInput,
   View,
 } from "react-native";
-import { PressableScale } from "@/components/PressableScale";
-import { Body, Heading, Label } from "@/components/Typography";
-import {
-  type SafewPageResource,
-  buildLocalSaayaFallback,
-} from "@/constants/safewPages";
-import { colors, shadow } from "@/constants/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../firebase";
 import { db } from "../firestore";
 
@@ -44,6 +45,11 @@ export interface ChatSession {
 }
 
 const SESSIONS_STORAGE_KEY = "safew_saaya_chat_sessions_v1";
+const CHAT_API_URL =
+  process.env.EXPO_PUBLIC_API_URL ??
+  (Platform.OS === "android"
+    ? "http://10.0.2.2:5000"
+    : "http://localhost:5000");
 
 const WELCOME_MESSAGE =
   "Hi, I’m **Saaya** — your safety companion 🤝\n\nI’m here to help you stay informed, find safer options, understand your rights, and feel more prepared when something doesn’t feel right.\n\n**What can I help you with today?**";
@@ -90,7 +96,7 @@ function createNewSession(): ChatSession {
 
 function loadStoredSessions(): ChatSession[] {
   try {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && window.localStorage) {
       const raw = window.localStorage.getItem(SESSIONS_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as ChatSession[];
@@ -100,7 +106,7 @@ function loadStoredSessions(): ChatSession[] {
       }
     }
   } catch {
-    // ignore storage errors
+    // ignore storage errors on native
   }
   return [createNewSession()];
 }
@@ -110,6 +116,41 @@ function deriveSessionTitle(messages: ChatMessage[]): string {
   if (!firstUserMsg) return "New conversation";
   const text = firstUserMsg.text.trim();
   return text.length > 48 ? `${text.slice(0, 48)}...` : text;
+}
+
+/**
+ * Generates a response through the Express server so the Gemini API key stays
+ * outside the mobile app bundle.
+ */
+async function generateSaayaResponse(
+  userMessage: string,
+  history: { role: "user" | "model"; text: string }[],
+): Promise<{ reply: string; recommendedPages: SafewPageResource[] }> {
+  const response = await fetch(`${CHAT_API_URL}/api/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: userMessage,
+      history: history.slice(-10),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Chat server returned ${response.status}`);
+  }
+
+  const data = (await response.json()) as { reply?: unknown };
+  if (typeof data.reply !== "string" || !data.reply.trim()) {
+    throw new Error("Chat server returned an invalid response.");
+  }
+
+  const { cleanReply, recommendedPages } = extractAndRecommendPages(
+    data.reply,
+    userMessage,
+  );
+  return { reply: cleanReply, recommendedPages };
 }
 
 function renderFormattedText(text: string, isUser: boolean, isError?: boolean) {
@@ -175,7 +216,8 @@ export default function SafetyAssistantScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [inputText, setInputText] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const bottomAnchorRef = useRef<HTMLDivElement | null>(null);
+  const scrollViewRef = useRef<ComponentRef<typeof ScrollView> | null>(null);
+  const keyboardBehavior = useKeyboardBehavior();
 
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) ??
@@ -208,24 +250,24 @@ export default function SafetyAssistantScreen() {
           }
         }
       } catch {
-        // Fallback to localStorage silently
+        // Fallback silently
       }
     };
 
     void loadCloudHistory();
   }, []);
 
-  // Persist sessions to localStorage and Firestore (when signed in)
+  // Persist sessions to localStorage (web) and Firestore (when signed in)
   useEffect(() => {
     try {
-      if (typeof window !== "undefined") {
+      if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(
           SESSIONS_STORAGE_KEY,
           JSON.stringify(sessions),
         );
       }
     } catch {
-      // ignore storage errors
+      // ignore storage errors on native
     }
 
     const currentUser = auth.currentUser;
@@ -238,10 +280,10 @@ export default function SafetyAssistantScreen() {
   }, [sessions]);
 
   useEffect(() => {
-    bottomAnchorRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
+    const timer = setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 80);
+    return () => clearTimeout(timer);
   }, [messages.length, isSending, activeSessionId]);
 
   const updateActiveSessionMessages = (
@@ -287,33 +329,14 @@ export default function SafetyAssistantScreen() {
     setIsSending(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: trimmed,
-          history: historyForApi,
-        }),
-      });
-
-      const data = (await response.json()) as {
-        reply?: string;
-        recommendedPages?: SafewPageResource[];
-        error?: string;
-      };
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "Unable to reach Saaya right now.");
-      }
+      const result = await generateSaayaResponse(trimmed, historyForApi);
 
       const modelMsg: ChatMessage = {
         id: `model_${Date.now()}`,
         role: "model",
-        text:
-          data.reply ||
-          "I'm here with you. Could you share a little more about what's happening so I can help you stay safe?",
+        text: result.reply,
         timestamp: formatTime(new Date()),
-        recommendedPages: data.recommendedPages,
+        recommendedPages: result.recommendedPages,
       };
 
       updateActiveSessionMessages((prev) => [...prev, modelMsg]);
@@ -371,390 +394,408 @@ export default function SafetyAssistantScreen() {
   );
 
   return (
-    <View className="relative flex-1 bg-paper">
-      {/* Uncrowded Header — Full Width for Heading + Side Menu Button */}
-      <View className="border-b border-mist bg-white px-4 py-3.5">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1 flex-row items-center pr-3">
-            <Pressable
-              onPress={() =>
-                router.canGoBack() ? router.back() : router.navigate("/")
-              }
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-              className="mr-3 h-10 w-10 items-center justify-center rounded-xl bg-paper"
-            >
-              <Ionicons name="arrow-back" size={20} color={colors.midnight} />
-            </Pressable>
+    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+      <StatusBar style="dark" backgroundColor="#FFFFFF" translucent={false} />
+      <KeyboardAvoidingView
+        className="relative flex-1 bg-paper"
+        behavior={keyboardBehavior}
+        keyboardVerticalOffset={0}
+      >
+        {/* Uncrowded Header — Full Width for Heading + Side Menu Button */}
+        <View className="border-b border-mist bg-white px-4 py-3.5">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-1 flex-row items-center pr-3">
+              <Pressable
+                onPress={() =>
+                  router.canGoBack() ? router.back() : router.navigate("/")
+                }
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+                className="mr-3 h-10 w-10 items-center justify-center rounded-xl bg-paper"
+              >
+                <Ionicons name="arrow-back" size={20} color={colors.midnight} />
+              </Pressable>
 
-            <View className="mr-3 h-10 w-10 items-center justify-center rounded-2xl bg-dusk-50">
-              <Ionicons
-                name="shield-checkmark"
-                size={22}
-                color={colors.dusk[600]}
-              />
-            </View>
-
-            <View className="flex-1">
-              <Text className="font-display text-[19px] leading-[23px] text-midnight">
-                Saaya
-              </Text>
-              <Text className="mt-0.5 font-bodyMedium text-[13px] leading-[17px] text-dusk-600">
-                SAFE-W Agent &amp; Ally
-              </Text>
-            </View>
-          </View>
-
-          {/* Side Menu Trigger Button */}
-          <Pressable
-            onPress={() => setIsMenuOpen(true)}
-            accessibilityRole="button"
-            accessibilityLabel="Open chat menu for New Chat and History"
-            className="h-10 w-10 items-center justify-center rounded-xl border border-mist bg-paper"
-          >
-            <Ionicons name="menu-outline" size={22} color={colors.midnight} />
-          </Pressable>
-        </View>
-
-        <Text className="mt-2.5 font-body text-[12.5px] leading-[18px] text-muted">
-          Calm, factual guidance · Safety first · Rights &amp; preparation
-        </Text>
-      </View>
-
-      {/* Side Menu Drawer (New Chat, Chat History & Quick Emergency Access) */}
-      {isMenuOpen ? (
-        <View className="absolute inset-0 z-50 flex-row">
-          {/* Backdrop */}
-          <Pressable
-            onPress={() => setIsMenuOpen(false)}
-            accessibilityRole="button"
-            accessibilityLabel="Close side menu"
-            style={{ backgroundColor: "rgba(19, 17, 28, 0.45)" }}
-            className="flex-1"
-          />
-
-          {/* Slide-over Side Menu Bar */}
-          <View
-            style={shadow.lift}
-            className="h-full w-[80%] max-w-[320px] border-l border-mist bg-white px-4 py-4 flex-col justify-between"
-          >
-            <View className="flex-1">
-              {/* Drawer Header */}
-              <View className="flex-row items-center justify-between border-b border-mist pb-3.5">
-                <View>
-                  <Text className="font-display text-[17px] text-midnight">
-                    Saaya Menu
-                  </Text>
-                  <Text className="font-body text-[12px] text-muted">
-                    Chats &amp; conversations
-                  </Text>
-                </View>
-                <Pressable
-                  onPress={() => setIsMenuOpen(false)}
-                  accessibilityRole="button"
-                  accessibilityLabel="Close menu"
-                  className="h-9 w-9 items-center justify-center rounded-xl bg-paper"
-                >
-                  <Ionicons name="close" size={20} color={colors.midnight} />
-                </Pressable>
+              <View className="mr-3 h-10 w-10 items-center justify-center rounded-2xl bg-dusk-50">
+                <Ionicons
+                  name="shield-checkmark"
+                  size={22}
+                  color={colors.dusk[600]}
+                />
               </View>
 
-              {/* New Chat Action */}
-              <PressableScale
-                onPress={handleStartNewChat}
-                accessibilityRole="button"
-                accessibilityLabel="Start a new chat with Saaya"
-                className="mt-4 flex-row items-center justify-center rounded-2xl bg-dusk-600 px-4 py-3"
-              >
-                <Ionicons name="add-circle-outline" size={19} color="#FFFFFF" />
-                <Text className="ml-2 font-bodyBold text-[14px] text-white">
-                  New Chat
+              <View className="flex-1">
+                <Text className="font-display text-[19px] leading-[23px] text-midnight">
+                  Saaya
                 </Text>
-              </PressableScale>
+                <Text className="mt-0.5 font-bodyMedium text-[13px] leading-[17px] text-dusk-600">
+                  SAFE-W Agent &amp; Ally
+                </Text>
+              </View>
+            </View>
 
-              {/* Saved Chat History Section */}
-              <View className="mt-5 flex-1">
-                <View className="mb-2 flex-row items-center justify-between">
-                  <Text className="font-bodyBold text-[12px] uppercase tracking-wider text-muted">
-                    Chat History ({savedHistorySessions.length})
-                  </Text>
-                </View>
+            {/* Side Menu Trigger Button */}
+            <Pressable
+              onPress={() => setIsMenuOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Open chat menu for New Chat and History"
+              className="h-10 w-10 items-center justify-center rounded-xl border border-mist bg-paper"
+            >
+              <Ionicons name="menu-outline" size={22} color={colors.midnight} />
+            </Pressable>
+          </View>
 
-                {savedHistorySessions.length === 0 ? (
-                  <View className="mt-2 rounded-2xl border border-mist bg-paper p-3.5">
-                    <Text className="font-body text-[13px] leading-[19px] text-muted">
-                      No saved chats yet. Once you message Saaya, your conversations will appear here automatically.
+          <Text className="mt-2.5 font-body text-[12.5px] leading-[18px] text-muted">
+            Calm, factual guidance · Safety first · Rights &amp; preparation
+          </Text>
+        </View>
+
+        {/* Side Menu Drawer (New Chat, Chat History & Quick Emergency Access) */}
+        {isMenuOpen ? (
+          <View className="absolute inset-0 z-50 flex-row">
+            {/* Backdrop */}
+            <Pressable
+              onPress={() => setIsMenuOpen(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close side menu"
+              style={{ backgroundColor: "rgba(19, 17, 28, 0.45)" }}
+              className="flex-1"
+            />
+
+            {/* Slide-over Side Menu Bar */}
+            <View
+              style={shadow.lift}
+              className="h-full w-[80%] max-w-[320px] flex-col justify-between border-l border-mist bg-white px-4 py-4"
+            >
+              <View className="flex-1">
+                {/* Drawer Header */}
+                <View className="flex-row items-center justify-between border-b border-mist pb-3.5">
+                  <View>
+                    <Text className="font-display text-[17px] text-midnight">
+                      Saaya Menu
+                    </Text>
+                    <Text className="font-body text-[12px] text-muted">
+                      Chats &amp; conversations
                     </Text>
                   </View>
-                ) : (
-                  <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-                    <View className="gap-2 pb-4">
-                      {savedHistorySessions.map((session) => {
-                        const isCurrent = session.id === activeSession.id;
-                        return (
-                          <View
-                            key={session.id}
-                            className={`flex-row items-center justify-between rounded-2xl border px-3 py-2.5 ${
-                              isCurrent
-                                ? "border-dusk-500 bg-dusk-50"
-                                : "border-mist bg-paper"
-                            }`}
-                          >
-                            <Pressable
-                              onPress={() => handleSelectSession(session.id)}
-                              className="flex-1 pr-2"
-                            >
-                              <View className="flex-row items-center">
-                                <Ionicons
-                                  name="chatbubble-ellipses-outline"
-                                  size={14}
-                                  color={
-                                    isCurrent
-                                      ? colors.dusk[600]
-                                      : colors.muted
-                                  }
-                                />
-                                <Text
-                                  numberOfLines={1}
-                                  className="ml-1.5 flex-1 font-bodyBold text-[13px] text-midnight"
-                                >
-                                  {session.title}
-                                </Text>
-                              </View>
-                              <Text className="mt-1 font-body text-[11px] text-muted">
-                                {session.updatedAt}
-                              </Text>
-                            </Pressable>
+                  <Pressable
+                    onPress={() => setIsMenuOpen(false)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Close menu"
+                    className="h-9 w-9 items-center justify-center rounded-xl bg-paper"
+                  >
+                    <Ionicons name="close" size={20} color={colors.midnight} />
+                  </Pressable>
+                </View>
 
-                            <Pressable
-                              onPress={() => handleDeleteSession(session.id)}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Delete chat ${session.title}`}
-                              className="h-8 w-8 items-center justify-center rounded-lg"
+                {/* New Chat Action */}
+                <PressableScale
+                  onPress={handleStartNewChat}
+                  accessibilityRole="button"
+                  accessibilityLabel="Start a new chat with Saaya"
+                  className="mt-4 flex-row items-center justify-center rounded-2xl bg-dusk-600 px-4 py-3"
+                >
+                  <Ionicons
+                    name="add-circle-outline"
+                    size={19}
+                    color="#FFFFFF"
+                  />
+                  <Text className="ml-2 font-bodyBold text-[14px] text-white">
+                    New Chat
+                  </Text>
+                </PressableScale>
+
+                {/* Saved Chat History Section */}
+                <View className="mt-5 flex-1">
+                  <View className="mb-2 flex-row items-center justify-between">
+                    <Text className="font-bodyBold text-[12px] uppercase tracking-wider text-muted">
+                      Chat History ({savedHistorySessions.length})
+                    </Text>
+                  </View>
+
+                  {savedHistorySessions.length === 0 ? (
+                    <View className="mt-2 rounded-2xl border border-mist bg-paper p-3.5">
+                      <Text className="font-body text-[13px] leading-[19px] text-muted">
+                        No saved chats yet. Once you message Saaya, your
+                        conversations will appear here automatically.
+                      </Text>
+                    </View>
+                  ) : (
+                    <ScrollView
+                      className="flex-1"
+                      showsVerticalScrollIndicator={false}
+                    >
+                      <View className="gap-2 pb-4">
+                        {savedHistorySessions.map((session) => {
+                          const isCurrent = session.id === activeSession.id;
+                          return (
+                            <View
+                              key={session.id}
+                              className={`flex-row items-center justify-between rounded-2xl border px-3 py-2.5 ${
+                                isCurrent
+                                  ? "border-dusk-500 bg-dusk-50"
+                                  : "border-mist bg-paper"
+                              }`}
+                            >
+                              <Pressable
+                                onPress={() => handleSelectSession(session.id)}
+                                className="flex-1 pr-2"
+                              >
+                                <View className="flex-row items-center">
+                                  <Ionicons
+                                    name="chatbubble-ellipses-outline"
+                                    size={14}
+                                    color={
+                                      isCurrent
+                                        ? colors.dusk[600]
+                                        : colors.muted
+                                    }
+                                  />
+                                  <Text
+                                    numberOfLines={1}
+                                    className="ml-1.5 flex-1 font-bodyBold text-[13px] text-midnight"
+                                  >
+                                    {session.title}
+                                  </Text>
+                                </View>
+                                <Text className="mt-1 font-body text-[11px] text-muted">
+                                  {session.updatedAt}
+                                </Text>
+                              </Pressable>
+
+                              <Pressable
+                                onPress={() => handleDeleteSession(session.id)}
+                                accessibilityRole="button"
+                                accessibilityLabel={`Delete chat ${session.title}`}
+                                className="h-8 w-8 items-center justify-center rounded-lg"
+                              >
+                                <Ionicons
+                                  name="trash-outline"
+                                  size={16}
+                                  color={colors.muted}
+                                />
+                              </Pressable>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    </ScrollView>
+                  )}
+                </View>
+              </View>
+
+              {/* Drawer Footer: Quick Emergency SOS */}
+              <View className="border-t border-mist pt-3">
+                <PressableScale
+                  onPress={() => {
+                    setIsMenuOpen(false);
+                    router.navigate("/emergency");
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Open Emergency SOS 112"
+                  className="flex-row items-center justify-center rounded-2xl bg-beacon px-4 py-3"
+                >
+                  <Ionicons name="alert-circle" size={18} color="#FFFFFF" />
+                  <Text className="ml-2 font-bodyBold text-[13px] text-white">
+                    Emergency SOS · 112
+                  </Text>
+                </PressableScale>
+              </View>
+            </View>
+          </View>
+        ) : null}
+
+        {/* Scrollable Conversation Thread */}
+        <ScrollView
+          ref={scrollViewRef}
+          className="flex-1 px-4"
+          contentContainerStyle={{ paddingTop: 16, paddingBottom: 24 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={
+            Platform.OS === "ios" ? "interactive" : "on-drag"
+          }
+        >
+          <View className="gap-4">
+            {messages.map((msg) => {
+              const isUser = msg.role === "user";
+              return (
+                <View
+                  key={msg.id}
+                  className={`flex-col ${isUser ? "items-end" : "items-start"}`}
+                >
+                  <View
+                    style={isUser ? undefined : shadow.lift}
+                    className={`max-w-[90%] rounded-[22px] px-4 py-3.5 ${
+                      isUser
+                        ? "bg-dusk-600 rounded-br-md"
+                        : msg.isError
+                          ? "border border-beacon bg-beacon-soft rounded-bl-md"
+                          : "border border-mist bg-white rounded-bl-md"
+                    }`}
+                  >
+                    {renderFormattedText(msg.text, isUser, msg.isError)}
+                  </View>
+
+                  {/* Recommended SAFE-W Pages (shown only when user asks about a related topic) */}
+                  {!isUser &&
+                  msg.recommendedPages &&
+                  msg.recommendedPages.length > 0 ? (
+                    <View className="mt-2.5 w-full max-w-[90%] gap-2">
+                      <Text className="px-1 font-bodyMedium text-[12px] text-muted">
+                        Recommended pages in SAFE-W:
+                      </Text>
+                      {msg.recommendedPages.map((page) => {
+                        const isRights = page.section === "Women's Rights";
+                        const iconBg = isRights
+                          ? "bg-marigold-soft"
+                          : "bg-haven-soft";
+                        const iconColor = isRights
+                          ? colors.marigoldDark
+                          : colors.havenDark;
+
+                        return (
+                          <PressableScale
+                            key={`${msg.id}_${page.route}`}
+                            onPress={() => router.navigate(page.route as Route)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Open ${page.title} in ${page.section}`}
+                            className="flex-row items-center rounded-2xl border border-mist bg-white p-3"
+                          >
+                            <View
+                              className={`mr-3 h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}
                             >
                               <Ionicons
-                                name="trash-outline"
-                                size={16}
-                                color={colors.muted}
+                                name={
+                                  page.icon as keyof typeof Ionicons.glyphMap
+                                }
+                                size={20}
+                                color={iconColor}
                               />
-                            </Pressable>
-                          </View>
+                            </View>
+                            <View className="flex-1 pr-2">
+                              <View className="flex-row items-center">
+                                <Text className="font-bodyMedium text-[11px] text-dusk-600">
+                                  {page.section}
+                                </Text>
+                                <Text className="mx-1 text-[11px] text-muted">
+                                  ·
+                                </Text>
+                                <Text className="font-body text-[11px] text-muted">
+                                  Tap to view details
+                                </Text>
+                              </View>
+                              <Text className="font-bodyBold text-[14px] text-midnight">
+                                {page.title}
+                              </Text>
+                              <Text className="mt-0.5 font-body text-[12px] leading-[17px] text-muted">
+                                {page.summary}
+                              </Text>
+                            </View>
+                            <Ionicons
+                              name="chevron-forward"
+                              size={18}
+                              color={colors.muted}
+                            />
+                          </PressableScale>
                         );
                       })}
                     </View>
-                  </ScrollView>
-                )}
-              </View>
-            </View>
+                  ) : null}
 
-            {/* Drawer Footer: Quick Emergency SOS */}
-            <View className="border-t border-mist pt-3">
-              <PressableScale
-                onPress={() => {
-                  setIsMenuOpen(false);
-                  router.navigate("/emergency");
-                }}
-                accessibilityRole="button"
-                accessibilityLabel="Open Emergency SOS 112"
-                className="flex-row items-center justify-center rounded-2xl bg-beacon px-4 py-3"
-              >
-                <Ionicons name="alert-circle" size={18} color="#FFFFFF" />
-                <Text className="ml-2 font-bodyBold text-[13px] text-white">
-                  Emergency SOS · 112
-                </Text>
-              </PressableScale>
-            </View>
-          </View>
-        </View>
-      ) : null}
-
-      {/* Scrollable Conversation Thread */}
-      <ScrollView
-        className="flex-1 px-4"
-        contentContainerStyle={{ paddingTop: 16, paddingBottom: 24 }}
-      >
-        <View className="gap-4">
-          {messages.map((msg) => {
-            const isUser = msg.role === "user";
-            return (
-              <View
-                key={msg.id}
-                className={`flex-col ${isUser ? "items-end" : "items-start"}`}
-              >
-                <View
-                  style={isUser ? undefined : shadow.lift}
-                  className={`max-w-[90%] rounded-[22px] px-4 py-3.5 ${
-                    isUser
-                      ? "bg-dusk-600 rounded-br-md"
-                      : msg.isError
-                        ? "border border-beacon bg-beacon-soft rounded-bl-md"
-                        : "border border-mist bg-white rounded-bl-md"
-                  }`}
-                >
-                  {renderFormattedText(msg.text, isUser, msg.isError)}
-                </View>
-
-                {/* Recommended SAFE-W Pages (shown only when user asks about a related topic) */}
-                {!isUser &&
-                msg.recommendedPages &&
-                msg.recommendedPages.length > 0 ? (
-                  <View className="mt-2.5 w-full max-w-[90%] gap-2">
-                    <Text className="px-1 font-bodyMedium text-[12px] text-muted">
-                      Recommended pages in SAFE-W:
+                  <View className="mt-1 flex-row items-center px-1">
+                    <Text className="font-body text-[11px] text-muted">
+                      {isUser ? "You" : "Saaya"}
                     </Text>
-                    {msg.recommendedPages.map((page) => {
-                      const isRights = page.section === "Women's Rights";
-                      const iconBg = isRights
-                        ? "bg-marigold-soft"
-                        : "bg-haven-soft";
-                      const iconColor = isRights
-                        ? colors.marigoldDark
-                        : colors.havenDark;
-
-                      return (
-                        <PressableScale
-                          key={`${msg.id}_${page.route}`}
-                          onPress={() => router.navigate(page.route as Route)}
-                          accessibilityRole="button"
-                          accessibilityLabel={`Open ${page.title} in ${page.section}`}
-                          className="flex-row items-center rounded-2xl border border-mist bg-white p-3"
-                        >
-                          <View
-                            className={`mr-3 h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}
-                          >
-                            <Ionicons
-                              name={
-                                page.icon as ComponentProps<
-                                  typeof Ionicons
-                                >["name"]
-                              }
-                              size={20}
-                              color={iconColor}
-                            />
-                          </View>
-                          <View className="flex-1 pr-2">
-                            <View className="flex-row items-center">
-                              <Text className="font-bodyMedium text-[11px] text-dusk-600">
-                                {page.section}
-                              </Text>
-                              <Text className="mx-1 text-[11px] text-muted">
-                                ·
-                              </Text>
-                              <Text className="font-body text-[11px] text-muted">
-                                Tap to view details
-                              </Text>
-                            </View>
-                            <Text className="font-bodyBold text-[14px] text-midnight">
-                              {page.title}
-                            </Text>
-                            <Text className="mt-0.5 font-body text-[12px] leading-[17px] text-muted">
-                              {page.summary}
-                            </Text>
-                          </View>
-                          <Ionicons
-                            name="chevron-forward"
-                            size={18}
-                            color={colors.muted}
-                          />
-                        </PressableScale>
-                      );
-                    })}
+                    <Text className="mx-1 font-body text-[11px] text-muted">
+                      ·
+                    </Text>
+                    <Text className="font-body text-[11px] text-muted">
+                      {msg.timestamp}
+                    </Text>
                   </View>
-                ) : null}
+                </View>
+              );
+            })}
 
-                <View className="mt-1 flex-row items-center px-1">
-                  <Text className="font-body text-[11px] text-muted">
-                    {isUser ? "You" : "Saaya"}
-                  </Text>
-                  <Text className="mx-1 font-body text-[11px] text-muted">
-                    ·
-                  </Text>
-                  <Text className="font-body text-[11px] text-muted">
-                    {msg.timestamp}
+            {isSending ? (
+              <View className="items-start">
+                <View className="flex-row items-center gap-2.5 rounded-[22px] rounded-bl-md border border-mist bg-white px-4 py-3">
+                  <ActivityIndicator color={colors.dusk[600]} />
+                  <Text className="font-body text-[14px] text-muted">
+                    Saaya is replying...
                   </Text>
                 </View>
               </View>
-            );
-          })}
+            ) : null}
 
-          {isSending ? (
-            <View className="items-start">
-              <View className="flex-row items-center gap-2.5 rounded-[22px] rounded-bl-md border border-mist bg-white px-4 py-3">
-                <ActivityIndicator color={colors.dusk[600]} />
-                <Text className="font-body text-[14px] text-muted">
-                  Saaya is replying...
-                </Text>
+            {/* Starter Prompts when conversation only has the welcome message */}
+            {messages.length <= 1 && !isSending ? (
+              <View className="mt-1">
+                <Label tone="muted" className="mb-2">
+                  Ask Saaya anything
+                </Label>
+                <View className="gap-2">
+                  {STARTER_PROMPTS.map((prompt) => (
+                    <PressableScale
+                      key={prompt}
+                      onPress={() => void handleSendMessage(prompt)}
+                      accessibilityRole="button"
+                      accessibilityLabel={prompt}
+                      className="flex-row items-center justify-between rounded-2xl border border-mist bg-white px-4 py-3"
+                    >
+                      <Body size="sm" tone="ink" className="flex-1 pr-2">
+                        {prompt}
+                      </Body>
+                      <Ionicons
+                        name="arrow-forward"
+                        size={16}
+                        color={colors.dusk[600]}
+                      />
+                    </PressableScale>
+                  ))}
+                </View>
               </View>
-            </View>
-          ) : null}
-
-          {/* Starter Prompts when conversation only has the welcome message */}
-          {messages.length <= 1 && !isSending ? (
-            <View className="mt-1">
-              <Label tone="muted" className="mb-2">
-                Ask Saaya anything
-              </Label>
-              <View className="gap-2">
-                {STARTER_PROMPTS.map((prompt) => (
-                  <PressableScale
-                    key={prompt}
-                    onPress={() => void handleSendMessage(prompt)}
-                    accessibilityRole="button"
-                    accessibilityLabel={prompt}
-                    className="flex-row items-center justify-between rounded-2xl border border-mist bg-white px-4 py-3"
-                  >
-                    <Body size="sm" tone="ink" className="flex-1 pr-2">
-                      {prompt}
-                    </Body>
-                    <Ionicons
-                      name="arrow-forward"
-                      size={16}
-                      color={colors.dusk[600]}
-                    />
-                  </PressableScale>
-                ))}
-              </View>
-            </View>
-          ) : null}
-
-          <div ref={bottomAnchorRef} />
-        </View>
-      </ScrollView>
-
-      {/* Message Input Composer */}
-      <View className="border-t border-mist bg-white px-4 py-3">
-        <View className="flex-row items-center gap-2.5">
-          <View className="flex-1 rounded-2xl border border-mist bg-paper px-3.5 py-2.5">
-            <TextInput
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder="Ask Saaya anything..."
-              editable={!isSending}
-              onSubmitEditing={() => void handleSendMessage()}
-              accessibilityLabel="Message Saaya"
-              className="w-full font-body text-[15px] text-midnight"
-            />
+            ) : null}
           </View>
-          <PressableScale
-            onPress={() => void handleSendMessage()}
-            disabled={!inputText.trim() || isSending}
-            accessibilityRole="button"
-            accessibilityLabel="Send message"
-            className={`h-12 w-12 items-center justify-center rounded-2xl ${
-              inputText.trim() && !isSending ? "bg-dusk-600" : "bg-mist"
-            }`}
-          >
-            <Ionicons
-              name="paper-plane-outline"
-              size={20}
-              color={inputText.trim() && !isSending ? "#FFFFFF" : colors.muted}
-            />
-          </PressableScale>
+        </ScrollView>
+
+        {/* Message Input Composer */}
+        <View className="border-t border-mist bg-white px-4 py-3">
+          <View className="flex-row items-center gap-2.5">
+            <View className="flex-1 rounded-2xl border border-mist bg-paper px-3.5 py-2.5">
+              <TextInput
+                value={inputText}
+                onChangeText={setInputText}
+                placeholder="Ask Saaya anything..."
+                editable={!isSending}
+                onSubmitEditing={() => void handleSendMessage()}
+                accessibilityLabel="Message Saaya"
+                className="w-full font-body text-[15px] text-midnight"
+              />
+            </View>
+            <PressableScale
+              onPress={() => void handleSendMessage()}
+              disabled={!inputText.trim() || isSending}
+              accessibilityRole="button"
+              accessibilityLabel="Send message"
+              className={`h-12 w-12 items-center justify-center rounded-2xl ${
+                inputText.trim() && !isSending ? "bg-dusk-600" : "bg-mist"
+              }`}
+            >
+              <Ionicons
+                name="paper-plane-outline"
+                size={20}
+                color={
+                  inputText.trim() && !isSending ? "#FFFFFF" : colors.muted
+                }
+              />
+            </PressableScale>
+          </View>
+          <Heading size="sm" className="sr-only">
+            Composer
+          </Heading>
         </View>
-        <Heading size="sm" className="sr-only">
-          Composer
-        </Heading>
-      </View>
-    </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

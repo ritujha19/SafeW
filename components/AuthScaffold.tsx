@@ -1,7 +1,8 @@
 import type { ImageSourcePropType } from "react-native";
 import type { ReactNode } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useKeyboardBehavior } from "@/hooks/useKeyboardBehavior";
 import { type IconName, Illustration } from "./Media";
 import { Body, Display } from "./Typography";
 
@@ -24,11 +25,9 @@ export function AuthScaffold({
   footer: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const keyboardBehavior = useKeyboardBehavior();
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-paper"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <KeyboardAvoidingView className="flex-1 bg-paper" behavior={keyboardBehavior}>
       <ScrollView
         contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 32 }}
         keyboardShouldPersistTaps="handled"

@@ -144,7 +144,12 @@ export const SAFEW_PAGES: SafewPageResource[] = [
       "Covers Constitutional Rights, Protection from Violence (BNS 2023 & DV Act), Workplace Rights (POSH), Family & Marriage Rights, Digital Rights, Rights When Seeking Help, and Free Legal Aid.",
       "Explains what each law means in simple language and why it matters to your safety.",
     ],
-    keywords: ["women's rights", "womens rights", "all rights", "legal rights in india"],
+    keywords: [
+      "women's rights",
+      "womens rights",
+      "all rights",
+      "legal rights in india",
+    ],
     icon: "scale-outline",
   },
   {
@@ -671,7 +676,10 @@ function hasPhrase(text: string, phrases: string[]): boolean {
     const p = normalizeSaayaText(phrase);
     if (!p) return false;
     if (p.includes(" ")) return normalized.includes(p);
-    return new RegExp(`\\b${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(normalized);
+    return new RegExp(
+      `\\b${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+      "i",
+    ).test(normalized);
   });
 }
 
@@ -884,7 +892,15 @@ Saaya provides safety information; it does not replace emergency services or law
       "in law house",
     ]) ||
     (hasPhrase(lower, ["husband", "wife", "married", "marriage"]) &&
-      hasPhrase(lower, ["right", "rights", "abuse", "violence", "property", "house", "maintenance"]))
+      hasPhrase(lower, [
+        "right",
+        "rights",
+        "abuse",
+        "violence",
+        "property",
+        "house",
+        "maintenance",
+      ]))
   ) {
     return {
       reply: `Here is a factual overview of **Rights Within Marriage** in India (the specific provisions that apply can depend on the marriage law governing the marriage and the facts of the situation):
@@ -962,7 +978,15 @@ Saaya provides safety information; it does not replace emergency services or law
   }
 
   // 5. Dowry.
-  if (hasPhrase(lower, ["dowry", "dowry prohibition", "demanding dowry", "dowry harassment", "streedhan"])) {
+  if (
+    hasPhrase(lower, [
+      "dowry",
+      "dowry prohibition",
+      "demanding dowry",
+      "dowry harassment",
+      "streedhan",
+    ])
+  ) {
     return {
       reply: `Here is a factual summary of **Dowry Prohibition Laws** in India:
 
@@ -1046,7 +1070,17 @@ Saaya provides safety information; it does not replace emergency services or law
       "maternity benefit",
     ]) ||
     (hasPhrase(lower, ["work", "office", "boss", "manager", "colleague"]) &&
-      hasPhrase(lower, ["harassment", "harass", "harassing", "sexual", "posh", "complaint", "rights", "maternity", "unsafe"]))
+      hasPhrase(lower, [
+        "harassment",
+        "harass",
+        "harassing",
+        "sexual",
+        "posh",
+        "complaint",
+        "rights",
+        "maternity",
+        "unsafe",
+      ]))
   ) {
     return {
       reply: `Here is a factual summary of **Workplace Rights** in India:
@@ -1086,7 +1120,18 @@ Saaya provides safety information; it does not replace emergency services or law
       "1930",
     ]) ||
     (hasPhrase(lower, ["online", "instagram", "whatsapp", "photo", "image"]) &&
-      hasPhrase(lower, ["blackmail", "blackmailing", "threat", "leaked", "private", "morphed", "impersonat", "harass", "harassing", "without consent"]))
+      hasPhrase(lower, [
+        "blackmail",
+        "blackmailing",
+        "threat",
+        "leaked",
+        "private",
+        "morphed",
+        "impersonat",
+        "harass",
+        "harassing",
+        "without consent",
+      ]))
   ) {
     return {
       reply: `Here is a practical and factual overview of **Digital Safety & Cyber Laws**:
@@ -1124,7 +1169,15 @@ Saaya provides safety information; it does not replace emergency services or law
       "15100",
     ]) ||
     (hasPhrase(lower, ["report", "complaint", "lawyer"]) &&
-      hasPhrase(lower, ["crime", "police", "legal", "fir", "offence", "case", "help"]))
+      hasPhrase(lower, [
+        "crime",
+        "police",
+        "legal",
+        "fir",
+        "offence",
+        "case",
+        "help",
+      ]))
   ) {
     return {
       reply: `Here is a factual overview of **Rights When Seeking Help & Legal Aid**:
@@ -1161,7 +1214,15 @@ Saaya provides safety information; it does not replace emergency services or law
       "how to react",
     ]) ||
     (hasPhrase(lower, ["prepare", "learn", "warning", "sign"]) &&
-      hasPhrase(lower, ["safety", "unsafe", "harassment", "abuse", "danger", "situation", "scenario"]))
+      hasPhrase(lower, [
+        "safety",
+        "unsafe",
+        "harassment",
+        "abuse",
+        "danger",
+        "situation",
+        "scenario",
+      ]))
   ) {
     return {
       reply: `Here is how SAFE-W's **Learn & Prepare** resources can help:
