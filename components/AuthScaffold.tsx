@@ -1,8 +1,9 @@
 import type { ImageSourcePropType } from "react-native";
 import type { ReactNode } from "react";
-import { KeyboardAvoidingView, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useKeyboardBehavior } from "@/hooks/useKeyboardBehavior";
+import { colors } from "@/constants/theme";
 import { type IconName, Illustration } from "./Media";
 import { Body, Display } from "./Typography";
 
@@ -25,9 +26,14 @@ export function AuthScaffold({
   footer: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
-  const keyboardBehavior = useKeyboardBehavior();
   return (
-    <KeyboardAvoidingView className="flex-1 bg-paper" behavior={keyboardBehavior}>
+    // KeyboardAvoidingView from react-native-keyboard-controller (not React Native's
+    // built-in one): with edge-to-edge on, the built-in one doesn't receive real
+    // keyboard insets on Android. Third-party component, so plain `style`, not className.
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={{ flex: 1, backgroundColor: colors.paper }}
+    >
       <ScrollView
         contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 32 }}
         keyboardShouldPersistTaps="handled"

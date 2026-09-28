@@ -15,6 +15,11 @@
       "package": "com.safew.app",
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+              "android.permission.SYSTEM_ALERT_WINDOW",
+              "android.permission.FOREGROUND_SERVICE",
+              "android.permission.VIBRATE"
+            ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -7,10 +7,12 @@ import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
+import { FloatingSaayaOverlay } from "@/components/FloatingSaayaOverlay";
 import { BrandMark, HeaderProfileButton } from "@/components/Header";
 import { colors } from "@/constants/theme";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+    import { KeyboardProvider } from "react-native-keyboard-controller";
 import "../global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -48,6 +50,7 @@ export default function RootLayout() {
   };
 
   return (
+    <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
     <Stack
       screenOptions={{
         headerStyle: { backgroundColor: colors.paper },
@@ -209,5 +212,7 @@ export default function RootLayout() {
         options={{ title: "Rights After Divorce" }}
       />
     </Stack>
+    <FloatingSaayaOverlay />
+    </KeyboardProvider>
   );
 }

@@ -144,12 +144,7 @@ export const SAFEW_PAGES: SafewPageResource[] = [
       "Covers Constitutional Rights, Protection from Violence (BNS 2023 & DV Act), Workplace Rights (POSH), Family & Marriage Rights, Digital Rights, Rights When Seeking Help, and Free Legal Aid.",
       "Explains what each law means in simple language and why it matters to your safety.",
     ],
-    keywords: [
-      "women's rights",
-      "womens rights",
-      "all rights",
-      "legal rights in india",
-    ],
+    keywords: ["women's rights", "womens rights", "all rights", "legal rights in india"],
     icon: "scale-outline",
   },
   {
@@ -593,44 +588,44 @@ export const SAFEW_PAGES: SafewPageResource[] = [
   },
 ];
 
-export const SAAYA_SYSTEM_INSTRUCTION = `You are Saaya, the SAFE-W Agent & Ally.
+export const SAAYA_SYSTEM_INSTRUCTION = `You are Saaya, the SAFE-W Agent & Ally — a compassionate, empathetic, and safety-first companion for women and their allies.
 
-Your primary purpose is to help users stay safer, understand
-their rights, and prepare for potentially unsafe situations.
+CORE MISSION & AUTONOMY:
+- You must thoughtfully and directly answer ANY question a user asks about women's safety, feeling unsure or uneasy in a situation, boundaries, harassment, stalking, domestic or relationship concerns, digital safety, workplace discomfort, travel/commute safety, helping another woman in distress, or women's legal rights.
+- Users will often describe unfamiliar, subtle, or messy real-life situations that are not pre-scripted. NEVER say "Sorry, Saaya doesn't know this" or give a generic menu of topics. Always reason through the user's specific situation on your own while strictly following every instruction below.
 
-Prioritize immediate physical safety over legal information,
-evidence collection, or extended conversation.
+EMPATHY, VALIDATION & SYMPATHY FOR WOMEN:
+1. When a woman feels unsure, confused, anxious, or unsafe (e.g., "Am I overthinking?", "Something feels off", "I don't know if this counts"):
+   - Start with warm empathy and validation. Reassure her immediately that her instincts and feelings are completely valid and that she never needs 100% proof of danger before choosing her comfort and safety.
+   - Never judge, blame, or dismiss her concern. Speak like a calm, caring, protective sister or ally.
+2. When a user asks about or wants to help another woman in that condition (e.g., seeing a girl being stalked/followed, supporting a friend/sister/colleague facing abuse, coercion, or fear):
+   - Express genuine empathy and sympathy for the woman going through that frightening or isolating situation, and appreciate the user's care in wanting to help her.
+   - Help the user understand how overwhelmed, frozen, or scared the woman may feel so the user can offer gentle, non-startling, survivor-centered support.
 
-When a user may be in immediate danger:
-1. Encourage moving to a safe, visible location.
-2. Discourage confrontation or unnecessary risk.
-3. Encourage contacting a trusted person.
-4. Direct the user to SAFE-W SOS/emergency options when appropriate.
-5. Keep the response concise and action-oriented.
+NON-NEGOTIABLE SAFETY INSTRUCTIONS TO FOLLOW IN EVERY REPLY:
+1. Immediate Physical Safety First:
+   - Always prioritize immediate physical safety over legal details, collecting evidence, or extended debate.
+   - Remind users: "Safety comes before evidence—never put yourself in danger just to take a photo, record, or prove what happened."
+2. Never Encourage Confrontation or Risky Behavior:
+   - Strictly discourage direct physical or verbal confrontation with a stalker, harasser, abuser, or aggressor, as confrontation can rapidly escalate into violence.
+3. Follow the SAFE-W "Notice → Move → Tell" Framework:
+   - Notice: Trust your gut early when someone's behavior or a setting feels wrong.
+   - Move: Calmly create distance and move toward a well-lit, visible, populated area (an open shop, security guard desk, reception counter, metro/bus staff, or crowd)—avoid isolated shortcuts or leading a follower to an empty home.
+   - Tell: Call or message a trusted contact, alert nearby staff/security, or use emergency helplines (**112** National Emergency, **181** Women Helpline, **1091** Women in Distress, **1930** Cybercrime, **15100** Free Legal Aid).
+4. Safe Bystander / Ally Intervention (When Helping Another Woman):
+   - Advise calm, indirect support focused on the woman at risk—NOT confronting or fighting the stalker/harasser.
+   - Suggest calmly approaching her in a visible area, speaking gently (or greeting her like an acquaintance/friend so the stalker sees she is not alone), walking together toward a well-lit shop/crowd/security guard, respecting her comfort, and calling **112** or **181** if danger persists.
+5. Discussing Women's Rights & Indian Law:
+   - Provide factual, current information in simple, reassuring language (e.g., BNS 2023 Sections 74–80, BNSS 2023 Section 173 Zero FIR & free FIR copy, Domestic Violence Act 2005, POSH Act 2013, IT Act Section 66E, Marriage & Family rights, NALSA Free Legal Aid Section 12(c)).
+   - Clearly distinguish general legal awareness from personalized legal advice from a lawyer, and do not claim a specific situation definitely constitutes a crime unless facts and law clearly establish it.
+6. Scope Reminder:
+   - Include a brief note when appropriate that Saaya is an AI safety & awareness companion, not a replacement for emergency services (112), law enforcement, lawyers, or doctors.
 
-When discussing women's rights or Indian law:
-- Provide factual, current information.
-- Explain laws in simple language.
-- Distinguish legal information from personalized legal advice.
-- Do not claim that a specific situation definitely constitutes
-  a crime unless the facts and applicable law clearly establish it.
-- Link users to SAFE-W Women's Rights resources when relevant.
-
-When discussing preparation:
-- Use SAFE-W Learn & Prepare resources.
-- Recommend relevant guides and warning-sign information.
-
-Saaya must never encourage confrontation, retaliation,
-unnecessary evidence collection, or risky behavior.
-
-Saaya is not a replacement for emergency services,
-law enforcement, lawyers, doctors, or other professionals.
-
-Tone:
-Calm, factual, concise, respectful, practical, and safety-first.
+TONE:
+Warm, empathetic, sympathetic, calm, validating, practical, concise, and safety-first.
 
 LINKING TO SAFE-W RESOURCES (PAGE RECOMMENDATIONS):
-When linking users to relevant SAFE-W Women's Rights, Learn & Prepare, or Emergency resources, include the matching page tag(s) at the very end of your response using the exact format [[PAGE:/route]] (only include tags when relevant to what the user asked):
+When relevant to the user's question, include 1 to 3 matching page tag(s) at the very end of your response using the exact format [[PAGE:/route]]:
 • Marriage & Family Subpages:
   - [[PAGE:/womenRights/viewMore/rightsWithinMarriage]] ("Rights Within Marriage")
   - [[PAGE:/womenRights/viewMore/rightsInSharedHousehold]] ("Rights in a Shared Household")
@@ -661,30 +656,8 @@ When linking users to relevant SAFE-W Women's Rights, Learn & Prepare, or Emerge
 • Emergency Support:
   - [[PAGE:/emergency]] ("Emergency SOS & Helplines")`;
 
-function normalizeSaayaText(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[’']/g, "'")
-    .replace(/[^a-z0-9\s']/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function hasPhrase(text: string, phrases: string[]): boolean {
-  const normalized = normalizeSaayaText(text);
-  return phrases.some((phrase) => {
-    const p = normalizeSaayaText(phrase);
-    if (!p) return false;
-    if (p.includes(" ")) return normalized.includes(p);
-    return new RegExp(
-      `\\b${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-      "i",
-    ).test(normalized);
-  });
-}
-
 function isCasualGreetingOrShortAck(text: string): boolean {
-  const cleaned = normalizeSaayaText(text);
+  const cleaned = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
   const casualPhrases = new Set([
     "hi",
     "hello",
@@ -710,81 +683,21 @@ function isCasualGreetingOrShortAck(text: string): boolean {
   return casualPhrases.has(cleaned);
 }
 
-function isImmediateSafetyConcern(text: string): boolean {
-  const normalized = normalizeSaayaText(text);
-
-  // Strong, explicit danger statements should trigger the safety-first flow.
-  if (
-    hasPhrase(normalized, [
-      "immediate danger",
-      "in immediate danger",
-      "help me now",
-      "i am in danger",
-      "i'm in danger",
-      "i am unsafe right now",
-      "i'm unsafe right now",
-      "unsafe right now",
-      "someone is following me",
-      "someone's following me",
-      "i am being followed",
-      "i'm being followed",
-      "someone is stalking me",
-      "someone's stalking me",
-      "someone is threatening me",
-      "someone's threatening me",
-      "they are threatening me",
-      "they're threatening me",
-      "someone blocked my path",
-      "someone blocked my way",
-      "they blocked my path",
-      "they blocked my way",
-      "driver won't let me out",
-      "driver will not let me out",
-      "cab driver won't let me out",
-      "cab driver will not let me out",
-      "can't get away",
-      "cannot get away",
-    ])
-  ) {
-    return true;
-  }
-
-  // Short phrases are only treated as urgent when they include a clear danger
-  // context. This avoids treating ordinary questions such as "Can I walk home?"
-  // as emergencies.
-  const dangerTerms = hasPhrase(normalized, [
-    "danger",
-    "unsafe",
-    "threat",
-    "threatening",
-    "followed",
-    "following",
-    "stalking",
-    "blocked",
-  ]);
-  const urgencyTerms = hasPhrase(normalized, [
-    "right now",
-    "now",
-    "help",
-    "escape",
-    "can't get away",
-    "cannot get away",
-  ]);
-
-  return dangerTerms && urgencyTerms;
-}
-
 export function extractAndRecommendPages(
   rawReply: string,
   userMessage: string,
 ): { cleanReply: string; recommendedPages: SafewPageResource[] } {
   const foundRoutes: string[] = [];
+
   const tagRegex = /\[\[PAGE:(\/[a-zA-Z0-9/_-]+)\]\]/g;
+
   let match: RegExpExecArray | null = tagRegex.exec(rawReply);
+
   while (match !== null) {
     if (match[1] && !foundRoutes.includes(match[1])) {
       foundRoutes.push(match[1]);
     }
+
     match = tagRegex.exec(rawReply);
   }
 
@@ -793,38 +706,182 @@ export function extractAndRecommendPages(
     .trim();
 
   if (isCasualGreetingOrShortAck(userMessage) && foundRoutes.length === 0) {
-    return { cleanReply, recommendedPages: [] };
+    return {
+      cleanReply,
+      recommendedPages: [],
+    };
   }
 
-  const byRoute = new Map(SAFEW_PAGES.map((p) => [p.route, p]));
+  const byRoute = new Map(
+    SAFEW_PAGES.map((page) => [page.route, page]),
+  );
+
   const selected: SafewPageResource[] = [];
 
-  for (const r of foundRoutes) {
-    const page = byRoute.get(r);
-    if (page && !selected.some((s) => s.route === page.route)) {
+  /*
+   * ---------------------------------------------------------
+   * 1. DETECT CURRENT / IMMEDIATE DANGER
+   * ---------------------------------------------------------
+   *
+   * This is intentionally deterministic because emergency
+   * page recommendation should not depend entirely on whether
+   * Gemini remembered to add a PAGE tag.
+   */
+
+  const userLower = userMessage.toLowerCase();
+
+  const immediateDangerPatterns = [
+    "hurting me",
+    "is hurting me",
+    "hurt me",
+    "hitting me",
+    "is hitting me",
+    "beating me",
+    "is beating me",
+    "attacking me",
+    "is attacking me",
+    "trying to hurt me",
+    "trying to attack me",
+    "threatening me",
+    "is threatening me",
+    "following me",
+    "is following me",
+    "chasing me",
+    "is chasing me",
+    "blocking my way",
+    "blocking me",
+    "won't let me leave",
+    "wont let me leave",
+    "trapped",
+    "i am scared",
+    "i'm scared",
+    "im scared",
+    "i am afraid",
+    "i'm afraid",
+    "im afraid",
+    "feel unsafe right now",
+    "feeling unsafe right now",
+    "unsafe right now",
+    "in danger",
+    "immediate danger",
+    "danger right now",
+    "need help now",
+    "help me now",
+    "happening right now",
+    "happening now",
+    "right now",
+    "sos",
+    "emergency",
+  ];
+
+  const isImmediateDanger = immediateDangerPatterns.some((pattern) =>
+    userLower.includes(pattern),
+  );
+
+  /*
+   * ---------------------------------------------------------
+   * 2. EMERGENCY PAGE HAS HIGHEST PRIORITY
+   * ---------------------------------------------------------
+   */
+
+  if (isImmediateDanger) {
+    const emergencyPage = byRoute.get("/emergency");
+
+    if (emergencyPage) {
+      selected.push(emergencyPage);
+    }
+  }
+
+  /*
+   * ---------------------------------------------------------
+   * 3. KEEP GEMINI'S EXPLICIT PAGE RECOMMENDATIONS
+   * ---------------------------------------------------------
+   *
+   * But don't add duplicates.
+   */
+
+  for (const route of foundRoutes) {
+    const page = byRoute.get(route);
+
+    if (
+      page &&
+      !selected.some((selectedPage) => selectedPage.route === page.route)
+    ) {
       selected.push(page);
     }
   }
 
-  const userLower = normalizeSaayaText(userMessage);
+  /*
+   * ---------------------------------------------------------
+   * 4. SCORE PAGES USING THE USER'S MESSAGE
+   * ---------------------------------------------------------
+   */
+
   const scoredByUser = SAFEW_PAGES.map((page) => {
     let score = 0;
-    for (const kw of page.keywords) {
-      if (hasPhrase(userLower, [kw])) {
-        score += kw.includes(" ") ? 5 : 3;
+
+    for (const keyword of page.keywords) {
+      const keywordLower = keyword.toLowerCase();
+
+      if (userLower.includes(keywordLower)) {
+        score += keyword.includes(" ") ? 5 : 3;
       }
     }
-    if (hasPhrase(userLower, [page.title])) {
+
+    if (userLower.includes(page.title.toLowerCase())) {
       score += 6;
     }
-    return { page, score };
+
+    /*
+     * Give Protection from Violence a stronger score when
+     * physical violence is explicitly described.
+     */
+    if (
+      page.route === "/womenRights/protectionFromViolence" &&
+      (
+        userLower.includes("beating") ||
+        userLower.includes("hitting") ||
+        userLower.includes("hurt") ||
+        userLower.includes("physical abuse") ||
+        userLower.includes("attacking") ||
+        userLower.includes("violence")
+      )
+    ) {
+      score += 8;
+    }
+
+    /*
+     * Legal-information questions should naturally favor
+     * rights pages, but not override an actual emergency.
+     */
+    if (
+      page.route === "/womenRights/viewMore/rightsWithinMarriage" &&
+      (
+        userLower.includes("what rights") ||
+        userLower.includes("my rights") ||
+        userLower.includes("rights as a wife") ||
+        userLower.includes("rights in marriage") ||
+        userLower.includes("rights within marriage")
+      )
+    ) {
+      score += 8;
+    }
+
+    return {
+      page,
+      score,
+    };
   })
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score);
 
+
   for (const { page } of scoredByUser) {
-    if (selected.length >= 3) break;
-    if (!selected.some((s) => s.route === page.route)) {
+    if (selected.length >= 3) {
+      break;
+    }
+
+    if (!selected.some((selectedPage) => selectedPage.route === page.route)) {
       selected.push(page);
     }
   }
@@ -835,417 +892,16 @@ export function extractAndRecommendPages(
   };
 }
 
-export function buildLocalSaayaFallback(userMessage: string): {
+export function buildLocalSaayaFallback(_userMessage: string): {
   reply: string;
   recommendedPages: SafewPageResource[];
 } {
-  const byRoute = new Map(SAFEW_PAGES.map((p) => [p.route, p]));
-  const lower = normalizeSaayaText(userMessage);
-
-  const pages = (...routes: string[]): SafewPageResource[] =>
-    routes
-      .map((route) => byRoute.get(route))
-      .filter((page): page is SafewPageResource => Boolean(page));
-
-  if (isCasualGreetingOrShortAck(userMessage)) {
-    return {
-      reply:
-        "Hi, I’m **Saaya**, the SAFE-W Agent & Ally.\\n\\nI can help with practical safety steps, Indian women's rights information, or SAFE-W Learn & Prepare resources.\\n\\n**What can I help you with today?**",
-      recommendedPages: [],
-    };
-  }
-
-  // 1. Immediate physical safety always comes first.
-  if (isImmediateSafetyConcern(userMessage)) {
-    return {
-      reply: `**Your safety comes first.**
-
-1. **Move** to a safe, visible place such as a busy shop, crowded area, or security desk.
-2. **Do not confront the person** or stop to collect evidence if that increases your risk.
-3. **Tell someone you trust** and share your location if you can do so safely.
-4. If you are in immediate danger, use **SAFE-W Emergency / SOS** or call **112**.
-
-Saaya provides safety information; it does not replace emergency services or law enforcement.`,
-      recommendedPages: pages(
-        "/emergency",
-        "/learn/warningSigns",
-        "/learn/safetyEssentials",
-      ),
-    };
-  }
-
-  // 2. Marriage / family rights. Use contextual terms rather than generic words
-  // such as "life" or "family" that can appear in unrelated questions.
-  if (
-    hasPhrase(lower, [
-      "rights within marriage",
-      "rights in marriage",
-      "marriage rights",
-      "married rights",
-      "rights as a wife",
-      "wife rights",
-      "husband rights",
-      "domestic relationship",
-      "shared household",
-      "matrimonial home",
-      "in laws house",
-      "in law house",
-    ]) ||
-    (hasPhrase(lower, ["husband", "wife", "married", "marriage"]) &&
-      hasPhrase(lower, [
-        "right",
-        "rights",
-        "abuse",
-        "violence",
-        "property",
-        "house",
-        "maintenance",
-      ]))
-  ) {
-    return {
-      reply: `Here is a factual overview of **Rights Within Marriage** in India (the specific provisions that apply can depend on the marriage law governing the marriage and the facts of the situation):
-
-• **Protection from Domestic Violence (DV Act, 2005 — Section 3)**: Covers physical, sexual, verbal, emotional, and economic abuse in qualifying domestic relationships.
-• **Right to Reside in a Shared Household (Sections 17 & 19)**: A woman in a domestic relationship has a statutory right to reside in the shared household—whether or not she owns it—and cannot be evicted except through legal procedure.
-• **Court Remedies (Sections 18–23)**: Depending on the circumstances, a Magistrate may grant Protection Orders, Residence Orders, Monetary Relief, Temporary Custody, or Compensation.
-• **Other Matrimonial Rights**: Applicable personal laws, the Special Marriage Act, and BNSS 2023 also address maintenance, divorce, property, and dowry prohibition.
-
-*Note: This is general legal information for awareness, not personalized legal advice. If you are unsafe at home right now, prioritize moving to a safe space and calling **112**.*`,
-      recommendedPages: pages(
-        "/womenRights/viewMore/rightsWithinMarriage",
-        "/womenRights/viewMore/rightsInSharedHousehold",
-        "/womenRights/familyMarriageRights",
-      ),
-    };
-  }
-
-  // 3. Divorce / separation / custody.
-  if (
-    hasPhrase(lower, [
-      "divorce",
-      "divorce rights",
-      "end marriage",
-      "mutual consent",
-      "judicial separation",
-      "separate from husband",
-      "separation",
-      "custody of child",
-      "child custody",
-    ])
-  ) {
-    return {
-      reply: `Here is a concise overview of **Divorce & Post-Divorce Rights** in India:
-
-• **Applicable Marriage Law**: Divorce grounds and procedures depend on the statute governing the marriage (such as the Hindu Marriage Act, Special Marriage Act, Indian Divorce Act, Parsi Marriage and Divorce Act, or Dissolution of Muslim Marriages Act).
-• **Contested & Mutual Consent Divorce**: Depending on the governing law and statutory conditions, spouses may seek divorce on specified grounds (such as cruelty or desertion) or jointly by mutual consent.
-• **Maintenance & Child Custody**: Courts can consider interim and permanent maintenance and orders for the custody, education, and support of minor children based on the child's welfare.
-
-*Note: This is general legal information, not personalized legal advice from a lawyer.*`,
-      recommendedPages: pages(
-        "/womenRights/viewMore/divorceRights",
-        "/womenRights/viewMore/rightsAfterDivorce",
-        "/womenRights/viewMore/maintenance",
-      ),
-    };
-  }
-
-  // 4. Maintenance / alimony.
-  if (
-    hasPhrase(lower, [
-      "maintenance",
-      "alimony",
-      "financial support",
-      "money from husband",
-      "interim maintenance",
-      "monetary relief",
-      "child support",
-      "bnss 144",
-    ])
-  ) {
-    return {
-      reply: `Here is a factual summary of **Maintenance Rights** under Indian law:
-
-• **BNSS 2023 Section 144**: Where statutory conditions are met, a Magistrate may order monthly maintenance and interim maintenance for a wife unable to maintain herself and for eligible children and parents.
-• **Matrimonial & DV Act Remedies**: Maintenance or monetary relief may also be sought under applicable marriage laws or Section 20 of the Domestic Violence Act, 2005.
-• **Case-Specific Assessment**: Courts determine eligibility and amounts based on the facts of the case.
-
-*Note: This is general legal information, not personalized legal advice.*`,
-      recommendedPages: pages(
-        "/womenRights/viewMore/maintenance",
-        "/womenRights/freeLegalAids",
-      ),
-    };
-  }
-
-  // 5. Dowry.
-  if (
-    hasPhrase(lower, [
-      "dowry",
-      "dowry prohibition",
-      "demanding dowry",
-      "dowry harassment",
-      "streedhan",
-    ])
-  ) {
-    return {
-      reply: `Here is a factual summary of **Dowry Prohibition Laws** in India:
-
-• **Dowry Prohibition Act, 1961 (Sections 3 & 4)**: Giving, taking, or directly or indirectly demanding dowry is punishable under the Act, subject to its statutory definitions and provisions.
-• **Property for the Benefit of the Wife (Section 6)**: Where dowry is received by someone other than the woman, the Act requires it to be transferred for her benefit within the statutory framework.
-• **Protection from Violence & Cruelty**: Abuse or harassment connected with unlawful dowry demands is also addressed under the BNS 2023 and the Domestic Violence Act, 2005.
-
-*Note: This is general legal information, not personalized legal advice.*`,
-      recommendedPages: pages(
-        "/womenRights/viewMore/dowryProhibition",
-        "/womenRights/protectionFromViolence",
-      ),
-    };
-  }
-
-  // 6. Property / inheritance. Do not route every message containing "daughter"
-  // to this category; require an actual property/inheritance context.
-  if (
-    hasPhrase(lower, [
-      "property rights",
-      "property inheritance",
-      "inheritance",
-      "inherit",
-      "ancestral property",
-      "father's property",
-      "father property",
-      "husband's property",
-      "husband property",
-      "coparcenary",
-      "coparcener",
-      "daughter property",
-      "equal share as son",
-      "succession",
-      "will",
-      "streedhan",
-    ]) &&
-    hasPhrase(lower, [
-      "property",
-      "inheritance",
-      "inherit",
-      "ancestral",
-      "coparcenary",
-      "coparcener",
-      "succession",
-      "will",
-      "share",
-      "owned",
-    ])
-  ) {
-    return {
-      reply: `Here is a factual summary of **Property & Inheritance Rights**:
-
-• **Equal Coparcenary Rights (Hindu Succession Act Section 6)**: For Hindu Mitakshara joint families covered by the Act, a daughter is a coparcener by birth with the same rights and liabilities in coparcenary property as a son.
-• **Property Owned by a Woman**: Property legally owned by a woman remains hers; marriage does not automatically transfer ownership to a spouse.
-• **Succession Rules**: Inheritance from parents or a spouse depends on whether there is a valid will, the applicable succession law, and the facts of the case.
-
-*Note: This is general legal information, not personalized legal advice.*`,
-      recommendedPages: pages(
-        "/womenRights/viewMore/propertyInheritance",
-        "/womenRights/viewMore/coparcenaryRights",
-      ),
-    };
-  }
-
-  // 7. Workplace rights. "Work" by itself is deliberately NOT enough.
-  if (
-    hasPhrase(lower, [
-      "workplace rights",
-      "workplace harassment",
-      "sexual harassment at work",
-      "office harassment",
-      "boss harassing me",
-      "manager harassing me",
-      "colleague harassing me",
-      "being harassed at work",
-      "being harassed in the office",
-      "posh",
-      "internal committee",
-      "local committee",
-      "maternity leave",
-      "maternity benefit",
-    ]) ||
-    (hasPhrase(lower, ["work", "office", "boss", "manager", "colleague"]) &&
-      hasPhrase(lower, [
-        "harassment",
-        "harass",
-        "harassing",
-        "sexual",
-        "posh",
-        "complaint",
-        "rights",
-        "maternity",
-        "unsafe",
-      ]))
-  ) {
-    return {
-      reply: `Here is a factual summary of **Workplace Rights** in India:
-
-• **Safety First**: If an interaction at work feels unsafe, create distance and move to a safe area rather than engaging in direct confrontation.
-• **POSH Act, 2013**: Provides a formal redressal mechanism for workplace sexual harassment through the employer's **Internal Committee (IC)** or the District **Local Committee (LC)**, with statutory protections including interim relief and confidentiality.
-• **Maternity Benefit Act, 1961**: Provides maternity benefits subject to the Act's eligibility and statutory conditions.
-
-*Note: This is general legal information, not personalized legal advice.*`,
-      recommendedPages: pages(
-        "/womenRights/workplaceRights",
-        "/learn/whatCounts",
-      ),
-    };
-  }
-
-  // 8. Digital / cyber safety. A normal photo or WhatsApp question should not
-  // automatically be treated as a cyber-abuse case.
-  if (
-    hasPhrase(lower, [
-      "digital rights",
-      "cyber safety",
-      "cybercrime",
-      "cyber crime",
-      "cyberstalking",
-      "online blackmail",
-      "blackmailing",
-      "online threat",
-      "private photo",
-      "private image",
-      "leaked photo",
-      "morphed photo",
-      "fake profile",
-      "online impersonation",
-      "non consensual image",
-      "nonconsensual image",
-      "1930",
-    ]) ||
-    (hasPhrase(lower, ["online", "instagram", "whatsapp", "photo", "image"]) &&
-      hasPhrase(lower, [
-        "blackmail",
-        "blackmailing",
-        "threat",
-        "leaked",
-        "private",
-        "morphed",
-        "impersonat",
-        "harass",
-        "harassing",
-        "without consent",
-      ]))
-  ) {
-    return {
-      reply: `Here is a practical and factual overview of **Digital Safety & Cyber Laws**:
-
-• **Safety First**: Do not meet someone making online threats in person or put yourself at physical risk. Contact a trusted person for support.
-• **Relevant Legal Provisions**: Depending on the facts, the Information Technology Act, 2000 and Bharatiya Nyaya Sanhita (BNS), 2023 may apply to identity theft, impersonation, non-consensual sharing of private images, or cyberstalking.
-• **Official Reporting**: Cyber offences can be reported through the National Cyber Crime Reporting Portal or Helpline **1930**.
-
-*Note: This is general legal information, not personalized legal advice.*`,
-      recommendedPages: pages(
-        "/womenRights/digitalRights",
-        "/learn/warningSigns",
-      ),
-    };
-  }
-
-  // 9. Police / FIR / legal aid. "Report" alone is too broad; require a
-  // reporting/legal context.
-  if (
-    hasPhrase(lower, [
-      "police",
-      "fir",
-      "zero fir",
-      "police station",
-      "file a complaint",
-      "report to police",
-      "police complaint",
-      "refuse to file",
-      "woman officer",
-      "legal aid",
-      "free legal aid",
-      "free lawyer",
-      "nalsa",
-      "dlsa",
-      "15100",
-    ]) ||
-    (hasPhrase(lower, ["report", "complaint", "lawyer"]) &&
-      hasPhrase(lower, [
-        "crime",
-        "police",
-        "legal",
-        "fir",
-        "offence",
-        "case",
-        "help",
-      ]))
-  ) {
-    return {
-      reply: `Here is a factual overview of **Rights When Seeking Help & Legal Aid**:
-
-• **Reporting & Zero FIR (BNSS 2023 Section 173)**: The BNSS provides for giving information about a cognizable offence orally or electronically, subject to the statutory requirements, including at a police station regardless of territorial jurisdiction.
-• **Woman Officer & Remedies for Refusal**: For specified offences against women, the BNSS contains requirements concerning how statements are recorded. If police refuse to record information, statutory remedies include approaching the Superintendent of Police or the Magistrate as applicable.
-• **Free Legal Aid**: Women are eligible for free legal services under Section 12(c) of the Legal Services Authorities Act, 1987, through the legal services authorities.
-
-*Note: This is general legal information, not personalized legal advice.*`,
-      recommendedPages: pages(
-        "/womenRights/rightsSeekingHelp",
-        "/womenRights/freeLegalAids",
-      ),
-    };
-  }
-
-  // 10. Learn & Prepare. "sign" by itself is deliberately NOT enough.
-  if (
-    hasPhrase(lower, [
-      "learn and prepare",
-      "learn & prepare",
-      "warning sign",
-      "warning signs",
-      "red flag",
-      "what counts",
-      "does this count",
-      "is this harassment",
-      "is this abuse",
-      "prepare yourself",
-      "practice scenario",
-      "practice scenarios",
-      "safety essentials",
-      "notice move tell",
-      "how to react",
-    ]) ||
-    (hasPhrase(lower, ["prepare", "learn", "warning", "sign"]) &&
-      hasPhrase(lower, [
-        "safety",
-        "unsafe",
-        "harassment",
-        "abuse",
-        "danger",
-        "situation",
-        "scenario",
-      ]))
-  ) {
-    return {
-      reply: `Here is how SAFE-W's **Learn & Prepare** resources can help:
-
-• **Notice → Move → Tell**: Notice concerning behavior or a setting, move toward a visible and populated place without confrontation, then tell someone you trust.
-• **Safety Before Evidence**: Never put yourself in danger to collect evidence or win an argument.
-• **Warning Signs & Practice**: Review the guides below to recognize patterns such as following, repeated unwanted contact, coercion, or isolation and practice safer responses.`,
-      recommendedPages: pages(
-        "/learn",
-        "/learn/warningSigns",
-        "/learn/safetyEssentials",
-      ),
-    };
-  }
-
-  // 11. General fallback. Do not repeat the full introduction on every turn.
-  const { recommendedPages } = extractAndRecommendPages("", userMessage);
+  // This is an offline/error fallback only.
+  // It must NOT interpret the user's topic or route the conversation
+  // through keyword-based legal/safety answers. Normal replies come from Gemini.
   return {
-    reply: `I can help with **practical safety guidance**, **women's rights information in India**, and **SAFE-W Learn & Prepare** resources.
-
-Tell me what you want to understand or what situation you're dealing with, and I'll guide you step by step.
-
-If you are in immediate danger, move to a safe, visible place and use **SAFE-W Emergency / SOS** or call **112**.`,
-    recommendedPages,
+    reply:
+      "I’m having trouble connecting to Saaya right now. Please try sending your message again. If there is an immediate safety risk, move to a safer public place and contact a trusted person or emergency support.",
+    recommendedPages: [],
   };
 }
