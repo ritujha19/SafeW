@@ -688,208 +688,112 @@ export function extractAndRecommendPages(
   userMessage: string,
 ): { cleanReply: string; recommendedPages: SafewPageResource[] } {
   const foundRoutes: string[] = [];
-
   const tagRegex = /\[\[PAGE:(\/[a-zA-Z0-9/_-]+)\]\]/g;
-
   let match: RegExpExecArray | null = tagRegex.exec(rawReply);
 
   while (match !== null) {
-    if (match[1] && !foundRoutes.includes(match[1])) {
-      foundRoutes.push(match[1]);
-    }
-
+    if (match[1] && !foundRoutes.includes(match[1])) foundRoutes.push(match[1]);
     match = tagRegex.exec(rawReply);
   }
 
-  const cleanReply = rawReply
-    .replace(/\[\[PAGE:\/[a-zA-Z0-9/_-]+\]\]/g, "")
-    .trim();
+  const cleanReply = rawReply.replace(/\[\[PAGE:\/[a-zA-Z0-9/_-]+\]\]/g, '').trim();
 
   if (isCasualGreetingOrShortAck(userMessage) && foundRoutes.length === 0) {
-    return {
-      cleanReply,
-      recommendedPages: [],
-    };
+    return { cleanReply, recommendedPages: [] };
   }
 
-  const byRoute = new Map(
-    SAFEW_PAGES.map((page) => [page.route, page]),
-  );
-
+  const byRoute = new Map(SAFEW_PAGES.map((page) => [page.route, page]));
   const selected: SafewPageResource[] = [];
-
-  /*
-   * ---------------------------------------------------------
-   * 1. DETECT CURRENT / IMMEDIATE DANGER
-   * ---------------------------------------------------------
-   *
-   * This is intentionally deterministic because emergency
-   * page recommendation should not depend entirely on whether
-   * Gemini remembered to add a PAGE tag.
-   */
-
   const userLower = userMessage.toLowerCase();
 
+  // Detect active danger without using overly broad phrases such as
+  // standalone "right now" or "scared".
   const immediateDangerPatterns = [
-    "hurting me",
-    "is hurting me",
-    "hurt me",
-    "hitting me",
-    "is hitting me",
-    "beating me",
-    "is beating me",
-    "attacking me",
-    "is attacking me",
-    "trying to hurt me",
-    "trying to attack me",
-    "threatening me",
-    "is threatening me",
-    "following me",
-    "is following me",
-    "chasing me",
-    "is chasing me",
-    "blocking my way",
-    "blocking me",
-    "won't let me leave",
-    "wont let me leave",
-    "trapped",
-    "i am scared",
-    "i'm scared",
-    "im scared",
-    "i am afraid",
-    "i'm afraid",
-    "im afraid",
-    "feel unsafe right now",
-    "feeling unsafe right now",
-    "unsafe right now",
-    "in danger",
-    "immediate danger",
-    "danger right now",
-    "need help now",
-    "help me now",
-    "happening right now",
-    "happening now",
-    "right now",
-    "sos",
-    "emergency",
+    'hurting me', 'is hurting me', 'hitting me', 'is hitting me',
+    'beating me', 'is beating me', 'attacking me', 'is attacking me',
+    'assaulting me', 'is assaulting me', 'trying to hurt me',
+    'trying to attack me', 'threatening me', 'is threatening me',
+    'following me', 'is following me', 'chasing me', 'is chasing me',
+    'blocking my way', 'blocking me', "won't let me leave",
+    'wont let me leave', 'trapped', 'in danger', 'immediate danger',
+    'danger right now', 'need help now', 'help me now',
+    'happening right now', 'happening now', 'sos', 'emergency',
   ];
 
-  const isImmediateDanger = immediateDangerPatterns.some((pattern) =>
-    userLower.includes(pattern),
-  );
+  const activeBystanderViolencePatterns = [
+    'is beating her', 'is beating his wife', 'is beating a woman',
+    'is beating someone', 'is hitting her', 'is hitting his wife',
+    'is hitting a woman', 'is hitting someone', 'is attacking her',
+    'is attacking his wife', 'is attacking a woman', 'is attacking someone',
+    'someone is beating', 'someone is hitting', 'someone is attacking',
+    'person is beating', 'person is hitting', 'person is attacking',
+  ];
 
-  /*
-   * ---------------------------------------------------------
-   * 2. EMERGENCY PAGE HAS HIGHEST PRIORITY
-   * ---------------------------------------------------------
-   */
+  const isImmediateDanger = immediateDangerPatterns.some((p) => userLower.includes(p));
+  const isActiveBystanderViolence = activeBystanderViolencePatterns.some((p) => userLower.includes(p));
+  const needsEmergencyPage = isImmediateDanger || isActiveBystanderViolence;
 
-  if (isImmediateDanger) {
-    const emergencyPage = byRoute.get("/emergency");
-
-    if (emergencyPage) {
-      selected.push(emergencyPage);
-    }
+  // Emergency is always first when the message describes active danger.
+  if (needsEmergencyPage) {
+    const emergencyPage = byRoute.get('/emergency');
+    if (emergencyPage) selected.push(emergencyPage);
   }
 
-  /*
-   * ---------------------------------------------------------
-   * 3. KEEP GEMINI'S EXPLICIT PAGE RECOMMENDATIONS
-   * ---------------------------------------------------------
-   *
-   * But don't add duplicates.
-   */
-
-  for (const route of foundRoutes) {
-    const page = byRoute.get(route);
-
-    if (
-      page &&
-      !selected.some((selectedPage) => selectedPage.route === page.route)
-    ) {
-      selected.push(page);
-    }
-  }
-
-  /*
-   * ---------------------------------------------------------
-   * 4. SCORE PAGES USING THE USER'S MESSAGE
-   * ---------------------------------------------------------
-   */
-
+  // Score the user's actual situation before considering Gemini's tags.
   const scoredByUser = SAFEW_PAGES.map((page) => {
     let score = 0;
 
     for (const keyword of page.keywords) {
-      const keywordLower = keyword.toLowerCase();
-
-      if (userLower.includes(keywordLower)) {
-        score += keyword.includes(" ") ? 5 : 3;
+      if (userLower.includes(keyword.toLowerCase())) {
+        score += keyword.includes(' ') ? 5 : 3;
       }
     }
 
-    if (userLower.includes(page.title.toLowerCase())) {
+    if (userLower.includes(page.title.toLowerCase())) score += 6;
+
+    if (
+      page.route === '/womenRights/protectionFromViolence' &&
+      (userLower.includes('beating') || userLower.includes('hitting') ||
+       userLower.includes('physical abuse') || userLower.includes('attacking') ||
+       userLower.includes('assault') || userLower.includes('violence'))
+    ) {
+      score += 10;
+    }
+
+    if (page.route === '/womenRights/rightsSeekingHelp' && needsEmergencyPage) {
       score += 6;
     }
 
-    /*
-     * Give Protection from Violence a stronger score when
-     * physical violence is explicitly described.
-     */
+    // "husband" / "wife" alone must NOT select Rights Within Marriage.
     if (
-      page.route === "/womenRights/protectionFromViolence" &&
-      (
-        userLower.includes("beating") ||
-        userLower.includes("hitting") ||
-        userLower.includes("hurt") ||
-        userLower.includes("physical abuse") ||
-        userLower.includes("attacking") ||
-        userLower.includes("violence")
-      )
+      page.route === '/womenRights/viewMore/rightsWithinMarriage' &&
+      (userLower.includes('what rights') || userLower.includes('my rights') ||
+       userLower.includes('rights as a wife') || userLower.includes('rights in marriage') ||
+       userLower.includes('rights within marriage') || userLower.includes('legal rights') ||
+       userLower.includes('what are my rights'))
     ) {
       score += 8;
     }
 
-    /*
-     * Legal-information questions should naturally favor
-     * rights pages, but not override an actual emergency.
-     */
-    if (
-      page.route === "/womenRights/viewMore/rightsWithinMarriage" &&
-      (
-        userLower.includes("what rights") ||
-        userLower.includes("my rights") ||
-        userLower.includes("rights as a wife") ||
-        userLower.includes("rights in marriage") ||
-        userLower.includes("rights within marriage")
-      )
-    ) {
-      score += 8;
-    }
-
-    return {
-      page,
-      score,
-    };
+    return { page, score };
   })
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score);
 
-
+  // Situation-based matches get priority.
   for (const { page } of scoredByUser) {
-    if (selected.length >= 3) {
-      break;
-    }
-
-    if (!selected.some((selectedPage) => selectedPage.route === page.route)) {
-      selected.push(page);
-    }
+    if (selected.length >= 3) break;
+    if (!selected.some((p) => p.route === page.route)) selected.push(page);
   }
 
-  return {
-    cleanReply,
-    recommendedPages: selected.slice(0, 3),
-  };
+  // Gemini tags only fill remaining slots.
+  for (const route of foundRoutes) {
+    if (selected.length >= 3) break;
+    const page = byRoute.get(route);
+    if (page && !selected.some((p) => p.route === page.route)) selected.push(page);
+  }
+
+  return { cleanReply, recommendedPages: selected.slice(0, 3) };
 }
 
 export function buildLocalSaayaFallback(_userMessage: string): {

@@ -48,7 +48,7 @@ app.post("/api/chat", async (req, res) => {
               (turn.role === "user" || turn.role === "model") &&
               typeof turn.text === "string",
           )
-          .slice(-10)
+          .slice(-6)
       : [];
 
     const contents = [
@@ -178,7 +178,11 @@ Safety-critical information should never be omitted just to meet the word limit.
       contents,
       config: {
         systemInstruction,
-        temperature: 0.35,
+        temperature: 0.25,
+        maxOutputTokens: 256,
+        thinkingConfig: {
+          thinkingBudget: 0,
+        },
       },
     });
 
