@@ -696,7 +696,7 @@ export function extractAndRecommendPages(
   userMessage: string,
 ): { cleanReply: string; recommendedPages: SafewPageResource[] } {
   const foundRoutes: string[] = [];
-  const tagRegex = /\[\[PAGE:(\/[a-zA-Z0-9/_-]+)\]\]/g;
+ const tagRegex = /\[\[PAGE:(\/[a-zA-Z0-9/_-]+)\]\]/g;
   let match: RegExpExecArray | null = tagRegex.exec(rawReply);
 
   while (match !== null) {

@@ -128,6 +128,68 @@ export const loadTrustedContacts = async () => {
 
   return contacts;
 };
+
+/**
+ * Deletes one saved contact, identified by its mobile number, from Firestore.
+ * Used by the three-dot menu on a saved contact card.
+ */
+export const deleteTrustedContact = async (mobNumber: string) => {
+  const contactRef = getTrustedContactsRef();
+
+  if (!contactRef) {
+    throw new Error("No user is currently logged in.");
+  }
+
+  const existingSnapshot = await getDoc(contactRef);
+  const existingContacts: TrustedContact[] = existingSnapshot.exists()
+    ? existingSnapshot.data().contacts ?? []
+    : [];
+
+  const remainingContacts = existingContacts.filter(
+    (contact) => contact.mobNumber.trim() !== mobNumber.trim(),
+  );
+
+  await setDoc(contactRef, { contacts: remainingContacts });
+  setTrustedContacts(remainingContacts);
+
+  return remainingContacts;
+};
+
+/**
+ * Replaces one saved contact's details in Firestore. `originalMobNumber` is
+ * the number the contact was saved under *before* this edit, so the right
+ * entry is found even if the edit itself changes the number.
+ */
+export const updateTrustedContact = async (
+  originalMobNumber: string,
+  updated: TrustedContact,
+) => {
+  const contactRef = getTrustedContactsRef();
+
+  if (!contactRef) {
+    throw new Error("No user is currently logged in.");
+  }
+
+  const existingSnapshot = await getDoc(contactRef);
+  const existingContacts: TrustedContact[] = existingSnapshot.exists()
+    ? existingSnapshot.data().contacts ?? []
+    : [];
+
+  const index = existingContacts.findIndex(
+    (contact) => contact.mobNumber.trim() === originalMobNumber.trim(),
+  );
+
+  const nextContacts =
+    index === -1
+      ? [...existingContacts, updated]
+      : existingContacts.map((contact, i) => (i === index ? updated : contact));
+
+  await setDoc(contactRef, { contacts: nextContacts });
+  setTrustedContacts(nextContacts);
+
+  return nextContacts;
+};
+
 export type SharedLocationState = {
   latitude: number | null;
   longitude: number | null;

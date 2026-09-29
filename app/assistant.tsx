@@ -38,6 +38,7 @@ import {
 } from "react-native-safe-area-context";
 import { auth } from "../firebase";
 import { db } from "../firestore";
+import React from "react";
 
 type Route = Parameters<ReturnType<typeof useRouter>["navigate"]>[0];
 
@@ -109,7 +110,7 @@ function deriveSessionTitle(messages: ChatMessage[]): string {
 }
 
 const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:5000";
+  process.env.EXPO_PUBLIC_API_URL;
 
 async function generateSaayaResponse(
   userMessage: string,

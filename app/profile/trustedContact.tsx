@@ -1,10 +1,12 @@
 import {
+  deleteTrustedContact,
   loadTrustedContacts,
   saveTrustedContacts,
+  updateTrustedContact,
   type TrustedContact as SavedContact,
 } from "@/auth";
 import React from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 export default function TrustedContactsScreen() {
   const [contacts, setContacts] = React.useState<SavedContact[]>([
@@ -14,22 +16,33 @@ export default function TrustedContactsScreen() {
   // Keeps track of which contacts have already been saved
   const [savedStates, setSavedStates] = React.useState<boolean[]>([false]);
 
+  // Which saved contact (by index) is currently being edited, if any.
+  const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+  const [editDraft, setEditDraft] = React.useState<SavedContact>({
+    name: "",
+    mobNumber: "",
+  });
+  // The number the contact was saved under *before* this edit, so we can find
+  // it in Firestore even if the edit itself changes the number.
+  const [editingOriginalNumber, setEditingOriginalNumber] = React.useState("");
+  const [isSavingEdit, setIsSavingEdit] = React.useState(false);
+
   React.useEffect(() => {
-  const loadContacts = async () => {
-    try {
-      const savedContacts = await loadTrustedContacts();
+    const loadContacts = async () => {
+      try {
+        const savedContacts = await loadTrustedContacts();
 
-      if (savedContacts.length > 0) {
-        setContacts(savedContacts);
-        setSavedStates(savedContacts.map(() => true));
+        if (savedContacts.length > 0) {
+          setContacts(savedContacts);
+          setSavedStates(savedContacts.map(() => true));
+        }
+      } catch (error) {
+        console.error("Unable to load trusted contacts:", error);
       }
-    } catch (error) {
-      console.error("Unable to load trusted contacts:", error);
-    }
-  };
+    };
 
-  loadContacts();
-}, []);
+    loadContacts();
+  }, []);
 
   const updateContact = (
     index: number,
@@ -63,18 +76,115 @@ export default function TrustedContactsScreen() {
   };
 
   const saveContacts = async () => {
-  try {
-    await saveTrustedContacts(contacts);
+    try {
+      await saveTrustedContacts(contacts);
 
-    setSavedStates(contacts.map(() => true));
+      setSavedStates(contacts.map(() => true));
 
-    console.log("trusted contacts saved", contacts);
-    alert("Trusted contacts saved successfully.");
-  } catch (error) {
-    console.error("Unable to save trusted contacts:", error);
-    alert("Unable to save trusted contacts. Please try again.");
-  }
-};
+      console.log("trusted contacts saved", contacts);
+      alert("Trusted contacts saved successfully.");
+    } catch (error) {
+      console.error("Unable to save trusted contacts:", error);
+      alert("Unable to save trusted contacts. Please try again.");
+    }
+  };
+
+  // --- Edit an existing saved contact ---
+
+  const startEditContact = (index: number) => {
+    const target = contacts[index];
+    setEditingIndex(index);
+    setEditDraft({ ...target });
+    setEditingOriginalNumber(target.mobNumber);
+  };
+
+  const cancelEditContact = () => {
+    setEditingIndex(null);
+    setEditDraft({ name: "", mobNumber: "" });
+    setEditingOriginalNumber("");
+  };
+
+  const saveEditedContact = async () => {
+    if (editingIndex === null) return;
+
+    const trimmedName = editDraft.name.trim();
+    const trimmedNumber = editDraft.mobNumber.trim();
+
+    if (!trimmedName || !trimmedNumber) {
+      alert("Please enter both a name and a mobile number.");
+      return;
+    }
+
+    const numberTakenByAnotherContact = contacts.some(
+      (contact, index) =>
+        index !== editingIndex &&
+        contact.mobNumber.trim() === trimmedNumber,
+    );
+    if (numberTakenByAnotherContact) {
+      alert("This number is already saved as a trusted contact.");
+      return;
+    }
+
+    const updated: SavedContact = { name: trimmedName, mobNumber: trimmedNumber };
+
+    setIsSavingEdit(true);
+    try {
+      await updateTrustedContact(editingOriginalNumber, updated);
+
+      setContacts((currentContacts) =>
+        currentContacts.map((contact, index) =>
+          index === editingIndex ? updated : contact,
+        ),
+      );
+      cancelEditContact();
+      alert("Contact updated.");
+    } catch (error) {
+      console.error("Unable to update trusted contact:", error);
+      alert("Unable to update this contact. Please try again.");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  // --- Delete an existing saved contact ---
+
+  const performDeleteContact = async (index: number) => {
+    const target = contacts[index];
+    try {
+      await deleteTrustedContact(target.mobNumber);
+
+      setContacts((currentContacts) =>
+        currentContacts.filter((_, i) => i !== index),
+      );
+      setSavedStates((currentStates) =>
+        currentStates.filter((_, i) => i !== index),
+      );
+      if (editingIndex === index) {
+        cancelEditContact();
+      }
+    } catch (error) {
+      console.error("Unable to delete trusted contact:", error);
+      alert("Unable to delete this contact. Please try again.");
+    }
+  };
+
+  const confirmDeleteContact = (index: number) => {
+    const target = contacts[index];
+    const label = target.name.trim() || target.mobNumber;
+
+    Alert.alert(
+      "Delete contact?",
+      `${label} will be removed from your trusted contacts.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => performDeleteContact(index),
+        },
+      ],
+    );
+  };
 
   return (
     <ScrollView
@@ -101,13 +211,107 @@ export default function TrustedContactsScreen() {
       {/* Contacts */}
       {contacts.map((contact, index) => {
         const isSaved = savedStates[index];
+        const isEditingThis = editingIndex === index;
+
+        if (isSaved && isEditingThis) {
+          return (
+            <View
+              key={index}
+              className="mb-5 rounded-[28px] border-2 border-[#4058D6] bg-white px-5 py-6 shadow-sm"
+            >
+              <Text className="mb-6 text-[22px] font-bold text-[#172B55]">
+                Edit contact
+              </Text>
+
+              {/* Name */}
+              <View className="mb-5">
+                <View className="mb-2 flex-row items-center">
+                  <View className="h-8 w-8 items-center justify-center rounded-full bg-[#EEF1FF]">
+                    <Text className="text-[15px]">👤</Text>
+                  </View>
+
+                  <Text className="ml-2 text-[15px] font-semibold text-[#172B55]">
+                    Name
+                  </Text>
+                </View>
+
+                <TextInput
+                  placeholder="Enter trusted contact's name"
+                  placeholderTextColor="#8996B0"
+                  value={editDraft.name}
+                  onChangeText={(value) =>
+                    setEditDraft((prev) => ({ ...prev, name: value }))
+                  }
+                  className="h-[56px] rounded-[18px] border border-[#DCE1EC] bg-[#FAFBFD] px-4 text-[16px] text-[#172B55]"
+                />
+              </View>
+
+              {/* Mobile Number */}
+              <View className="mb-6">
+                <View className="mb-2 flex-row items-center">
+                  <View className="h-8 w-8 items-center justify-center rounded-full bg-[#EEF1FF]">
+                    <Text className="text-[15px]">📞</Text>
+                  </View>
+
+                  <Text className="ml-2 text-[15px] font-semibold text-[#172B55]">
+                    Mobile number
+                  </Text>
+                </View>
+
+                <TextInput
+                  placeholder="Enter mobile number"
+                  placeholderTextColor="#8996B0"
+                  maxLength={10}
+                  value={editDraft.mobNumber}
+                  onChangeText={(value) =>
+                    setEditDraft((prev) => ({ ...prev, mobNumber: value }))
+                  }
+                  keyboardType="phone-pad"
+                  className="h-[56px] rounded-[18px] border border-[#DCE1EC] bg-[#FAFBFD] px-4 text-[16px] text-[#172B55]"
+                />
+              </View>
+
+              {/* Save / Cancel */}
+              <View className="flex-row gap-3">
+                <Pressable
+                  onPress={cancelEditContact}
+                  disabled={isSavingEdit}
+                  accessibilityLabel="Cancel editing this contact"
+                  className="h-[52px] flex-1 items-center justify-center rounded-full border border-[#DCE1EC] bg-white active:opacity-70"
+                >
+                  <Text className="text-[15px] font-bold text-[#7A86A5]">
+                    Cancel
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={saveEditedContact}
+                  disabled={isSavingEdit}
+                  accessibilityLabel="Save changes to this contact"
+                  className="h-[52px] flex-1 items-center justify-center rounded-full bg-[#4058D6] active:opacity-80"
+                  style={{ opacity: isSavingEdit ? 0.6 : 1 }}
+                >
+                  <Text className="text-[15px] font-bold text-white">
+                    {isSavingEdit ? "Saving..." : "Save changes"}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          );
+        }
 
         return isSaved ? (
           <View
             key={index}
             className="mb-5 rounded-[28px] bg-white px-6 py-6 shadow-sm"
           >
-            <View className="flex-row items-center">
+            {/* Row is pressable: tap the contact to edit it */}
+            <Pressable
+              onPress={() => startEditContact(index)}
+              accessibilityRole="button"
+              accessibilityLabel={`Edit ${contact.name || contact.mobNumber}`}
+              className="flex-row items-center active:opacity-70"
+            >
               {/* Avatar */}
               <View className="mr-5 h-[76px] w-[76px] items-center justify-center rounded-full bg-[#C9CBE8]">
                 <Text className="text-[30px]">👤</Text>
@@ -132,7 +336,7 @@ export default function TrustedContactsScreen() {
 
               {/* Arrow */}
               <Text className="ml-2 text-[32px] text-[#707B9D]">›</Text>
-            </View>
+            </Pressable>
 
             {/* Status badges + menu */}
             <View className="mt-4 flex-row items-center">
@@ -153,6 +357,7 @@ export default function TrustedContactsScreen() {
               <View className="flex-1" />
 
               <Pressable
+                onPress={() => confirmDeleteContact(index)}
                 accessibilityLabel={`More options for ${contact.name}`}
                 className="px-2 py-1 active:opacity-50"
               >
