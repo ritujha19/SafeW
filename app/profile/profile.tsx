@@ -8,7 +8,6 @@ import {
   logout,
   requestAndShareCurrentLocation,
   sharedLocationState,
-  trustedContacts,
 } from "@/auth";
 import { auth } from "@/firebase";
 import { Button } from "@/components/Button";
@@ -17,6 +16,7 @@ import { PressableScale } from "@/components/PressableScale";
 import { Screen } from "@/components/Screen";
 import { Body, Display, Heading, Label } from "@/components/Typography";
 import { colors } from "@/constants/theme";
+import { useTrustedContacts } from "@/hooks/useTrustedContacts";
 
 function SetupRow({
   icon,
@@ -55,6 +55,11 @@ function SetupRow({
 
 export default function Profile() {
   const router = useRouter();
+  const {
+    contacts: trustedContacts,
+    loading: trustedContactsLoading,
+    error: trustedContactsError,
+  } = useTrustedContacts();
   const [name, setName] = useState(auth.currentUser?.displayName ?? "User");
   useFocusEffect(
   useCallback(() => {
@@ -114,9 +119,13 @@ export default function Profile() {
           icon="people-outline"
           title="Trusted contacts"
           detail={
-            trustedContacts.length > 0
-              ? `${trustedContacts.length} saved`
-              : "Add someone you trust"
+            trustedContactsLoading
+              ? "Loading trusted contacts..."
+              : trustedContactsError
+                ? "Unable to load trusted contacts"
+                : trustedContacts.length > 0
+                  ? `${trustedContacts.length} saved`
+                  : "Add someone you trust"
           }
           right={
             <Ionicons name="chevron-forward" size={20} color={colors.muted} />

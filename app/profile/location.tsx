@@ -1,4 +1,4 @@
-import { trustedContacts, sharedLocationState, setSharedLocationState } from "@/auth";
+import { sharedLocationState, setSharedLocationState } from "@/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
@@ -12,6 +12,7 @@ import { Screen } from "@/components/Screen";
 import { Body, Heading, Label } from "@/components/Typography";
 import { lottie } from "@/constants/media";
 import { colors } from "@/constants/theme";
+import { useTrustedContacts } from "@/hooks/useTrustedContacts";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -34,6 +35,11 @@ const formatTimestamp = (value: unknown) =>
 
 export default function LocationScreen() {
   const [location, setLocation] = useState(sharedLocationState);
+  const {
+    contacts: trustedContacts,
+    loading: trustedContactsLoading,
+    error: trustedContactsError,
+  } = useTrustedContacts();
 
   const [permission, setPermission] =
     useState<Location.LocationPermissionResponse | null>(null);
@@ -126,6 +132,16 @@ export default function LocationScreen() {
       alert(
         "Your current location is not available yet. Please wait a moment and try again.",
       );
+      return;
+    }
+
+    if (trustedContactsLoading) {
+      alert("Trusted contacts are still loading. Please try again in a moment.");
+      return;
+    }
+
+    if (trustedContactsError) {
+      alert("Unable to load trusted contacts. Please try again.");
       return;
     }
 
@@ -291,7 +307,11 @@ export default function LocationScreen() {
       </Label>
 
       <View className="mb-6 flex-row flex-wrap gap-2">
-        {trustedContacts.length > 0 ? (
+        {trustedContactsLoading ? (
+          <Body size="sm">Loading trusted contacts...</Body>
+        ) : trustedContactsError ? (
+          <Body size="sm">Unable to load trusted contacts.</Body>
+        ) : trustedContacts.length > 0 ? (
           trustedContacts.map((contact, i) => (
             <View
               key={i}

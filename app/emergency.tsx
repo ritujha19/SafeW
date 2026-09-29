@@ -1,10 +1,10 @@
-import { trustedContacts } from "@/auth";
 import { Button } from "@/components/Button";
 import { LottieAnim } from "@/components/Media";
 import { PressableScale } from "@/components/PressableScale";
 import { Body, Display } from "@/components/Typography";
 import { lottie } from "@/constants/media";
 import { colors, shadow } from "@/constants/theme";
+import { useTrustedContacts } from "@/hooks/useTrustedContacts";
 import { Ionicons } from "@expo/vector-icons";
 import {
   type AudioPlayer,
@@ -245,6 +245,11 @@ function wavBytesToDataUri(bytes: Uint8Array): string {
 export default function Emergency() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const {
+    contacts: trustedContacts,
+    loading: trustedContactsLoading,
+    error: trustedContactsError,
+  } = useTrustedContacts();
 
   const [isSirenActive, setIsSirenActive] = useState(false);
   const [sirenMode, setSirenMode] = useState<SirenMode>("patrol");
@@ -897,9 +902,13 @@ export default function Emergency() {
             onPress={() => router.navigate("/profile/location")}
           />
           <Body tone="soft" size="sm" className="mt-3 text-center">
-            {trustedContacts.length > 0
-              ? `${trustedContacts.length} trusted contact${trustedContacts.length === 1 ? "" : "s"} saved`
-              : "No trusted contacts saved yet"}
+            {trustedContactsLoading
+              ? "Loading trusted contacts..."
+              : trustedContactsError
+                ? "Unable to load trusted contacts"
+                : trustedContacts.length > 0
+                  ? `${trustedContacts.length} trusted contact${trustedContacts.length === 1 ? "" : "s"} saved`
+                  : "No trusted contacts saved yet"}
           </Body>
         </View>
       </ScrollView>

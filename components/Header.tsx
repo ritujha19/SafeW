@@ -7,11 +7,11 @@ import { LordIcon, type LordIconHandle } from "./Media";
 export function BrandMark() {
   return (
     <View className="flex-row items-center">
-      <View className="mr-2 h-9 w-9 items-center justify-center rounded-[10px] bg-blue-900">
+      <View className="mr-2 h-8 w-8 items-center justify-center rounded-[10px] bg-blue-900">
         <Image
           source={require("../assets/images/android-icon-monochrome.png")}
           resizeMode="contain"
-          style={{ width: 50, height: 50}}
+          style={{ width: 35, height: 35 }}
         />
       </View>
       <Text className="font-display text-[21px] text-midnight">SAFE-W</Text>
