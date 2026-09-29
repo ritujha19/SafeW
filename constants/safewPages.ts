@@ -144,7 +144,12 @@ export const SAFEW_PAGES: SafewPageResource[] = [
       "Covers Constitutional Rights, Protection from Violence (BNS 2023 & DV Act), Workplace Rights (POSH), Family & Marriage Rights, Digital Rights, Rights When Seeking Help, and Free Legal Aid.",
       "Explains what each law means in simple language and why it matters to your safety.",
     ],
-    keywords: ["women's rights", "womens rights", "all rights", "legal rights in india"],
+    keywords: [
+      "women's rights",
+      "womens rights",
+      "all rights",
+      "legal rights in india",
+    ],
     icon: "scale-outline",
   },
   {
@@ -657,7 +662,10 @@ When relevant to the user's question, include 1 to 3 matching page tag(s) at the
   - [[PAGE:/emergency]] ("Emergency SOS & Helplines")`;
 
 function isCasualGreetingOrShortAck(text: string): boolean {
-  const cleaned = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+  const cleaned = text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .trim();
   const casualPhrases = new Set([
     "hi",
     "hello",
@@ -696,7 +704,9 @@ export function extractAndRecommendPages(
     match = tagRegex.exec(rawReply);
   }
 
-  const cleanReply = rawReply.replace(/\[\[PAGE:\/[a-zA-Z0-9/_-]+\]\]/g, '').trim();
+  const cleanReply = rawReply
+    .replace(/\[\[PAGE:\/[a-zA-Z0-9/_-]+\]\]/g, "")
+    .trim();
 
   if (isCasualGreetingOrShortAck(userMessage) && foundRoutes.length === 0) {
     return { cleanReply, recommendedPages: [] };
@@ -709,33 +719,81 @@ export function extractAndRecommendPages(
   // Detect active danger without using overly broad phrases such as
   // standalone "right now" or "scared".
   const immediateDangerPatterns = [
-    'hurting me', 'is hurting me', 'hitting me', 'is hitting me',
-    'beating me', 'is beating me', 'attacking me', 'is attacking me',
-    'assaulting me', 'is assaulting me', 'trying to hurt me',
-    'trying to attack me', 'threatening me', 'is threatening me',
-    'following me', 'is following me', 'chasing me', 'is chasing me',
-    'blocking my way', 'blocking me', "won't let me leave",
-    'wont let me leave', 'trapped', 'in danger', 'immediate danger',
-    'danger right now', 'need help now', 'help me now',
-    'happening right now', 'happening now', 'sos', 'emergency',
+    "hurting me",
+    "is hurting me",
+    "hitting me",
+    "is hitting me",
+    "beating me",
+    "is beating me",
+    "attacking me",
+    "is attacking me",
+    "assaulting me",
+    "is assaulting me",
+    "trying to hurt me",
+    "trying to attack me",
+    "threatening me",
+    "is threatening me",
+    "following me",
+    "is following me",
+    "chasing me",
+    "is chasing me",
+    "blocking my way",
+    "blocking me",
+    "won't let me leave",
+    "wont let me leave",
+    "trapped",
+    "in danger",
+    "immediate danger",
+    "danger right now",
+    "need help now",
+    "help me now",
+    "happening right now",
+    "happening now",
+    "sos",
+    "emergency",
   ];
 
   const activeBystanderViolencePatterns = [
-    'is beating her', 'is beating his wife', 'is beating a woman',
-    'is beating someone', 'is hitting her', 'is hitting his wife',
-    'is hitting a woman', 'is hitting someone', 'is attacking her',
-    'is attacking his wife', 'is attacking a woman', 'is attacking someone',
-    'someone is beating', 'someone is hitting', 'someone is attacking',
-    'person is beating', 'person is hitting', 'person is attacking',
+    "is beating her",
+    "is beating his wife",
+    "is beating a woman",
+    "is beating someone",
+    "is hitting her",
+    "is hitting his wife",
+    "is hitting a woman",
+    "is hitting someone",
+    "is attacking her",
+    "is attacking his wife",
+    "is attacking a woman",
+    "is attacking someone",
+    "someone is beating",
+    "someone is hitting",
+    "someone is attacking",
+    "person is beating",
+    "person is hitting",
+    "person is attacking",
+    "domestic violence is happening",
+    "being abused",
+    "getting abused",
+    "abuse is happening",
+    "violence is happening",
+    "right now it is happening",
+    "currently happening",
+    "ongoing abuse",
+    "ongoing domestic violence",
   ];
 
-  const isImmediateDanger = immediateDangerPatterns.some((p) => userLower.includes(p));
-  const isActiveBystanderViolence = activeBystanderViolencePatterns.some((p) => userLower.includes(p));
+  const isImmediateDanger = immediateDangerPatterns.some((p) =>
+    userLower.includes(p),
+  );
+  const isActiveBystanderViolence = activeBystanderViolencePatterns.some((p) =>
+    userLower.includes(p),
+  );
   const needsEmergencyPage = isImmediateDanger || isActiveBystanderViolence;
 
   // Emergency is always first when the message describes active danger.
   if (needsEmergencyPage) {
-    const emergencyPage = byRoute.get('/emergency');
+    const emergencyPage = byRoute.get("/emergency");
     if (emergencyPage) selected.push(emergencyPage);
   }
 
@@ -745,32 +803,47 @@ export function extractAndRecommendPages(
 
     for (const keyword of page.keywords) {
       if (userLower.includes(keyword.toLowerCase())) {
-        score += keyword.includes(' ') ? 5 : 3;
+        score += keyword.includes(" ") ? 5 : 3;
       }
     }
 
     if (userLower.includes(page.title.toLowerCase())) score += 6;
 
-    if (
-      page.route === '/womenRights/protectionFromViolence' &&
-      (userLower.includes('beating') || userLower.includes('hitting') ||
-       userLower.includes('physical abuse') || userLower.includes('attacking') ||
-       userLower.includes('assault') || userLower.includes('violence'))
-    ) {
-      score += 10;
-    }
+   if (
+  page.route === "/womenRights/protectionFromViolence" &&
+  (
+    userLower.includes("beating") ||
+    userLower.includes("hitting") ||
+    userLower.includes("hurt") ||
+    userLower.includes("physical abuse") ||
+    userLower.includes("attacking") ||
+    userLower.includes("violence") ||
+    userLower.includes("rape") ||
+    userLower.includes("rapist") ||
+    userLower.includes("sexual assault") ||
+    userLower.includes("sexually assaulted") ||
+    userLower.includes("sexual violence") ||
+    userLower.includes("forced") ||
+    userLower.includes("forced humiliation")
+  )
+) {
+  score += 10;
+}
 
-    if (page.route === '/womenRights/rightsSeekingHelp' && needsEmergencyPage) {
+    if (page.route === "/womenRights/rightsSeekingHelp" && needsEmergencyPage) {
       score += 6;
     }
 
     // "husband" / "wife" alone must NOT select Rights Within Marriage.
     if (
-      page.route === '/womenRights/viewMore/rightsWithinMarriage' &&
-      (userLower.includes('what rights') || userLower.includes('my rights') ||
-       userLower.includes('rights as a wife') || userLower.includes('rights in marriage') ||
-       userLower.includes('rights within marriage') || userLower.includes('legal rights') ||
-       userLower.includes('what are my rights'))
+      page.route === "/womenRights/viewMore/rightsWithinMarriage" &&
+      (userLower.includes("what rights") ||
+        userLower.includes("my rights") ||
+        userLower.includes("rights as a wife") ||
+        userLower.includes("rights in marriage") ||
+        userLower.includes("rights within marriage") ||
+        userLower.includes("legal rights") ||
+        userLower.includes("what are my rights"))
     ) {
       score += 8;
     }
@@ -790,7 +863,8 @@ export function extractAndRecommendPages(
   for (const route of foundRoutes) {
     if (selected.length >= 3) break;
     const page = byRoute.get(route);
-    if (page && !selected.some((p) => p.route === page.route)) selected.push(page);
+    if (page && !selected.some((p) => p.route === page.route))
+      selected.push(page);
   }
 
   return { cleanReply, recommendedPages: selected.slice(0, 3) };
@@ -800,9 +874,6 @@ export function buildLocalSaayaFallback(_userMessage: string): {
   reply: string;
   recommendedPages: SafewPageResource[];
 } {
-  // This is an offline/error fallback only.
-  // It must NOT interpret the user's topic or route the conversation
-  // through keyword-based legal/safety answers. Normal replies come from Gemini.
   return {
     reply:
       "I’m having trouble connecting to Saaya right now. Please try sending your message again. If there is an immediate safety risk, move to a safer public place and contact a trusted person or emergency support.",

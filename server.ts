@@ -1,4 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
+import {
+  GoogleGenAI,
+  ThinkingLevel
+} from "@google/genai";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -28,11 +31,7 @@ const ai = new GoogleGenAI({
 
 app.post("/api/chat", async (req, res) => {
   try {
-    const {
-      message,
-      history,
-      fastReplyMode = true,
-    } = req.body;
+    const { message, history, fastReplyMode = true } = req.body;
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({
@@ -125,7 +124,30 @@ When the situation is not an immediate emergency, do not unnecessarily turn the 
 
 When the user asks for legal information, provide legal information clearly and distinguish general information from personalized legal advice.
 
-When the user asks how to help another person, prioritize safe bystander actions and avoid encouraging physical confrontation.
+When the user is describing violence happening to another person,
+consistently treat the other person as the victim and the user as
+the bystander/helper.
+
+Do NOT address the user as though they are the victim.
+
+For example, if the user says:
+"One person in my home is being abused right now. What can I do?"
+
+Use language such as:
+- "The person's immediate safety is the priority."
+- "If it is safe for you to do so, call 112."
+- "Avoid physically confronting the abuser."
+- "If you can safely help the person reach a safer place, do so."
+
+Avoid language such as:
+- "Your safety is at risk" unless referring to the user's own risk.
+- "Move away from the abuser."
+- "Leave the house."
+- "Document your injuries."
+- "You are not alone."
+
+Do not switch between "you" and "the victim" as if they are the same person.
+Maintain the identified roles throughout the entire response.
 
 When immediate danger is genuinely present, prioritize practical safety actions and appropriate emergency support.
 
@@ -147,7 +169,9 @@ Do not add unnecessary background information.
 
 Do not turn a simple question into a long educational explanation.
 
-${fastReplyMode ? `
+${
+  fastReplyMode
+    ? `
 FAST RESPONSE MODE:
 
 Be concise.
@@ -170,21 +194,81 @@ Start with the most important action.
 The response should feel like a short, natural conversation with an AI assistant, not an article.
 
 Safety-critical information should never be omitted just to meet the word limit.
-` : ""}
+`
+    : ""
+}
 `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents,
-      config: {
-        systemInstruction,
-        temperature: 0.25,
-        maxOutputTokens: 256,
-        thinkingConfig: {
-          thinkingBudget: 0,
+    let response;
+
+    try {
+      console.log("Saaya: trying gemini-3.8-flash");
+
+      response = await ai.models.generateContent({
+        model: "gemini-3.8-flash",
+        contents,
+        config: {
+          systemInstruction,
+          maxOutputTokens: 512,
+          thinkingConfig: {
+            thinkingLevel: ThinkingLevel.LOW,
+          },
         },
-      },
-    });
+      });
+
+      console.log("Saaya: gemini-3.8-flash succeeded");
+    } catch (error) {
+      console.error("Saaya: gemini-3.8-flash failed", error);
+
+      try {
+        console.log("Saaya: trying gemini-3.1-flash-lite");
+
+        response = await ai.models.generateContent({
+          model: "gemini-3.1-flash-lite",
+          contents,
+          config: {
+            systemInstruction,
+            maxOutputTokens: 512,
+            thinkingConfig: {
+              thinkingLevel: ThinkingLevel.MINIMAL,
+            },
+          },
+        });
+
+        console.log("Saaya: gemini-3.1-flash-lite succeeded");
+      } catch (error) {
+        console.error("Saaya: gemini-3.1-flash-lite failed", error);
+
+        try {
+          console.log("Saaya: trying gemini-2.5-flash");
+
+          response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents,
+            config: {
+              systemInstruction,
+              temperature: 0.25,
+              maxOutputTokens: 512,
+              thinkingConfig: {
+                thinkingBudget: 0,
+              },
+            },
+          });
+
+          console.log("Saaya: gemini-2.5-flash succeeded");
+        } catch (error) {
+          console.error("Saaya: gemini-2.5-flash failed", error);
+        }
+      }
+    }
+
+    if (!response) {
+      throw new Error("All Saaya AI models failed.");
+    }
+
+    console.log("Saaya finish reason:", response.candidates?.[0]?.finishReason);
+
+    console.log("Saaya token count:", response.candidates?.[0]?.tokenCount);
 
     const rawReply = response.text?.trim();
 
@@ -192,10 +276,10 @@ Safety-critical information should never be omitted just to meet the word limit.
       throw new Error("Gemini returned an empty response.");
     }
 
-    const {
-      cleanReply,
-      recommendedPages,
-    } = extractAndRecommendPages(rawReply, message);
+    const { cleanReply, recommendedPages } = extractAndRecommendPages(
+      rawReply,
+      message,
+    );
 
     return res.json({
       reply: cleanReply,
