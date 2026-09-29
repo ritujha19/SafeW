@@ -38,3 +38,18 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Share the APK download page
+
+Build and deploy the web app (`npm run web` for local testing, or export it with
+`npx expo export --platform web` and host the generated `dist` directory). After
+an EAS build using the `preview` profile finishes, copy its direct `.apk`
+artifact URL and share the deployed `/download` page with that URL in the
+`apk` query parameter:
+
+```text
+https://your-web-host.example/download?apk=<URL-encoded-EAS-APK-URL>
+```
+
+The page shows what SafeW offers and displays a download button only for an
+HTTPS APK URL from an EAS artifact on `expo.dev`.

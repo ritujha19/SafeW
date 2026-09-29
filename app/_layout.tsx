@@ -4,7 +4,7 @@ import { Figtree_400Regular } from "@expo-google-fonts/figtree/400Regular";
 import { Figtree_500Medium } from "@expo-google-fonts/figtree/500Medium";
 import { Figtree_700Bold } from "@expo-google-fonts/figtree/700Bold";
 import { useFonts } from "expo-font";
-import { Stack, useRouter } from "expo-router";
+import { Stack, usePathname, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
 import { FloatingSaayaOverlay } from "@/components/FloatingSaayaOverlay";
@@ -19,6 +19,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [fontsLoaded] = useFonts({
     BricolageGrotesque_600SemiBold,
@@ -74,6 +75,7 @@ export default function RootLayout() {
           ),
         }}
       />
+      <Stack.Screen name="download" options={{ headerShown: false }} />
       <Stack.Screen name="createAcc" options={{ title: "Create Account" }} />
       <Stack.Screen
         name="updateProfile"
@@ -212,7 +214,7 @@ export default function RootLayout() {
         options={{ title: "Rights After Divorce" }}
       />
     </Stack>
-    <FloatingSaayaOverlay />
+    {pathname !== "/download" && <FloatingSaayaOverlay />}
     </KeyboardProvider>
   );
 }
