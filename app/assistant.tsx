@@ -39,7 +39,6 @@ import {
 } from "react-native-safe-area-context";
 import { auth } from "../firebase";
 import { db } from "../firestore";
-import React from "react";
 
 type Route = Parameters<ReturnType<typeof useRouter>["navigate"]>[0];
 

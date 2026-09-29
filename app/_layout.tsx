@@ -115,7 +115,7 @@ export default function RootLayout() {
       />
       <Stack.Screen
         name="assistant"
-        options={{ title: "Saaya · SAFE-W Agent", headerShown: false }}
+        options={{ title: "Saaya ·Safety companion", headerShown: false }}
       />
 
       <Stack.Screen name="learn/index" options={{ title: "Learn & Prepare" }} />
