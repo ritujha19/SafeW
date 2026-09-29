@@ -78,15 +78,7 @@ const helplines: {
   { number: "139", name: "Indian Railway Security Helpline" },
 ];
 
-/**
- * Computes the instantaneous frequency and distance envelope of an authentic
- * police siren at time `t` (in seconds).
- * - "patrol": Realistic distant police PCR patrol vehicle with slow exponential
- *   wind-up (480 Hz -> 1120 Hz), long coast-down, periodic intersection yelp burst,
- *   Doppler shift, and approaching/receding distance swell.
- * - "wail": Loud close-range police wail (560 Hz -> 1360 Hz).
- * - "yelp": Fast tactical yelp sweep (620 Hz -> 1520 Hz).
- */
+
 function computeSirenProfile(
   t: number,
   mode: SirenMode,
