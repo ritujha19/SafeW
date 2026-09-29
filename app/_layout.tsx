@@ -6,7 +6,7 @@ import { Figtree_700Bold } from "@expo-google-fonts/figtree/700Bold";
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FloatingSaayaOverlay } from "@/components/FloatingSaayaOverlay";
 import { BrandMark, HeaderProfileButton } from "@/components/Header";
 import { colors } from "@/constants/theme";

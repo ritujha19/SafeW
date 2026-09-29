@@ -9,7 +9,7 @@ import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import {
   onAuthStateChanged,
@@ -18,6 +18,7 @@ import {
 import {
   type ComponentProps,
   type ComponentRef,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -206,6 +207,10 @@ function renderFormattedText(text: string, isUser: boolean, isError?: boolean) {
 
 export default function SafetyAssistantScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{
+    quickPrompt?: string | string[];
+    quickPromptId?: string | string[];
+  }>();
   const insets = useSafeAreaInsets();
   const keyboardVisible = useKeyboardVisible();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -221,6 +226,13 @@ export default function SafetyAssistantScreen() {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
   const scrollViewRef = useRef<ComponentRef<typeof ScrollView> | null>(null);
+  const handledQuickPromptIdRef = useRef<string | null>(null);
+  const quickPrompt = Array.isArray(params.quickPrompt)
+    ? params.quickPrompt[0]
+    : params.quickPrompt;
+  const quickPromptId = Array.isArray(params.quickPromptId)
+    ? params.quickPromptId[0]
+    : params.quickPromptId;
 
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) ??
@@ -333,77 +345,113 @@ export default function SafetyAssistantScreen() {
     return () => clearTimeout(timer);
   }, [keyboardVisible, editingMessageId]);
 
-  const updateActiveSessionMessages = (
-    updater: (prev: ChatMessage[]) => ChatMessage[],
-  ) => {
-    setSessions((prevSessions) =>
-      prevSessions.map((session) => {
-        if (session.id !== activeSession.id) return session;
-        const nextMessages = updater(session.messages);
-        return {
-          ...session,
-          title: deriveSessionTitle(nextMessages),
-          updatedAt: formatSessionDate(new Date()),
-          messages: nextMessages,
-        };
-      }),
-    );
-  };
-
-  const handleSendMessage = async (overrideText?: string) => {
-    const trimmed = (overrideText ?? inputText).trim();
-    if (!trimmed || isSending) return;
-
-    const userMsg: ChatMessage = {
-      id: `user_${Date.now()}`,
-      role: "user",
-      text: trimmed,
-      timestamp: formatTime(new Date()),
-    };
-
-    const historyForApi = messages
-      .filter((m) => !m.isError)
-      .map((m) => ({
-        role: m.role,
-        text: m.text,
-      }));
-
-    if (!overrideText) {
-      setInputText("");
-    }
-
-    updateActiveSessionMessages((prev) => [...prev, userMsg]);
-    setIsSending(true);
-
-    try {
-      const result = await generateSaayaResponse(
-        trimmed,
-        historyForApi,
-        isFastReplyMode,
+  const updateActiveSessionMessages = useCallback(
+    (updater: (prev: ChatMessage[]) => ChatMessage[]) => {
+      setSessions((prevSessions) =>
+        prevSessions.map((session) => {
+          if (session.id !== activeSession.id) return session;
+          const nextMessages = updater(session.messages);
+          return {
+            ...session,
+            title: deriveSessionTitle(nextMessages),
+            updatedAt: formatSessionDate(new Date()),
+            messages: nextMessages,
+          };
+        }),
       );
+    },
+    [activeSession.id],
+  );
 
-      const modelMsg: ChatMessage = {
-        id: `model_${Date.now()}`,
-        role: "model",
-        text: result.reply,
+  const handleSendMessage = useCallback(
+    async (overrideText?: string, forceFastReply = false) => {
+      const trimmed = (overrideText ?? inputText).trim();
+      if (!trimmed || isSending) return;
+
+      const userMsg: ChatMessage = {
+        id: `user_${Date.now()}`,
+        role: "user",
+        text: trimmed,
         timestamp: formatTime(new Date()),
-        recommendedPages: result.recommendedPages,
       };
 
-      updateActiveSessionMessages((prev) => [...prev, modelMsg]);
-    } catch {
-      const errorMsg: ChatMessage = {
-        id: `error_${Date.now()}`,
-        role: "model",
-        text: "I’m having trouble connecting to Saaya right now. Please try sending your message again.",
-        timestamp: formatTime(new Date()),
-        isError: true,
-      };
-      updateActiveSessionMessages((prev) => [...prev, errorMsg]);
-    } finally {
-      setIsSending(false);
+      const historyForApi = messages
+        .filter((m) => !m.isError)
+        .map((m) => ({
+          role: m.role,
+          text: m.text,
+        }));
+
+      if (!overrideText) {
+        setInputText("");
+      }
+
+      updateActiveSessionMessages((prev) => [...prev, userMsg]);
+      setIsSending(true);
+
+      try {
+        const result = await generateSaayaResponse(
+          trimmed,
+          historyForApi,
+          forceFastReply || isFastReplyMode,
+        );
+
+        const modelMsg: ChatMessage = {
+          id: `model_${Date.now()}`,
+          role: "model",
+          text: result.reply,
+          timestamp: formatTime(new Date()),
+          recommendedPages: result.recommendedPages,
+        };
+
+        updateActiveSessionMessages((prev) => [...prev, modelMsg]);
+      } catch {
+        const errorMsg: ChatMessage = {
+          id: `error_${Date.now()}`,
+          role: "model",
+          text: "I’m having trouble connecting to Saaya right now. Please try sending your message again.",
+          timestamp: formatTime(new Date()),
+          isError: true,
+        };
+        updateActiveSessionMessages((prev) => [...prev, errorMsg]);
+      } finally {
+        setIsSending(false);
+      }
+    },
+    [
+      inputText,
+      isFastReplyMode,
+      isSending,
+      messages,
+      updateActiveSessionMessages,
+    ],
+  );
+
+  useEffect(() => {
+    if (
+      !quickPrompt ||
+      !quickPromptId ||
+      !currentUser ||
+      !hasHydrated ||
+      isSending ||
+      handledQuickPromptIdRef.current === quickPromptId
+    ) {
+      return;
     }
-  };
+
+    handledQuickPromptIdRef.current = quickPromptId;
+    setIsFastReplyMode(true);
+    router.setParams({ quickPrompt: undefined, quickPromptId: undefined });
+    void handleSendMessage(quickPrompt, true);
+  }, [
+    currentUser,
+    hasHydrated,
+    isSending,
+    handleSendMessage,
+    quickPrompt,
+    quickPromptId,
+    router,
+  ]);
 
   const handleCopyMessage = async (msg: ChatMessage) => {
     const cleanText = msg.text.replace(/\*\*([^*]+)\*\*/g, "$1").trim();

@@ -1,4 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import {
+  type AudioPlayer,
+  createAudioPlayer,
+  setAudioModeAsync,
+} from "expo-audio";
+import { File, Paths } from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -160,7 +166,7 @@ export async function openPhoneOverlayPermissionSettings() {
  * Generates a distant police patrol WAV loop so the user can trigger
  * the patrol siren directly from the floating side companion on any screen.
  */
-function createQuickPatrolSirenWavUri(): string {
+function createQuickPatrolSirenWavBytes(): Uint8Array {
   const sampleRate = 22050;
   const durationSeconds = 9.2;
   const numSamples = Math.floor(sampleRate * durationSeconds);
@@ -230,9 +236,11 @@ function createQuickPatrolSirenWavUri(): string {
     view.setInt16(44 + i * 2, clamped * 32767, true);
   }
 
-  const bytes = new Uint8Array(buffer);
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  return new Uint8Array(buffer);
+}
+
+function wavBytesToDataUri(bytes: Uint8Array): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   let base64 = "";
   for (let i = 0; i < bytes.length; i += 3) {
     const b1 = bytes[i];
@@ -253,7 +261,10 @@ export function FloatingSaayaOverlay() {
   const { state, updateState } = useFloatingCompanion();
   const [quickPrompt, setQuickPrompt] = useState("");
   const [isQuickSirenActive, setIsQuickSirenActive] = useState(false);
+  const [isStartingQuickSiren, setIsStartingQuickSiren] = useState(false);
+  const isStartingSirenRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const nativePlayerRef = useRef<AudioPlayer | null>(null);
 
   useEffect(() => {
     return () => {
@@ -261,57 +272,124 @@ export function FloatingSaayaOverlay() {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      if (nativePlayerRef.current) {
+        try {
+          nativePlayerRef.current.pause();
+          nativePlayerRef.current.remove();
+        } catch (error) {
+          console.warn("Unable to clean up the floating patrol siren:", error);
+        }
+        nativePlayerRef.current = null;
+      }
     };
   }, []);
 
-  const toggleQuickSiren = () => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    if (isQuickSirenActive) {
-      if (audioRef.current) {
+  const stopQuickSiren = () => {
+    if (audioRef.current) {
+      try {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
-        audioRef.current = null;
+      } catch (error) {
+        console.warn("Unable to stop the floating web patrol siren:", error);
       }
-      setIsQuickSirenActive(false);
-      Alert.alert("Siren Stopped", "Patrol siren turned off.");
+      audioRef.current = null;
+    }
+    if (nativePlayerRef.current) {
+      try {
+        nativePlayerRef.current.pause();
+        nativePlayerRef.current.remove();
+      } catch (error) {
+        console.warn("Unable to stop the floating native patrol siren:", error);
+      }
+      nativePlayerRef.current = null;
+    }
+    setIsQuickSirenActive(false);
+    Alert.alert("Siren Stopped", "Patrol siren turned off.");
+  };
+
+  const toggleQuickSiren = async () => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    if (isQuickSirenActive) {
+      stopQuickSiren();
       return;
     }
 
+    if (isStartingSirenRef.current) return;
+    isStartingSirenRef.current = true;
+    setIsStartingQuickSiren(true);
+
     try {
-      if (typeof window !== "undefined" && typeof Audio !== "undefined") {
-        const wavUri = createQuickPatrolSirenWavUri();
+      if (Platform.OS !== "web") {
+        await setAudioModeAsync({ playsInSilentMode: true });
+        const bytes = createQuickPatrolSirenWavBytes();
+        const sirenFile = new File(Paths.cache, "safew_quick_patrol_siren.wav");
+        sirenFile.write(bytes);
+
+        const player = createAudioPlayer({ uri: sirenFile.uri });
+        player.loop = true;
+        player.volume = 1;
+        nativePlayerRef.current = player;
+        player.play();
+        setIsQuickSirenActive(true);
+        Alert.alert("Patrol Siren Active", "Playing distant police patrol siren.");
+        return;
+      }
+
+      if (typeof Audio !== "undefined") {
+        const wavUri = wavBytesToDataUri(createQuickPatrolSirenWavBytes());
         const audio = new Audio(wavUri);
         audio.loop = true;
         audio.volume = 1.0;
         audioRef.current = audio;
-        void audio.play();
+        await audio.play();
         setIsQuickSirenActive(true);
         Alert.alert(
           "Patrol Siren Active",
           "Playing distant police patrol siren.",
         );
-        return;
+      } else {
+        throw new Error("Audio playback is unavailable on this platform.");
       }
-    } catch {
-      // Fallback to Emergency screen on native if Web Audio is unavailable
+    } catch (error) {
+      console.error("Unable to start the floating patrol siren:", error);
+      if (nativePlayerRef.current) {
+        try {
+          nativePlayerRef.current.remove();
+        } catch (cleanupError) {
+          console.warn("Unable to remove the failed patrol siren player:", cleanupError);
+        }
+        nativePlayerRef.current = null;
+      }
+      if (audioRef.current) {
+        try {
+          audioRef.current.pause();
+        } catch (cleanupError) {
+          console.warn("Unable to stop the failed patrol siren:", cleanupError);
+        }
+        audioRef.current = null;
+      }
+      Alert.alert(
+        "Siren unavailable",
+        "The siren could not start. Please try again or open Emergency Support.",
+      );
+    } finally {
+      isStartingSirenRef.current = false;
+      setIsStartingQuickSiren(false);
     }
-
-    updateState({ panelState: "docked" });
-    router.navigate("/emergency");
   };
 
   const handleQuickAskSubmit = () => {
     const trimmed = quickPrompt.trim();
+    if (!trimmed) return;
     updateState({ panelState: "docked" });
-    try {
-      if (trimmed && typeof window !== "undefined" && window.localStorage) {
-        window.localStorage.setItem("safew_pending_quick_prompt", trimmed);
-      }
-    } catch {
-      // ignore on native
-    }
     setQuickPrompt("");
-    router.navigate("/assistant");
+    router.navigate({
+      pathname: "/assistant",
+      params: {
+        quickPrompt: trimmed,
+        quickPromptId: `${Date.now()}-${Math.random()}`,
+      },
+    });
   };
 
   if (!state.isEnabled || !state.hasOverlayPermission) {
@@ -438,6 +516,7 @@ export function FloatingSaayaOverlay() {
               <View className="mt-3 gap-2">
                 <Pressable
                   onPress={toggleQuickSiren}
+                  disabled={isStartingQuickSiren}
                   accessibilityRole="button"
                   accessibilityLabel="Toggle distant police patrol siren"
                   className={`flex-row items-center justify-between rounded-2xl px-3.5 py-2.5 ${
@@ -459,9 +538,11 @@ export function FloatingSaayaOverlay() {
                           : "text-marigold-dark"
                       }`}
                     >
-                      {isQuickSirenActive
-                        ? "Stop Distant Patrol Siren"
-                        : "Play Distant Police Patrol Siren"}
+                      {isStartingQuickSiren
+                        ? "Starting Police Siren…"
+                        : isQuickSirenActive
+                          ? "Stop Distant Patrol Siren"
+                          : "Play Distant Police Patrol Siren"}
                     </Text>
                   </View>
                   <Text
@@ -469,7 +550,11 @@ export function FloatingSaayaOverlay() {
                       isQuickSirenActive ? "text-white" : "text-marigold-dark"
                     }`}
                   >
-                    {isQuickSirenActive ? "ON" : "1-Tap"}
+                    {isStartingQuickSiren
+                      ? "..."
+                      : isQuickSirenActive
+                        ? "ON"
+                        : "1-Tap"}
                   </Text>
                 </Pressable>
 
