@@ -52,7 +52,23 @@ const SIREN_MODES: {
   },
 ];
 
-const helplines = [
+const helplines: {
+  number: string;
+  name: string;
+  note?: string;
+  channel?: "whatsapp";
+}[] = [
+  {
+    number: "14490",
+    name: "National Commission for Women (NCW)",
+    note: "24/7 helpline",
+  },
+  {
+    number: "7827170170",
+    name: "NCW WhatsApp Support",
+    note: "Message NCW on WhatsApp",
+    channel: "whatsapp",
+  },
   {
     number: "181",
     name: "National Women Helpline",
@@ -518,6 +534,15 @@ export default function Emergency() {
     );
   };
 
+  const openWhatsapp = (number: string) => {
+    if (isSirenActive) {
+      stopSiren();
+    }
+    Linking.openURL(`https://wa.me/${number}`).catch(() =>
+      alert(`Couldn't open WhatsApp. Please message ${number} in WhatsApp.`),
+    );
+  };
+
   const activeStrobeColor =
     strobePhase === "red" ? colors.beacon : "#2563EB";
 
@@ -841,13 +866,17 @@ export default function Emergency() {
         <View className="mt-5 gap-3">
           {helplines.map((line) => (
             <PressableScale
-              key={line.number}
+              key={`${line.channel ?? "phone"}-${line.number}`}
               accessibilityRole="button"
-              accessibilityLabel={`Call ${line.number}, ${line.name}`}
-              onPress={() => call(line.number)}
+              accessibilityLabel={`${line.channel === "whatsapp" ? "Message" : "Call"} ${line.number}, ${line.name}`}
+              onPress={() =>
+                line.channel === "whatsapp"
+                  ? openWhatsapp(line.number)
+                  : call(line.number)
+              }
               className="flex-row items-center rounded-[22px] border border-white/15 bg-white/10 p-4"
             >
-              <Text className="w-[68px] font-display text-[26px] text-white">
+              <Text className="w-[112px] font-display text-[24px] text-white">
                 {line.number}
               </Text>
               <View className="flex-1 pr-3">
@@ -860,7 +889,11 @@ export default function Emergency() {
                   </Text>
                 ) : null}
               </View>
-              <Ionicons name="call-outline" size={20} color="#FFFFFF" />
+              <Ionicons
+                name={line.channel === "whatsapp" ? "logo-whatsapp" : "call-outline"}
+                size={20}
+                color="#FFFFFF"
+              />
             </PressableScale>
           ))}
         </View>
