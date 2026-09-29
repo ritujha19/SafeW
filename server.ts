@@ -1,7 +1,4 @@
-import {
-  GoogleGenAI,
-  ThinkingLevel
-} from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -271,6 +268,8 @@ Safety-critical information should never be omitted just to meet the word limit.
     console.log("Saaya token count:", response.candidates?.[0]?.tokenCount);
 
     const rawReply = response.text?.trim();
+    console.log("Saaya raw reply length:", rawReply?.length);
+    console.log("Saaya raw reply:", rawReply);
 
     if (!rawReply) {
       throw new Error("Gemini returned an empty response.");

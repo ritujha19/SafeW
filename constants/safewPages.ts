@@ -771,7 +771,11 @@ export function extractAndRecommendPages(
     "someone is attacking",
     "person is beating",
     "person is hitting",
-    "person is attacking",
+    "being physically attacked",
+    "being attacked",
+    "physically attacked",
+    "woman is being attacked",
+    "woman is being assaulted",
     "domestic violence is happening",
     "being abused",
     "getting abused",
@@ -809,26 +813,25 @@ export function extractAndRecommendPages(
 
     if (userLower.includes(page.title.toLowerCase())) score += 6;
 
-   if (
-  page.route === "/womenRights/protectionFromViolence" &&
-  (
-    userLower.includes("beating") ||
-    userLower.includes("hitting") ||
-    userLower.includes("hurt") ||
-    userLower.includes("physical abuse") ||
-    userLower.includes("attacking") ||
-    userLower.includes("violence") ||
-    userLower.includes("rape") ||
-    userLower.includes("rapist") ||
-    userLower.includes("sexual assault") ||
-    userLower.includes("sexually assaulted") ||
-    userLower.includes("sexual violence") ||
-    userLower.includes("forced") ||
-    userLower.includes("forced humiliation")
-  )
-) {
-  score += 10;
-}
+    if (
+      page.route === "/womenRights/protectionFromViolence" &&
+      (userLower.includes("beating") ||
+        userLower.includes("hitting") ||
+        userLower.includes("hurt") ||
+        userLower.includes("physical abuse") ||
+        userLower.includes("attacking") ||
+        userLower.includes("attacked") ||
+        userLower.includes("violence") ||
+        userLower.includes("rape") ||
+        userLower.includes("rapist") ||
+        userLower.includes("sexual assault") ||
+        userLower.includes("sexually assaulted") ||
+        userLower.includes("sexual violence") ||
+        userLower.includes("forced") ||
+        userLower.includes("forced humiliation"))
+    ) {
+      score += 10;
+    }
 
     if (page.route === "/womenRights/rightsSeekingHelp" && needsEmergencyPage) {
       score += 6;
