@@ -56,18 +56,11 @@ const helplines: {
   number: string;
   name: string;
   note?: string;
-  channel?: "whatsapp";
 }[] = [
   {
     number: "14490",
     name: "National Commission for Women (NCW)",
     note: "24/7 helpline",
-  },
-  {
-    number: "7827170170",
-    name: "NCW WhatsApp Support",
-    note: "Message NCW on WhatsApp",
-    channel: "whatsapp",
   },
   {
     number: "181",
@@ -77,7 +70,6 @@ const helplines: {
   { number: "1091", name: "Women in Distress Helpline" },
   { number: "139", name: "Indian Railway Security Helpline" },
 ];
-
 
 function computeSirenProfile(
   t: number,
@@ -159,7 +151,8 @@ function computeSirenProfile(
  */
 function createPoliceSirenWavBytes(mode: SirenMode): Uint8Array {
   const sampleRate = 22050;
-  const durationSeconds = mode === "patrol" ? 14.0 : mode === "wail" ? 3.8 : 1.6;
+  const durationSeconds =
+    mode === "patrol" ? 14.0 : mode === "wail" ? 3.8 : 1.6;
   const numSamples = Math.floor(sampleRate * durationSeconds);
   const dataSize = numSamples * 2;
   const buffer = new ArrayBuffer(44 + dataSize);
@@ -227,7 +220,8 @@ function createPoliceSirenWavBytes(mode: SirenMode): Uint8Array {
 }
 
 function wavBytesToDataUri(bytes: Uint8Array): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   let base64 = "";
   for (let i = 0; i < bytes.length; i += 3) {
     const b1 = bytes[i];
@@ -531,17 +525,7 @@ export default function Emergency() {
     );
   };
 
-  const openWhatsapp = (number: string) => {
-    if (isSirenActive) {
-      stopSiren();
-    }
-    Linking.openURL(`https://wa.me/${number}`).catch(() =>
-      alert(`Couldn't open WhatsApp. Please message ${number} in WhatsApp.`),
-    );
-  };
-
-  const activeStrobeColor =
-    strobePhase === "red" ? colors.beacon : "#2563EB";
+  const activeStrobeColor = strobePhase === "red" ? colors.beacon : "#2563EB";
 
   return (
     <LinearGradient
@@ -566,8 +550,7 @@ export default function Emergency() {
             bottom: 0,
             left: 0,
             zIndex: 50,
-            backgroundColor:
-              strobePhase === "red" ? "#E42A40" : "#1D4ED8",
+            backgroundColor: strobePhase === "red" ? "#E42A40" : "#1D4ED8",
           }}
           className="flex-1 justify-between px-6 py-10"
         >
@@ -689,9 +672,7 @@ export default function Emergency() {
               : undefined
           }
           className={`mt-2 overflow-hidden rounded-[24px] border ${
-            isSirenActive
-              ? "bg-white/15"
-              : "border-white/20 bg-white/10"
+            isSirenActive ? "bg-white/15" : "border-white/20 bg-white/10"
           }`}
         >
           {/* Red & Blue Police Lightbar Strip when active */}
@@ -778,16 +759,15 @@ export default function Emergency() {
                   isSirenActive ? "text-beacon-dark" : "text-white"
                 }`}
               >
-                {isSirenActive
-                  ? "Stop Police Siren"
-                  : "Activate Police Siren"}
+                {isSirenActive ? "Stop Police Siren" : "Activate Police Siren"}
               </Text>
             </PressableScale>
 
             {/* Siren Pattern Selector (Wail / Yelp / Hi-Lo) */}
             <View className="mt-3.5">
               <Text className="mb-2 font-body text-[12px] text-white/75">
-                Siren tone pattern · {SIREN_MODES.find((m) => m.id === sirenMode)?.subtitle}
+                Siren tone pattern ·{" "}
+                {SIREN_MODES.find((m) => m.id === sirenMode)?.subtitle}
               </Text>
               <View className="flex-row gap-2">
                 {SIREN_MODES.map((mode) => {
@@ -863,14 +843,10 @@ export default function Emergency() {
         <View className="mt-5 gap-3">
           {helplines.map((line) => (
             <PressableScale
-              key={`${line.channel ?? "phone"}-${line.number}`}
+              key={line.number}
               accessibilityRole="button"
-              accessibilityLabel={`${line.channel === "whatsapp" ? "Message" : "Call"} ${line.number}, ${line.name}`}
-              onPress={() =>
-                line.channel === "whatsapp"
-                  ? openWhatsapp(line.number)
-                  : call(line.number)
-              }
+              accessibilityLabel={`Call ${line.number}, ${line.name}`}
+              onPress={() => call(line.number)}
               className="flex-row items-center rounded-[22px] border border-white/15 bg-white/10 p-4"
             >
               <Text className="w-[112px] font-display text-[24px] text-white">
@@ -886,11 +862,7 @@ export default function Emergency() {
                   </Text>
                 ) : null}
               </View>
-              <Ionicons
-                name={line.channel === "whatsapp" ? "logo-whatsapp" : "call-outline"}
-                size={20}
-                color="#FFFFFF"
-              />
+              <Ionicons name="call-outline" size={20} color="#FFFFFF" />
             </PressableScale>
           ))}
         </View>

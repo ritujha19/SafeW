@@ -1222,6 +1222,7 @@ export default function SafetyAssistantScreen() {
                 value={inputText}
                 onChangeText={setInputText}
                 placeholder="Ask Saaya anything..."
+                placeholderTextColor={colors.muted}
                 editable={!isSending}
                 onSubmitEditing={() => void handleSendMessage()}
                 accessibilityLabel="Message Saaya"

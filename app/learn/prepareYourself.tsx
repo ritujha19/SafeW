@@ -312,7 +312,9 @@ export default function PrepareYourself() {
     return (
       <Screen>
         <View className="items-center rounded-[32px] bg-midnight px-6 py-10">
-          <LottieAnim source={lottie.successCheck} size={84} loop={false} />
+          <View className="mb-3 h-16 w-16 items-center justify-center rounded-full bg-haven-soft">
+            <Ionicons name="checkmark-circle" size={42} color={colors.havenDark} />
+          </View>
           <Label tone="marigold" className="mt-1">
             QUIZ COMPLETE
           </Label>

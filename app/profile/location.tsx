@@ -1,10 +1,14 @@
-import { sharedLocationState, setSharedLocationState } from "@/auth";
+import {
+  requestAndShareCurrentLocation,
+  sharedLocationState,
+  setSharedLocationState,
+} from "@/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
 import * as SMS from "expo-sms";
 import { useCallback, useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { Linking, Text, TextInput, View } from "react-native";
 
 import { Button } from "@/components/Button";
 import { LottieAnim } from "@/components/Media";
@@ -33,6 +37,26 @@ const formatTimestamp = (value: unknown) =>
       ? String(value)
       : "N/A";
 
+function formatAddress(address: Location.LocationGeocodedAddress | undefined) {
+  if (!address) return null;
+
+  const formattedAddress =
+    address.formattedAddress ??
+    [
+      address.name,
+      address.street,
+      address.district,
+      address.city,
+      address.region,
+      address.postalCode,
+      address.country,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+  return formattedAddress || null;
+}
+
 export default function LocationScreen() {
   const [location, setLocation] = useState(sharedLocationState);
   const {
@@ -49,6 +73,8 @@ export default function LocationScreen() {
   );
 
   const [gettingLocation, setGettingLocation] = useState(true);
+  const [requestingPermission, setRequestingPermission] = useState(false);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
 
   useFocusEffect(
@@ -79,19 +105,32 @@ export default function LocationScreen() {
 
           if (!active) return;
 
+          let address: string | null = null;
+
+          try {
+            const addressResults = await Location.reverseGeocodeAsync(
+              currentLocation.coords,
+            );
+            address = formatAddress(addressResults[0]);
+          } catch (error) {
+            console.error("Location address lookup error:", error);
+          }
+
+          if (!active) return;
+
           const newLocation = {
             latitude: currentLocation.coords.latitude,
             longitude: currentLocation.coords.longitude,
             accuracy: currentLocation.coords.accuracy,
             timestamp: currentLocation.timestamp,
-            address: null,
+            address,
           };
 
           setLocation(newLocation);
 
           // Save the exact fresh coordinates so the rest of the app
           // can use the same location if needed.
-          setSharedLocationState(currentLocation, null);
+          setSharedLocationState(currentLocation, address);
         } catch (error) {
           console.error("Location error:", error);
 
@@ -120,11 +159,55 @@ export default function LocationScreen() {
   const hasLocation =
     location.latitude !== null && location.longitude !== null;
 
+  const handleRequestPermission = async () => {
+    try {
+      setRequestingPermission(true);
+      setPermissionError(null);
+      const permissionResult =
+        await Location.requestForegroundPermissionsAsync();
+      setPermission(permissionResult);
+
+      if (permissionResult.status !== "granted") return;
+
+      const result = await requestAndShareCurrentLocation();
+      if (!result.success || !result.location) {
+        throw new Error(
+          result.success
+            ? "Location permission succeeded without a location."
+            : result.message,
+        );
+      }
+
+      setLocation({
+        latitude: result.location.coords.latitude,
+        longitude: result.location.coords.longitude,
+        accuracy: result.location.coords.accuracy,
+        timestamp: result.location.timestamp,
+        address: result.address ?? null,
+      });
+    } catch (error) {
+      console.error("Location permission error:", error);
+      setPermissionError(
+        "Unable to request location permission. Please try again.",
+      );
+    } finally {
+      setRequestingPermission(false);
+    }
+  };
+
+  const handleOpenLocationSettings = async () => {
+    try {
+      await Linking.openSettings();
+    } catch (error) {
+      console.error("Unable to open location settings:", error);
+      setPermissionError(
+        "Unable to open settings. Please enable location access in your device settings.",
+      );
+    }
+  };
+
   const handleShare = async () => {
     if (!permissionGranted) {
-      alert(
-        "Location permission is required before sharing. Please allow location access first.",
-      );
       return;
     }
 
@@ -182,7 +265,7 @@ export default function LocationScreen() {
         `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
       const finalMessage =
-        `${message.trim()}\n\n📍 My current location:\n${mapsLink}`;
+        `${message.trim()}\n\n📍 My current location:\nAddress: ${location.address ?? "Address unavailable"}\nMap: ${mapsLink}`;
 
       // Open the native SMS composer with the location already prepared.
       await SMS.sendSMSAsync(phoneNumbers, finalMessage);
@@ -266,6 +349,11 @@ export default function LocationScreen() {
           </Heading>
 
           <Row
+            label="Address"
+            value={location.address ?? "Address unavailable"}
+          />
+
+          <Row
             label="Latitude"
             value={String(location.latitude)}
           />
@@ -300,6 +388,39 @@ export default function LocationScreen() {
           </Body>
         </View>
       )}
+
+      {!gettingLocation && !permissionGranted ? (
+        <View className="mb-5 rounded-[24px] bg-marigold-soft p-5">
+          <Heading>Location permission needed</Heading>
+          <Body size="sm" className="mt-1">
+            Allow location access to get your current address and share it.
+          </Body>
+          {permissionError ? (
+            <Body size="sm" tone="beacon" className="mt-2">
+              {permissionError}
+            </Body>
+          ) : null}
+          <Button
+            icon={
+              permission?.canAskAgain === false
+                ? "settings-outline"
+                : "navigate-outline"
+            }
+            label={
+              permission?.canAskAgain === false
+                ? "Open App Settings"
+                : "Allow Location Access"
+            }
+            loading={requestingPermission}
+            className="mt-4"
+            onPress={
+              permission?.canAskAgain === false
+                ? handleOpenLocationSettings
+                : handleRequestPermission
+            }
+          />
+        </View>
+      ) : null}
 
       {/* Contacts */}
       <Label tone="ink" className="mb-2">

@@ -3,7 +3,7 @@ import * as Location from "expo-location";
 import { LinearGradient } from "expo-linear-gradient";
 import {useFocusEffect, useRouter } from "expo-router";
 import {useCallback, useState, type ReactNode } from "react";
-import { Text, View } from "react-native";
+import { Linking, Text, View } from "react-native";
 import {
   logout,
   requestAndShareCurrentLocation,
@@ -61,6 +61,12 @@ export default function Profile() {
     error: trustedContactsError,
   } = useTrustedContacts();
   const [name, setName] = useState(auth.currentUser?.displayName ?? "User");
+  const [status, requestPermission, getPermission] =
+    Location.useForegroundPermissions();
+  const permissionGranted = status?.status === "granted";
+  const [requestingPermission, setRequestingPermission] = useState(false);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
+
   useFocusEffect(
   useCallback(() => {
     const currentUser = auth.currentUser;
@@ -68,24 +74,42 @@ export default function Profile() {
     if (currentUser) {
       setName(currentUser.displayName ?? "User");
     }
-  }, [])
+    void getPermission().catch((error) => {
+      console.error("Location permission refresh error:", error);
+      setPermissionError("Unable to check location permission.");
+    });
+  }, [getPermission])
 );
-  const [status] = Location.useForegroundPermissions();
-  const permissionGranted = status?.status === "granted";
 
   async function handleRequestPermission() {
-    const result = await requestAndShareCurrentLocation();
+    try {
+      setRequestingPermission(true);
+      setPermissionError(null);
+      const result = await requestPermission();
 
-    if (result.success) {
-      alert(
-        `Location permission granted. ${result.address ?? "Current location saved."}`,
+      if (result.status !== "granted") return;
+
+      const locationResult = await requestAndShareCurrentLocation();
+      if (!locationResult.success) {
+        throw new Error(locationResult.message);
+      }
+    } catch (error) {
+      console.error("Location permission error:", error);
+      setPermissionError(
+        "Unable to request location permission. Please try again.",
       );
-      return;
+    } finally {
+      setRequestingPermission(false);
     }
+  }
 
-    if (result.canAskAgain === false) {
-      alert(
-        "Location permission denied. To use this feature, please enable location permission in your phone settings.",
+  async function handleOpenLocationSettings() {
+    try {
+      await Linking.openSettings();
+    } catch (error) {
+      console.error("Unable to open location settings:", error);
+      setPermissionError(
+        "Unable to open settings. Please enable location access in your device settings.",
       );
     }
   }
@@ -161,15 +185,35 @@ export default function Profile() {
 
       <Button
         variant={permissionGranted ? "soft" : "primary"}
-        icon="navigate-outline"
+        icon={
+          permissionGranted
+            ? "checkmark-circle-outline"
+            : status?.canAskAgain === false
+              ? "settings-outline"
+              : "navigate-outline"
+        }
         label={
           permissionGranted
             ? "Location already granted"
-            : "Ask for Location Permission"
+            : status?.canAskAgain === false
+              ? "Open App Settings"
+              : "Allow Location Access"
         }
+        loading={requestingPermission}
         className="mt-4"
-        onPress={handleRequestPermission}
+        onPress={
+          permissionGranted
+            ? undefined
+            : status?.canAskAgain === false
+              ? handleOpenLocationSettings
+              : handleRequestPermission
+        }
       />
+      {permissionError ? (
+        <Body size="sm" tone="beacon" className="mt-2">
+          {permissionError}
+        </Body>
+      ) : null}
 
       {sharedLocationState.latitude !== null && (
         <Body size="sm" className="mt-4">
