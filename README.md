@@ -274,6 +274,6 @@ Built with **React Native, Expo, Firebase, Node.js, Express, and Google Gemini.*
 
 ---
 
-#Auhor 
+# Auhor 
 
 Ritu Jha 
