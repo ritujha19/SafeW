@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useLocalSearchParams, type Href } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { Body, Display, Heading } from "@/components/Typography";
 import { colors } from "@/constants/theme";
 
@@ -29,30 +28,9 @@ const features = [
   },
 ] as const;
 
-function getEasApkUrl(value: string | undefined): string | null {
-  if (!value) return null;
-
-  try {
-    const url = new URL(value);
-    if (
-      url.protocol === "https:" &&
-      url.hostname === "expo.dev" &&
-      url.pathname.startsWith("/artifacts/eas/") &&
-      url.pathname.endsWith(".apk")
-    ) {
-      return url.toString();
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-}
-
 export default function Download() {
-  const params = useLocalSearchParams<{ apk?: string | string[] }>();
-  const apkParam = Array.isArray(params.apk) ? params.apk[0] : params.apk;
-  const apkUrl = getEasApkUrl(apkParam);
+  const APK_URL =
+    "https://github.com/ritujha19/SafeW/releases/download/v1.0.0/application-708f14ea-df43-40a6-92c1-e0b36446186a.apk";
 
   return (
     <ScrollView
@@ -120,33 +98,20 @@ export default function Download() {
             Install the Android app to keep these tools close at hand.
           </Body>
 
-          {apkUrl ? (
-            <Link href={apkUrl as Href} asChild>
-              <Pressable
-                accessibilityRole="link"
-                className="mt-5 min-h-14 flex-row items-center justify-center rounded-2xl bg-marigold px-5"
-              >
-                <Ionicons
-                  name="download-outline"
-                  size={21}
-                  color={colors.midnight}
-                />
-                <Text className="ml-2 font-bodyBold text-[16px] text-midnight">
-                  Download APK
-                </Text>
-              </Pressable>
-            </Link>
-          ) : (
-            <View
-              accessibilityRole="alert"
-              className="mt-5 rounded-2xl bg-white/10 p-4"
-            >
-              <Text className="font-bodyMedium text-[14px] leading-5 text-white">
-                The APK download link is missing or invalid. Open this page
-                using the SafeW download link shared with your EAS build.
-              </Text>
-            </View>
-          )}
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => Linking.openURL(APK_URL)}
+            className="mt-5 min-h-14 flex-row items-center justify-center rounded-2xl bg-marigold px-5"
+          >
+            <Ionicons
+              name="download-outline"
+              size={21}
+              color={colors.midnight}
+            />
+            <Text className="ml-2 font-bodyBold text-[16px] text-midnight">
+              Download APK
+            </Text>
+          </Pressable>
 
           <Body size="sm" tone="soft" className="mt-4 text-center">
             Android APK · Only install apps from sources you trust.
