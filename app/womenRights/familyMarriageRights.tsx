@@ -67,7 +67,8 @@ export default function FamilyMarriageRights() {
             title: "Rights Within Marriage",
             meaning:
               "Marriage does not mean that a woman loses her legal identity or basic rights. The exact legal rights and responsibilities of spouses can depend on the law governing the marriage.",
-            whyItMatters: "Being married does not mean giving up your legal rights.",
+            whyItMatters:
+              "Being married does not mean giving up your legal rights.",
             route: "/womenRights/viewMore/rightsWithinMarriage",
           },
           {
@@ -84,7 +85,8 @@ export default function FamilyMarriageRights() {
             title: "Maintenance",
             meaning:
               "In certain situations, a spouse may be able to ask for financial support from the other spouse. The law that applies and the circumstances of the case determine what support may be available.",
-            whyItMatters: "Financial support can be important during separation or matrimonial proceedings.",
+            whyItMatters:
+              "Financial support can be important during separation or matrimonial proceedings.",
             route: "/womenRights/viewMore/maintenance",
           },
           {
@@ -128,7 +130,8 @@ export default function FamilyMarriageRights() {
             title: "Rights After Divorce",
             meaning:
               "Ending a marriage can involve other legal matters such as financial support, children and property. The rights and orders available depend on the law and circumstances involved.",
-            whyItMatters: "Divorce is not only about ending the marriage. Other important legal matters may also need to be addressed.",
+            whyItMatters:
+              "Divorce is not only about ending the marriage. Other important legal matters may also need to be addressed.",
             route: "/womenRights/viewMore/rightsAfterDivorce",
           },
         ]}

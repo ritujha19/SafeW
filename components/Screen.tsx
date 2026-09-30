@@ -41,9 +41,18 @@ export function Callout({
   const c = callouts[tone];
   return (
     <View className={`mb-5 flex-row rounded-[22px] p-4 ${c.box}`}>
-      <Ionicons name={icon} size={22} color={c.icon} style={{ marginRight: 12, marginTop: 1 }} />
+      <Ionicons
+        name={icon}
+        size={22}
+        color={c.icon}
+        style={{ marginRight: 12, marginTop: 1 }}
+      />
       <View className="flex-1">
-        {title ? <Heading size="sm" className="mb-1">{title}</Heading> : null}
+        {title ? (
+          <Heading size="sm" className="mb-1">
+            {title}
+          </Heading>
+        ) : null}
         {typeof children === "string" ? (
           <Body size="sm" tone="ink">
             {children}

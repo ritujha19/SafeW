@@ -101,7 +101,11 @@ export const LordIcon = forwardRef<LordIconHandle, LordIconProps>(
             justifyContent: "center",
           }}
         >
-          <Ionicons name={fallback} size={Math.round(size * 0.85)} color={color} />
+          <Ionicons
+            name={fallback}
+            size={Math.round(size * 0.85)}
+            color={color}
+          />
         </View>
       );
     }
@@ -124,7 +128,11 @@ export const LordIcon = forwardRef<LordIconHandle, LordIconProps>(
 const tints = {
   dusk: { blob: "bg-dusk-100", dot: "bg-marigold", icon: colors.dusk[600] },
   haven: { blob: "bg-haven-soft", dot: "bg-marigold", icon: colors.havenDark },
-  marigold: { blob: "bg-marigold-soft", dot: "bg-dusk-300", icon: colors.marigoldDark },
+  marigold: {
+    blob: "bg-marigold-soft",
+    dot: "bg-dusk-300",
+    icon: colors.marigoldDark,
+  },
 } as const;
 
 export function Illustration({

@@ -7,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
 import * as SMS from "expo-sms";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Linking, Text, TextInput, View } from "react-native";
 
 import { Button } from "@/components/Button";
@@ -36,6 +36,14 @@ const formatTimestamp = (value: unknown) =>
     : value
       ? String(value)
       : "N/A";
+
+const defaultLocationMessage = "I need help. Can you come and check on me?";
+
+function createLocationMessage(address: string | null) {
+  return address
+    ? `${defaultLocationMessage} The address - ${address}`
+    : defaultLocationMessage;
+}
 
 function formatAddress(address: Location.LocationGeocodedAddress | undefined) {
   if (!address) return null;
@@ -68,14 +76,26 @@ export default function LocationScreen() {
   const [permission, setPermission] =
     useState<Location.LocationPermissionResponse | null>(null);
 
-  const [message, setMessage] = useState(
-    "I need help. Please check my location.",
+  const [message, setMessage] = useState(() =>
+    createLocationMessage(sharedLocationState.address),
   );
 
   const [gettingLocation, setGettingLocation] = useState(true);
   const [requestingPermission, setRequestingPermission] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    setMessage((currentMessage) => {
+      if (
+        currentMessage === defaultLocationMessage ||
+        currentMessage.startsWith(`${defaultLocationMessage} - Address:`)
+      ) {
+        return createLocationMessage(location.address);
+      }
+      return currentMessage;
+    });
+  }, [location.address]);
 
   useFocusEffect(
     useCallback(() => {
@@ -98,10 +118,9 @@ export default function LocationScreen() {
           }
 
           // Get ONE fresh location when this screen opens.
-          const currentLocation =
-            await Location.getCurrentPositionAsync({
-              accuracy: Location.Accuracy.Balanced,
-            });
+          const currentLocation = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
 
           if (!active) return;
 
@@ -135,9 +154,7 @@ export default function LocationScreen() {
           console.error("Location error:", error);
 
           if (active) {
-            alert(
-              "Unable to get your current location. Please try again.",
-            );
+            alert("Unable to get your current location. Please try again.");
           }
         } finally {
           if (active) {
@@ -156,8 +173,7 @@ export default function LocationScreen() {
 
   const permissionGranted = permission?.status === "granted";
 
-  const hasLocation =
-    location.latitude !== null && location.longitude !== null;
+  const hasLocation = location.latitude !== null && location.longitude !== null;
 
   const handleRequestPermission = async () => {
     try {
@@ -219,7 +235,9 @@ export default function LocationScreen() {
     }
 
     if (trustedContactsLoading) {
-      alert("Trusted contacts are still loading. Please try again in a moment.");
+      alert(
+        "Trusted contacts are still loading. Please try again in a moment.",
+      );
       return;
     }
 
@@ -261,20 +279,16 @@ export default function LocationScreen() {
         return;
       }
 
-      const mapsLink =
-        `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+      const mapsLink = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
-      const finalMessage =
-        `${message.trim()}\n\n📍 My current location:\nAddress: ${location.address ?? "Address unavailable"}\nMap: ${mapsLink}`;
+      const finalMessage = `${message.trim()}\n\n📍 Google Maps location:\n${mapsLink}`;
 
       // Open the native SMS composer with the location already prepared.
       await SMS.sendSMSAsync(phoneNumbers, finalMessage);
     } catch (error) {
       console.error("SMS sharing error:", error);
 
-      alert(
-        "Unable to open the SMS app. Please try again.",
-      );
+      alert("Unable to open the SMS app. Please try again.");
     } finally {
       setSending(false);
     }
@@ -296,40 +310,24 @@ export default function LocationScreen() {
           ) : null}
 
           <View className="h-[64px] w-[64px] items-center justify-center rounded-full bg-marigold">
-            <Ionicons
-              name="location"
-              size={30}
-              color={colors.midnight}
-            />
+            <Ionicons name="location" size={30} color={colors.midnight} />
           </View>
         </View>
 
         <View
           className={`mt-1 flex-row items-center rounded-full px-3 py-1.5 ${
-            permissionGranted
-              ? "bg-haven-soft"
-              : "bg-marigold-soft"
+            permissionGranted ? "bg-haven-soft" : "bg-marigold-soft"
           }`}
         >
           <Ionicons
-            name={
-              permissionGranted
-                ? "checkmark-circle"
-                : "alert-circle"
-            }
+            name={permissionGranted ? "checkmark-circle" : "alert-circle"}
             size={16}
-            color={
-              permissionGranted
-                ? colors.havenDark
-                : colors.marigoldDark
-            }
+            color={permissionGranted ? colors.havenDark : colors.marigoldDark}
           />
 
           <Text
             className={`ml-1.5 font-bodyBold text-[13px] ${
-              permissionGranted
-                ? "text-haven-dark"
-                : "text-marigold-dark"
+              permissionGranted ? "text-haven-dark" : "text-marigold-dark"
             }`}
           >
             {gettingLocation
@@ -344,34 +342,20 @@ export default function LocationScreen() {
       {/* Coordinates */}
       {hasLocation ? (
         <View className="mb-5 rounded-[24px] border border-mist bg-white px-5 py-2">
-          <Heading className="pb-1 pt-3">
-            Current location
-          </Heading>
+          <Heading className="pb-1 pt-3">Current location</Heading>
 
           <Row
             label="Address"
             value={location.address ?? "Address unavailable"}
           />
 
-          <Row
-            label="Latitude"
-            value={String(location.latitude)}
-          />
+          <Row label="Latitude" value={String(location.latitude)} />
 
-          <Row
-            label="Longitude"
-            value={String(location.longitude)}
-          />
+          <Row label="Longitude" value={String(location.longitude)} />
 
-          <Row
-            label="Accuracy"
-            value={String(location.accuracy ?? "N/A")}
-          />
+          <Row label="Accuracy" value={String(location.accuracy ?? "N/A")} />
 
-          <Row
-            label="Timestamp"
-            value={formatTimestamp(location.timestamp)}
-          />
+          <Row label="Timestamp" value={formatTimestamp(location.timestamp)} />
         </View>
       ) : (
         <View className="mb-5 rounded-[24px] bg-dusk-50 p-5">
@@ -434,10 +418,7 @@ export default function LocationScreen() {
           <Body size="sm">Unable to load trusted contacts.</Body>
         ) : trustedContacts.length > 0 ? (
           trustedContacts.map((contact, i) => (
-            <View
-              key={i}
-              className="rounded-full bg-dusk-50 px-3.5 py-2"
-            >
+            <View key={i} className="rounded-full bg-dusk-50 px-3.5 py-2">
               <Text className="font-bodyMedium text-[14px] text-dusk-700">
                 {contact.name || contact.mobNumber}
               </Text>
@@ -469,7 +450,10 @@ export default function LocationScreen() {
 
       {/* Send */}
       <Button
-        icon="paper-plane-outline"
+        leadingVisual={
+          <LottieAnim source={lottie.mailOpenDocument} size={24} />
+        }
+        leadingVisualSize={24}
         label={
           gettingLocation
             ? "Getting location..."
@@ -480,6 +464,7 @@ export default function LocationScreen() {
         haptic="medium"
         onPress={handleShare}
         disabled={gettingLocation || sending || !hasLocation}
+        className="mb-2"
       />
     </Screen>
   );

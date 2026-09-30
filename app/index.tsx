@@ -19,7 +19,6 @@ import { colors, shadow } from "@/constants/theme";
 
 /* ---------------------------- small pieces ---------------------------- */
 
-
 const toolAccents = {
   dusk: { chip: "bg-dusk-50", icon: colors.dusk[600] },
   haven: { chip: "bg-haven-soft", icon: colors.havenDark },
@@ -51,8 +50,16 @@ function ToolCard({
       onPressIn={() => iconRef.current?.play()}
       onPress={onPress}
     >
-      <View className={`mr-4 h-14 w-14 items-center justify-center rounded-2xl ${a.chip}`}>
-        <LordIcon ref={iconRef} source={source} fallback={icon} size={34} color={a.icon} />
+      <View
+        className={`mr-4 h-14 w-14 items-center justify-center rounded-2xl ${a.chip}`}
+      >
+        <LordIcon
+          ref={iconRef}
+          source={source}
+          fallback={icon}
+          size={34}
+          color={a.icon}
+        />
       </View>
       <View className="flex-1 pr-2">
         <Heading>{title}</Heading>
@@ -81,8 +88,8 @@ export default function Home() {
       <Animated.View entering={FadeInDown.duration(450)} className="mb-6 mt-2">
         <Display size="xl">Your safety matters.</Display>
         <Body className="mt-3 mb-5">
-          Get support, learn practical safety skills, and stay connected to the people
-          you trust.
+          Get support, learn practical safety skills, and stay connected to the
+          people you trust.
         </Body>
       </Animated.View>
 
@@ -95,7 +102,10 @@ export default function Home() {
           onPress={() => router.navigate("/emergency")}
           // Shadow lives on the outer wrapper; overflow:hidden on the inner
           // view would clip it on iOS.
-          wrapperStyle={[shadow.sos, { borderRadius: 32, backgroundColor: colors.beaconDark }]}
+          wrapperStyle={[
+            shadow.sos,
+            { borderRadius: 32, backgroundColor: colors.beaconDark },
+          ]}
           style={{ borderRadius: 32, overflow: "hidden" }}
         >
           <LinearGradient
@@ -118,10 +128,16 @@ export default function Home() {
               </View>
               <View className="h-[132px] w-[132px] items-center justify-center">
                 <View style={{ position: "absolute" }}>
-                  <LottieAnim source={lottie.sosPulse} size={170} reducedProgress={0.4} />
+                  <LottieAnim
+                    source={lottie.sosPulse}
+                    size={170}
+                    reducedProgress={0.4}
+                  />
                 </View>
                 <View className="h-[74px] w-[74px] items-center justify-center rounded-full bg-white">
-                  <Text className="font-display text-[22px] text-beacon-dark">SOS</Text>
+                  <Text className="font-display text-[22px] text-beacon-dark">
+                    SOS
+                  </Text>
                 </View>
               </View>
             </View>
@@ -129,7 +145,10 @@ export default function Home() {
         </PressableScale>
       </Animated.View>
 
-      <Animated.View entering={FadeInDown.delay(360).duration(420)} className="mt-8">
+      <Animated.View
+        entering={FadeInDown.delay(360).duration(420)}
+        className="mt-8"
+      >
         <Heading size="lg" className="mb-3 mt-10">
           Your tools
         </Heading>
@@ -140,7 +159,9 @@ export default function Home() {
             icon="chatbubble-ellipses-outline"
             source={lordicon.assistant}
             accent="dusk"
-            onPress={() => {router.navigate("/assistant")}}
+            onPress={() => {
+              router.navigate("/assistant");
+            }}
           />
           <ToolCard
             title="Learn & Prepare"

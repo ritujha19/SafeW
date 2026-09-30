@@ -11,10 +11,7 @@ import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
-import {
-  onAuthStateChanged,
-  type User,
-} from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import {
   type ComponentProps,
   type ComponentRef,
@@ -109,8 +106,7 @@ function deriveSessionTitle(messages: ChatMessage[]): string {
   return text.length > 48 ? `${text.slice(0, 48)}...` : text;
 }
 
-const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL;
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 async function generateSaayaResponse(
   userMessage: string,
@@ -258,19 +254,12 @@ export default function SafetyAssistantScreen() {
 
       const loadCloudHistory = async () => {
         try {
-          const docRef = doc(
-            db,
-            "users",
-            user.uid,
-            "private",
-            "saayaChats",
-          );
+          const docRef = doc(db, "users", user.uid, "private", "saayaChats");
           const snap = await getDoc(docRef);
 
           if (snap.exists()) {
             const cloudSessions = snap.data().sessions as
-              | ChatSession[]
-              | undefined;
+              ChatSession[] | undefined;
 
             if (Array.isArray(cloudSessions) && cloudSessions.length > 0) {
               setSessions(cloudSessions);
@@ -309,13 +298,7 @@ export default function SafetyAssistantScreen() {
       session.messages.some((message) => message.role === "user"),
     );
 
-    const docRef = doc(
-      db,
-      "users",
-      currentUser.uid,
-      "private",
-      "saayaChats",
-    );
+    const docRef = doc(db, "users", currentUser.uid, "private", "saayaChats");
 
     if (savedSessions.length === 0) {
       void deleteDoc(docRef).catch(() => {});
@@ -573,13 +556,7 @@ export default function SafetyAssistantScreen() {
 
     if (!currentUser) return;
 
-    const docRef = doc(
-      db,
-      "users",
-      currentUser.uid,
-      "private",
-      "saayaChats",
-    );
+    const docRef = doc(db, "users", currentUser.uid, "private", "saayaChats");
 
     const savedRemaining = remaining.filter((session) =>
       session.messages.some((message) => message.role === "user"),
@@ -650,9 +627,7 @@ export default function SafetyAssistantScreen() {
             accessibilityRole="button"
             accessibilityLabel="Log in to SAFE-W"
           >
-            <Text className="font-bodyBold text-[15px] text-white">
-              Log In
-            </Text>
+            <Text className="font-bodyBold text-[15px] text-white">Log In</Text>
           </PressableScale>
 
           <PressableScale

@@ -1,6 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View, type TextInputProps } from "react-native";
+import {
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  type TextInputProps,
+} from "react-native";
 import { colors } from "@/constants/theme";
 import type { IconName } from "./Media";
 import { Label } from "./Typography";
@@ -14,7 +20,13 @@ type Props = TextInputProps & {
   prefix?: string;
 };
 
-export function TextField({ label, icon, secure = false, prefix, ...input }: Props) {
+export function TextField({
+  label,
+  icon,
+  secure = false,
+  prefix,
+  ...input
+}: Props) {
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(secure);
 
@@ -34,7 +46,9 @@ export function TextField({ label, icon, secure = false, prefix, ...input }: Pro
           color={focused ? colors.dusk[600] : colors.muted}
         />
         {prefix ? (
-          <Text className="ml-3 font-bodyMedium text-[16px] text-muted">{prefix}</Text>
+          <Text className="ml-3 font-bodyMedium text-[16px] text-muted">
+            {prefix}
+          </Text>
         ) : null}
         <TextInput
           {...input}

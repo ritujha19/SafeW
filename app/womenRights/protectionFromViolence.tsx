@@ -63,7 +63,8 @@ export default function ProtectionFromViolence() {
               "It provides criminal protection against specified forms of physical assault or criminal force directed at women.",
           },
           {
-            label: "Protection of Women from Domestic Violence Act, 2005 — Section 3",
+            label:
+              "Protection of Women from Domestic Violence Act, 2005 — Section 3",
             title: "Domestic Violence",
             meaning:
               "Section 3 defines domestic violence and covers specified forms of physical, sexual, verbal or emotional, and economic abuse within the relationships covered by the Act.",
@@ -81,7 +82,8 @@ export default function ProtectionFromViolence() {
           {
             label: "BNS, 2023 — Section 124",
             title: "Acid Attack",
-            meaning: "Section 124 addresses voluntarily causing grievous hurt by use of acid or a similar substance.",
+            meaning:
+              "Section 124 addresses voluntarily causing grievous hurt by use of acid or a similar substance.",
             whyItMatters:
               "It provides specific criminal protection against acid attacks and related serious harm.",
           },
@@ -90,7 +92,8 @@ export default function ProtectionFromViolence() {
             title: "Trafficking of Persons",
             meaning:
               "Section 143 addresses trafficking of persons through specified acts and means for specified exploitative purposes.",
-            whyItMatters: "It provides criminal protection against human trafficking and exploitation.",
+            whyItMatters:
+              "It provides criminal protection against human trafficking and exploitation.",
           },
         ]}
       />

@@ -1,6 +1,11 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { AccordionItem, Block, Bullets, type Accent } from "@/components/Accordion";
+import {
+  AccordionItem,
+  Block,
+  Bullets,
+  type Accent,
+} from "@/components/Accordion";
 import { Button } from "@/components/Button";
 import type { IconName } from "@/components/Media";
 import { Callout, Screen } from "@/components/Screen";
@@ -28,7 +33,16 @@ const icon: IconName[] = [
   "trending-up-outline", // When behaviour becomes more concerning
 ];
 const accent: Accent[] = [
-  "dusk", "dusk", "marigold", "marigold", "marigold", "dusk", "dusk", "marigold", "marigold", "marigold",
+  "dusk",
+  "dusk",
+  "marigold",
+  "marigold",
+  "marigold",
+  "dusk",
+  "dusk",
+  "marigold",
+  "marigold",
+  "marigold",
 ];
 
 const accordionItems: Item[] = [
@@ -211,15 +225,19 @@ export default function WarningSigns() {
   return (
     <Screen>
       <Body tone="ink" className="mb-4">
-        Learn to recognize warning signs early so you can stay aware, prepared, and
-        safer in potentially harmful situations.
+        Learn to recognize warning signs early so you can stay aware, prepared,
+        and safer in potentially harmful situations.
       </Body>
 
-      <Callout icon="information-circle-outline" tone="dusk" title="Context matters">
-        Warning signs are not proof that a crime has occurred. Pay closer attention
-        when behaviour is repeated, unwanted, threatening, coercive, exploitative,
-        or escalating. If you feel unsafe, trust your instincts and consider
-        reaching out to someone you trust.
+      <Callout
+        icon="information-circle-outline"
+        tone="dusk"
+        title="Context matters"
+      >
+        Warning signs are not proof that a crime has occurred. Pay closer
+        attention when behaviour is repeated, unwanted, threatening, coercive,
+        exploitative, or escalating. If you feel unsafe, trust your instincts
+        and consider reaching out to someone you trust.
       </Callout>
 
       {accordionItems.map((item, index) => (

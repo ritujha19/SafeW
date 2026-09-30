@@ -42,7 +42,11 @@ export function RightsSection({
           {heading}
         </Heading>
       ) : null}
-      {description ? <Body size="sm" className="mb-3">{description}</Body> : null}
+      {description ? (
+        <Body size="sm" className="mb-3">
+          {description}
+        </Body>
+      ) : null}
       {!description && heading ? <View className="mb-2" /> : null}
 
       {items.map((item) => {
@@ -82,9 +86,13 @@ export function LegalNote() {
   const router = useRouter();
   return (
     <View className="mt-4">
-      <Callout icon="scale-outline" tone="dusk" title="General information, not legal advice">
-        Laws change and every situation is different. A legal-aid service can tell you
-        what applies to you.
+      <Callout
+        icon="scale-outline"
+        tone="dusk"
+        title="General information, not legal advice"
+      >
+        Laws change and every situation is different. A legal-aid service can
+        tell you what applies to you.
       </Callout>
       <Button
         variant="outline"

@@ -19,7 +19,11 @@ export const signUp = async (
   password: string,
   displayName?: string,
 ) => {
-  const credential = await createUserWithEmailAndPassword(auth, email, password);
+  const credential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password,
+  );
   if (displayName) {
     await updateProfile(credential.user, { displayName });
   }
@@ -63,9 +67,7 @@ const getTrustedContactsRef = () => {
   return doc(db, "users", user.uid, "private", "trustedContacts");
 };
 
-export const saveTrustedContacts = async (
-  contacts: TrustedContact[],
-) => {
+export const saveTrustedContacts = async (contacts: TrustedContact[]) => {
   const contactRef = getTrustedContactsRef();
 
   if (!contactRef) {
@@ -80,10 +82,9 @@ export const saveTrustedContacts = async (
   // Check whether this user already has contacts in Firestore.
   const existingSnapshot = await getDoc(contactRef);
 
-  const existingContacts: TrustedContact[] =
-    existingSnapshot.exists()
-      ? existingSnapshot.data().contacts ?? []
-      : [];
+  const existingContacts: TrustedContact[] = existingSnapshot.exists()
+    ? (existingSnapshot.data().contacts ?? [])
+    : [];
 
   // Merge contacts from this device with contacts already in Firestore.
   const mergedContacts = [...existingContacts];
@@ -121,8 +122,7 @@ export const loadTrustedContacts = async () => {
     return [];
   }
 
-  const contacts: TrustedContact[] =
-    snapshot.data().contacts ?? [];
+  const contacts: TrustedContact[] = snapshot.data().contacts ?? [];
 
   setTrustedContacts(contacts);
 
@@ -142,7 +142,7 @@ export const deleteTrustedContact = async (mobNumber: string) => {
 
   const existingSnapshot = await getDoc(contactRef);
   const existingContacts: TrustedContact[] = existingSnapshot.exists()
-    ? existingSnapshot.data().contacts ?? []
+    ? (existingSnapshot.data().contacts ?? [])
     : [];
 
   const remainingContacts = existingContacts.filter(
@@ -172,7 +172,7 @@ export const updateTrustedContact = async (
 
   const existingSnapshot = await getDoc(contactRef);
   const existingContacts: TrustedContact[] = existingSnapshot.exists()
-    ? existingSnapshot.data().contacts ?? []
+    ? (existingSnapshot.data().contacts ?? [])
     : [];
 
   const index = existingContacts.findIndex(
@@ -224,7 +224,9 @@ export const requestAndShareCurrentLocation = async () => {
 
   if (existingPermission.status === "granted") {
     const currentLocation = await Location.getCurrentPositionAsync({});
-    const addressData = await Location.reverseGeocodeAsync(currentLocation.coords);
+    const addressData = await Location.reverseGeocodeAsync(
+      currentLocation.coords,
+    );
     const formattedAddress =
       addressData[0]?.formattedAddress ?? "Address unavailable";
 
@@ -252,7 +254,9 @@ export const requestAndShareCurrentLocation = async () => {
   }
 
   const currentLocation = await Location.getCurrentPositionAsync({});
-  const addressData = await Location.reverseGeocodeAsync(currentLocation.coords);
+  const addressData = await Location.reverseGeocodeAsync(
+    currentLocation.coords,
+  );
   const formattedAddress =
     addressData[0]?.formattedAddress ?? "Address unavailable";
 

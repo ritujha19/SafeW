@@ -54,7 +54,10 @@ export function PressableScale({
         className={className}
         style={style}
         onPressIn={(e) => {
-          scale.value = withSpring(pressedScale, { damping: 18, stiffness: 320 });
+          scale.value = withSpring(pressedScale, {
+            damping: 18,
+            stiffness: 320,
+          });
           onPressIn?.(e);
         }}
         onPressOut={(e) => {

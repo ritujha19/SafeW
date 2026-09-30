@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator, Text } from "react-native";
+import type { ReactNode } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
 import { colors } from "@/constants/theme";
 import type { IconName } from "./Media";
 import { PressableScale } from "./PressableScale";
@@ -22,6 +23,8 @@ type Props = {
   onPress?: () => void;
   variant?: keyof typeof variants;
   icon?: IconName;
+  leadingVisual?: ReactNode;
+  leadingVisualSize?: number;
   disabled?: boolean;
   /** Shows a spinner in place of the icon and disables the button. */
   loading?: boolean;
@@ -34,6 +37,8 @@ export function Button({
   onPress,
   variant = "primary",
   icon,
+  leadingVisual,
+  leadingVisualSize = 24,
   disabled = false,
   loading = false,
   className = "",
@@ -55,10 +60,34 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator color={v.icon} style={{ marginRight: 8 }} />
+      ) : leadingVisual ? (
+        <View
+          style={{
+            width: leadingVisualSize,
+            height: leadingVisualSize,
+            marginRight: 8,
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            flexShrink: 0,
+          }}
+        >
+          {leadingVisual}
+        </View>
       ) : icon ? (
-        <Ionicons name={icon} size={20} color={v.icon} style={{ marginRight: 8 }} />
+        <Ionicons
+          name={icon}
+          size={20}
+          color={v.icon}
+          style={{ marginRight: 8 }}
+        />
       ) : null}
-      <Text className={`font-bodyBold text-[16px] ${v.text}`}>{label}</Text>
+      <Text
+        numberOfLines={1}
+        className={`flex-shrink font-bodyBold text-[16px] ${v.text}`}
+      >
+        {label}
+      </Text>
     </PressableScale>
   );
 }

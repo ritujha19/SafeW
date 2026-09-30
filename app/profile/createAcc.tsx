@@ -1,5 +1,6 @@
 import { Link, useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
+import { BackHandler } from "react-native";
 import { signUp } from "@/auth";
 import { AuthScaffold } from "@/components/AuthScaffold";
 import { SignupIllustration } from "@/components/AuthIllustrations";
@@ -18,6 +19,20 @@ export default function CreateAccountPage() {
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const handleBack = () => {
+      router.replace("/");
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBack,
+    );
+
+    return () => subscription.remove();
+  }, [router]);
 
   const handleCreateAccount = async () => {
     if (submitting) return;
@@ -56,7 +71,11 @@ export default function CreateAccountPage() {
           <Body>Already have an account? </Body>
           <Link
             href="/profile/login"
-            style={{ fontFamily: "Figtree_700Bold", fontSize: 16, color: colors.dusk[600] }}
+            style={{
+              fontFamily: "Figtree_700Bold",
+              fontSize: 16,
+              color: colors.dusk[600],
+            }}
           >
             Log in
           </Link>
@@ -64,7 +83,11 @@ export default function CreateAccountPage() {
       }
     >
       {error ? (
-        <Callout tone="danger" icon="alert-circle-outline" title="Couldn't create account">
+        <Callout
+          tone="danger"
+          icon="alert-circle-outline"
+          title="Couldn't create account"
+        >
           {error}
         </Callout>
       ) : null}

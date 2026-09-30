@@ -20,15 +20,15 @@ export default function DigitalRights() {
       </Callout>
 
       <Callout tone="dusk" title="If something happens online">
-        Save relevant evidence, use the platform&asop;s reporting mechanism where
-        appropriate, and report cybercrime through the Government&asop;s National
-        Cyber Crime Reporting Portal. For an emergency, contact the police
-        through 112.
+        Save relevant evidence, use the platform&asop;s reporting mechanism
+        where appropriate, and report cybercrime through the Government&asop;s
+        National Cyber Crime Reporting Portal. For an emergency, contact the
+        police through 112.
       </Callout>
 
       <Body tone="ink" className="mb-1 mt-2">
-        Understand your rights when using social media, messaging apps,
-        websites and other digital services.
+        Understand your rights when using social media, messaging apps, websites
+        and other digital services.
       </Body>
       <Body size="sm" className="mb-4">
         These are simplified explanations. The exact legal provision that
@@ -60,7 +60,8 @@ export default function DigitalRights() {
             title: "Protection from Cyberstalking",
             meaning:
               "Stalking includes repeatedly contacting or following a woman despite a clear indication of disinterest, and monitoring her use of the internet, email or other electronic communication, subject to the exceptions provided by law.",
-            whyItMatters: "Persistent unwanted online monitoring or contact can have legal consequences.",
+            whyItMatters:
+              "Persistent unwanted online monitoring or contact can have legal consequences.",
           },
           {
             label: "Information Technology Act, 2000 — Sections 66C & 66D",
@@ -75,10 +76,12 @@ export default function DigitalRights() {
             title: "Protection from Illegal Sexual or Obscene Content",
             meaning:
               "The IT Act contains offences concerning publishing or transmitting obscene material and material containing sexually explicit acts in electronic form. The exact section depends on the content and circumstances.",
-            whyItMatters: "Online publication or transmission of prohibited material can have legal consequences.",
+            whyItMatters:
+              "Online publication or transmission of prohibited material can have legal consequences.",
           },
           {
-            label: "IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021",
+            label:
+              "IT (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021",
             title: "Right to Report Harmful Online Content",
             meaning:
               "Intermediaries are subject to due-diligence and grievance-redressal requirements. The rules address categories including privacy-invasive content and content that is insulting or harassing on the basis of gender.",
@@ -94,7 +97,8 @@ export default function DigitalRights() {
               "Personal information such as identity and contact details can require legal protection when handled digitally.",
           },
           {
-            label: "Digital Personal Data Protection Act, 2023 — phased commencement",
+            label:
+              "Digital Personal Data Protection Act, 2023 — phased commencement",
             title: "Control Over Your Personal Data",
             meaning:
               "The Act provides a framework for rights such as access to information about personal data, correction and erasure, grievance redressal and withdrawal of consent. These provisions should be treated according to their notified commencement dates rather than as if every right is already fully operational.",
@@ -106,7 +110,8 @@ export default function DigitalRights() {
             title: "Right to Report Cybercrime",
             meaning:
               "Cybercrime can be reported through the Government of India's National Cyber Crime Reporting Portal. The portal includes reporting options for women/children-related cybercrime and other cybercrimes.",
-            whyItMatters: "You do not have to rely only on the social-media platform when online abuse or another cybercrime occurs.",
+            whyItMatters:
+              "You do not have to rely only on the social-media platform when online abuse or another cybercrime occurs.",
           },
           {
             label: "Applicable cyber and criminal laws",

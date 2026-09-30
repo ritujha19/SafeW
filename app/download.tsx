@@ -22,7 +22,8 @@ const features = [
   {
     icon: "book-outline",
     title: "Learn and know your rights",
-    description: "Explore safety guidance and information about women's rights.",
+    description:
+      "Explore safety guidance and information about women's rights.",
     color: colors.havenDark,
     background: colors.havenSoft,
   },
@@ -76,7 +77,9 @@ export default function Download() {
           <View className="mb-5 h-14 w-14 items-center justify-center rounded-2xl bg-haven-soft">
             <Ionicons name="sparkles" size={28} color={colors.havenDark} />
           </View>
-          <Display size="lg">Feel safer, more supported, and more prepared.</Display>
+          <Display size="lg">
+            Feel safer, more supported, and more prepared.
+          </Display>
           <Body className="mt-3">
             SafeW brings practical safety tools and trusted information together
             in one place, so you can explore your options at your own pace.
@@ -151,8 +154,8 @@ export default function Download() {
         </View>
 
         <Text className="mt-6 text-center font-body text-[13px] text-muted">
-          SafeW is a support and information tool. It does not replace
-          emergency services.
+          SafeW is a support and information tool. It does not replace emergency
+          services.
         </Text>
       </View>
     </ScrollView>

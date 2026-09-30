@@ -126,7 +126,8 @@ const lawSections: LawSection[] = [
   {
     section: "Section 15",
     title: "Offences are cognizable and non-bailable",
-    whatTheLawSays: "The offences punishable under the Act are cognizable and non-bailable.",
+    whatTheLawSays:
+      "The offences punishable under the Act are cognizable and non-bailable.",
     whatItMeans:
       "These terms describe the criminal-procedure status of offences under the Act. They indicate that these offences are treated as criminal offences with specific procedural consequences.",
   },
@@ -143,7 +144,8 @@ const lawSections: LawSection[] = [
     title: "Officers are public servants",
     whatTheLawSays:
       "A Child Marriage Prohibition Officer appointed under Section 16 is considered a public servant while performing functions under the Act.",
-    whatItMeans: "The officer has the legal status of a public servant when carrying out duties under this law.",
+    whatItMeans:
+      "The officer has the legal status of a public servant when carrying out duties under this law.",
   },
   {
     section: "Section 18",
@@ -158,7 +160,8 @@ const lawSections: LawSection[] = [
     title: "State Government can make rules",
     whatTheLawSays:
       "The State Government may make rules, by notification in the Official Gazette, for carrying out the provisions of the Act. Rules made under this section are to be laid before the State Legislature as provided by the Act.",
-    whatItMeans: "States can create rules explaining how parts of the Act are implemented in practice.",
+    whatItMeans:
+      "States can create rules explaining how parts of the Act are implemented in practice.",
   },
   {
     section: "Section 20",
@@ -194,9 +197,9 @@ export default function LegalAgeMarriage() {
       </Body>
 
       <Callout tone="dusk" title="What is this law about?">
-        This Act provides for the prohibition of child marriages and deals
-        with their legal consequences, penalties, prevention, court remedies
-        and enforcement.
+        This Act provides for the prohibition of child marriages and deals with
+        their legal consequences, penalties, prevention, court remedies and
+        enforcement.
       </Callout>
 
       {lawSections.map((item) => (
@@ -207,7 +210,9 @@ export default function LegalAgeMarriage() {
           icon="document-text-outline"
           accent="dusk"
           expanded={openSection === item.section}
-          onToggle={() => setOpenSection(openSection === item.section ? null : item.section)}
+          onToggle={() =>
+            setOpenSection(openSection === item.section ? null : item.section)
+          }
         >
           <Block label="What the law says" tone="plain">
             {item.whatTheLawSays}
@@ -220,9 +225,9 @@ export default function LegalAgeMarriage() {
 
       <Callout tone="marigold" title="⚠️ Important">
         This page is a simplified legal-information guide. The exact legal
-        position can depend on the facts of a case, court orders and
-        applicable State rules or amendments. It is not a substitute for
-        advice from a qualified legal professional.
+        position can depend on the facts of a case, court orders and applicable
+        State rules or amendments. It is not a substitute for advice from a
+        qualified legal professional.
       </Callout>
 
       <Body size="sm" className="mt-1">

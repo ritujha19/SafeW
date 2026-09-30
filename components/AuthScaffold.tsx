@@ -35,11 +35,20 @@ export function AuthScaffold({
       style={{ flex: 1, backgroundColor: colors.paper }}
     >
       <ScrollView
-        contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 32 }}
+        contentContainerStyle={{
+          padding: 24,
+          paddingBottom: insets.bottom + 32,
+        }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {illustrationNode ?? <Illustration source={illustration} fallback={fallback} height={168} />}
+        {illustrationNode ?? (
+          <Illustration
+            source={illustration}
+            fallback={fallback}
+            height={168}
+          />
+        )}
         <Display size="lg" className="mt-3">
           {title}
         </Display>

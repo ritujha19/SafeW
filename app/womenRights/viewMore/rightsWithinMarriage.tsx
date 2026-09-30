@@ -12,15 +12,14 @@ export default function RightsWithinMarriage() {
 
       <Callout tone="dusk" title="Marriage does not mean giving up your rights">
         <Body size="sm" tone="ink">
-          Being married does not remove a woman&apos;s protection under the
-          law. Depending on the circumstances and the law applicable to the
-          marriage, legal remedies can exist for domestic violence, residence,
-          financial support, matrimonial disputes, divorce and matters
-          involving children.
+          Being married does not remove a woman&apos;s protection under the law.
+          Depending on the circumstances and the law applicable to the marriage,
+          legal remedies can exist for domestic violence, residence, financial
+          support, matrimonial disputes, divorce and matters involving children.
         </Body>
         <Body size="sm" tone="ink" className="mt-3">
-          The exact rights and procedure can differ because India has
-          different marriage and family-law frameworks.
+          The exact rights and procedure can differ because India has different
+          marriage and family-law frameworks.
         </Body>
       </Callout>
 
@@ -58,7 +57,8 @@ export default function RightsWithinMarriage() {
             title: "Protection from Domestic Violence",
             meaning:
               "Section 3 defines domestic violence for the purposes of the Act. It covers physical abuse, sexual abuse, verbal and emotional abuse, and economic abuse when the statutory requirements are satisfied.",
-            important: "Domestic violence is not limited to physical violence. The Act recognizes several forms of abuse.",
+            important:
+              "Domestic violence is not limited to physical violence. The Act recognizes several forms of abuse.",
           },
           {
             law: "Protection of Women from Domestic Violence Act, 2005",
@@ -66,7 +66,8 @@ export default function RightsWithinMarriage() {
             title: "Protection Orders",
             meaning:
               "When the Magistrate is satisfied that domestic violence has taken place or is likely to take place, the Magistrate may issue a protection order. The order can prohibit specified acts, including committing domestic violence, contacting the aggrieved person in specified ways, or interfering with certain assets or property.",
-            important: "A protection order is made by the Magistrate according to the facts and requirements of the case.",
+            important:
+              "A protection order is made by the Magistrate according to the facts and requirements of the case.",
           },
           {
             law: "Protection of Women from Domestic Violence Act, 2005",
@@ -74,7 +75,8 @@ export default function RightsWithinMarriage() {
             title: "Temporary Child Custody",
             meaning:
               "The Magistrate may grant temporary custody of a child or children to the aggrieved person or make arrangements concerning custody as permitted by the Act.",
-            important: "This is a temporary remedy under the Domestic Violence Act and depends on the circumstances of the case.",
+            important:
+              "This is a temporary remedy under the Domestic Violence Act and depends on the circumstances of the case.",
           },
           {
             law: "Protection of Women from Domestic Violence Act, 2005",
@@ -82,7 +84,8 @@ export default function RightsWithinMarriage() {
             title: "Compensation and Damages",
             meaning:
               "The Magistrate may direct the respondent to pay compensation and damages for injuries, including mental torture and emotional distress, caused by domestic violence.",
-            important: "The amount and grant of compensation depend on the circumstances and the order of the Magistrate.",
+            important:
+              "The amount and grant of compensation depend on the circumstances and the order of the Magistrate.",
           },
           {
             law: "Protection of Women from Domestic Violence Act, 2005",
@@ -99,7 +102,8 @@ export default function RightsWithinMarriage() {
             title: "Relief in Other Legal Proceedings",
             meaning:
               "Reliefs available under the Domestic Violence Act may also be sought in certain other legal proceedings before a civil court, family court or criminal court, subject to the requirements of the Act.",
-            important: "The same situation can involve different legal proceedings, so the appropriate remedy depends on the facts and applicable law.",
+            important:
+              "The same situation can involve different legal proceedings, so the appropriate remedy depends on the facts and applicable law.",
           },
           {
             law: "Protection of Women from Domestic Violence Act, 2005",
@@ -116,7 +120,8 @@ export default function RightsWithinMarriage() {
             title: "Protection Officers and Service Providers",
             meaning:
               "The Act provides for the appointment of Protection Officers and recognizes service providers who can assist women in matters covered by the Act.",
-            important: "Protection Officers and recognized service providers are part of the statutory support mechanism under the Domestic Violence Act.",
+            important:
+              "Protection Officers and recognized service providers are part of the statutory support mechanism under the Domestic Violence Act.",
           },
           {
             law: "Protection of Women from Domestic Violence Act, 2005",
@@ -124,7 +129,8 @@ export default function RightsWithinMarriage() {
             title: "Application to the Magistrate",
             meaning:
               "An aggrieved person or certain persons acting on her behalf may present an application to the Magistrate seeking one or more of the reliefs provided under the Act.",
-            important: "The specific relief requested and the facts of the case determine what orders the Magistrate can consider.",
+            important:
+              "The specific relief requested and the facts of the case determine what orders the Magistrate can consider.",
           },
         ]}
       />
@@ -134,10 +140,10 @@ export default function RightsWithinMarriage() {
       </Heading>
       <Callout tone="dusk">
         A woman does not have to treat abuse as simply a &quot;marital
-        problem.&quot; Where the statutory requirements are met, the
-        Protection of Women from Domestic Violence Act provides legal remedies
-        including protection orders, residence orders, monetary relief,
-        custody orders and compensation.
+        problem.&quot; Where the statutory requirements are met, the Protection
+        of Women from Domestic Violence Act provides legal remedies including
+        protection orders, residence orders, monetary relief, custody orders and
+        compensation.
       </Callout>
 
       <Block label="Remember" tone="remember">
@@ -150,8 +156,8 @@ export default function RightsWithinMarriage() {
       <Body size="sm" className="mt-5">
         This page provides general legal information about selected statutory
         rights and remedies. It is not a substitute for legal advice in an
-        individual case. The availability of a particular remedy depends on
-        the applicable law and the facts and circumstances of the case.
+        individual case. The availability of a particular remedy depends on the
+        applicable law and the facts and circumstances of the case.
       </Body>
     </Screen>
   );

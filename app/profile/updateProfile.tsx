@@ -90,9 +90,7 @@ export default function UpdateProfile() {
 
       {/* Name */}
       <View className="mt-6">
-        <Text className="mb-2 font-bodyBold text-dusk-900">
-          Name
-        </Text>
+        <Text className="mb-2 font-bodyBold text-dusk-900">Name</Text>
 
         <TextInput
           value={name}
@@ -105,9 +103,7 @@ export default function UpdateProfile() {
 
       {/* Email */}
       <View className="mt-6">
-        <Text className="mb-2 font-bodyBold text-dusk-900">
-          Email
-        </Text>
+        <Text className="mb-2 font-bodyBold text-dusk-900">Email</Text>
 
         <TextInput
           value={currentUser?.email ?? ""}
@@ -118,25 +114,19 @@ export default function UpdateProfile() {
 
       {/* Reset Password */}
       <View className="mt-6">
-        <Text className="mb-2 font-bodyBold text-dusk-900">
-          Password
+        <Text className="mb-2 font-bodyBold text-dusk-900">Password</Text>
+
+        <Button
+          variant="soft"
+          label={resettingPassword ? "Sending..." : "Reset Password"}
+          onPress={handleResetPassword}
+          disabled={resettingPassword || saving}
+        />
+
+        <Text className="mt-2 text-sm text-gray-500">
+          A password reset link will be sent to your email. If you don&asop;t
+          see it in your inbox, please check your Spam or Junk folder.
         </Text>
-
-       <Button
-  variant="soft"
-  label={
-    resettingPassword
-      ? "Sending..."
-      : "Reset Password"
-  }
-  onPress={handleResetPassword}
-  disabled={resettingPassword || saving}
-/>
-
-<Text className="mt-2 text-sm text-gray-500">
-  A password reset link will be sent to your email. If you don&asop;t see it in
-  your inbox, please check your Spam or Junk folder.
-</Text>
       </View>
 
       {/* Save */}

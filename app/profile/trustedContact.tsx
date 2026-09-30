@@ -6,7 +6,14 @@ import {
   type TrustedContact as SavedContact,
 } from "@/auth";
 import React from "react";
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 export default function TrustedContactsScreen() {
   const [contacts, setContacts] = React.useState<SavedContact[]>([
@@ -117,15 +124,17 @@ export default function TrustedContactsScreen() {
 
     const numberTakenByAnotherContact = contacts.some(
       (contact, index) =>
-        index !== editingIndex &&
-        contact.mobNumber.trim() === trimmedNumber,
+        index !== editingIndex && contact.mobNumber.trim() === trimmedNumber,
     );
     if (numberTakenByAnotherContact) {
       alert("This number is already saved as a trusted contact.");
       return;
     }
 
-    const updated: SavedContact = { name: trimmedName, mobNumber: trimmedNumber };
+    const updated: SavedContact = {
+      name: trimmedName,
+      mobNumber: trimmedNumber,
+    };
 
     setIsSavingEdit(true);
     try {
@@ -190,7 +199,7 @@ export default function TrustedContactsScreen() {
     <ScrollView
       contentContainerClassName="flex-grow bg-[#FAF9F7] px-6 pb-10"
       showsVerticalScrollIndicator={false}
-    >  
+    >
       <View className="mt-7">
         <Text className="text-[38px] font-extrabold leading-[44px] text-[#172B55]">
           Trusted Contacts
@@ -361,9 +370,7 @@ export default function TrustedContactsScreen() {
                 accessibilityLabel={`More options for ${contact.name}`}
                 className="px-2 py-1 active:opacity-50"
               >
-                <Text className="text-[25px] font-bold text-[#697291]">
-                  ⋮
-                </Text>
+                <Text className="text-[25px] font-bold text-[#697291]">⋮</Text>
               </Pressable>
             </View>
           </View>
@@ -392,9 +399,7 @@ export default function TrustedContactsScreen() {
                 placeholder="Enter trusted contact's name"
                 placeholderTextColor="#8996B0"
                 value={contact.name}
-                onChangeText={(value) =>
-                  updateContact(index, "name", value)
-                }
+                onChangeText={(value) => updateContact(index, "name", value)}
                 className="h-[56px] rounded-[18px] border border-[#DCE1EC] bg-[#FAFBFD] px-4 text-[16px] text-[#172B55]"
               />
             </View>
@@ -464,9 +469,7 @@ export default function TrustedContactsScreen() {
         className="mb-4 h-[64px] flex-row items-center rounded-full bg-[#EEF0FF] px-6 active:opacity-70"
       >
         <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-[#DCE3FF]">
-          <Text className="text-[28px] leading-[30px] text-[#5368C9]">
-            +
-          </Text>
+          <Text className="text-[28px] leading-[30px] text-[#5368C9]">+</Text>
         </View>
 
         <Text className="flex-1 text-[17px] font-bold text-[#4D61B8]">
@@ -481,9 +484,7 @@ export default function TrustedContactsScreen() {
         onPress={saveContacts}
         className="h-[64px] flex-row items-center justify-center rounded-full bg-[#4058D6] active:opacity-80"
       >
-        <Text className="text-[17px] font-bold text-white">
-          Save contacts
-        </Text>
+        <Text className="text-[17px] font-bold text-white">Save contacts</Text>
 
         <Text className="ml-3 text-[24px] text-white">→</Text>
       </Pressable>

@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { LinearGradient } from "expo-linear-gradient";
-import {useFocusEffect, useRouter } from "expo-router";
-import {useCallback, useState, type ReactNode } from "react";
-import { Linking, Text, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { AppState, Linking, Text, View } from "react-native";
 import {
   logout,
   requestAndShareCurrentLocation,
@@ -63,29 +63,52 @@ export default function Profile() {
   const [name, setName] = useState(auth.currentUser?.displayName ?? "User");
   const [status, requestPermission, getPermission] =
     Location.useForegroundPermissions();
-  const permissionGranted = status?.status === "granted";
+  const [permissionStatus, setPermissionStatus] = useState(status);
+  const permissionGranted = permissionStatus?.status === "granted";
   const [requestingPermission, setRequestingPermission] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
-  useFocusEffect(
-  useCallback(() => {
-    const currentUser = auth.currentUser;
+  useEffect(() => {
+    if (status) setPermissionStatus(status);
+  }, [status]);
 
-    if (currentUser) {
-      setName(currentUser.displayName ?? "User");
-    }
-    void getPermission().catch((error) => {
-      console.error("Location permission refresh error:", error);
-      setPermissionError("Unable to check location permission.");
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (appState) => {
+      if (appState !== "active") return;
+
+      void getPermission()
+        .then(setPermissionStatus)
+        .catch((error) => {
+          console.error("Location permission refresh error:", error);
+          setPermissionError("Unable to check location permission.");
+        });
     });
-  }, [getPermission])
-);
+
+    return () => subscription.remove();
+  }, [getPermission]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const currentUser = auth.currentUser;
+
+      if (currentUser) {
+        setName(currentUser.displayName ?? "User");
+      }
+      void getPermission()
+        .then(setPermissionStatus)
+        .catch((error) => {
+          console.error("Location permission refresh error:", error);
+          setPermissionError("Unable to check location permission.");
+        });
+    }, [getPermission]),
+  );
 
   async function handleRequestPermission() {
     try {
       setRequestingPermission(true);
       setPermissionError(null);
       const result = await requestPermission();
+      setPermissionStatus(result);
 
       if (result.status !== "granted") return;
 
@@ -131,7 +154,12 @@ export default function Profile() {
         <Body tone="soft" className="mt-1">
           Keep your safety setup ready before you need it.
         </Body>
-        <Button label={"Update Profile"} variant="soft" className="mt-4" onPress={() => router.navigate("/profile/updateProfile")}/>
+        <Button
+          label={"Update Profile"}
+          variant="soft"
+          className="mt-4"
+          onPress={() => router.navigate("/profile/updateProfile")}
+        />
       </LinearGradient>
 
       <Heading size="lg" className="mb-3">
@@ -188,14 +216,14 @@ export default function Profile() {
         icon={
           permissionGranted
             ? "checkmark-circle-outline"
-            : status?.canAskAgain === false
+            : permissionStatus?.canAskAgain === false
               ? "settings-outline"
               : "navigate-outline"
         }
         label={
           permissionGranted
             ? "Location already granted"
-            : status?.canAskAgain === false
+            : permissionStatus?.canAskAgain === false
               ? "Open App Settings"
               : "Allow Location Access"
         }
@@ -204,7 +232,7 @@ export default function Profile() {
         onPress={
           permissionGranted
             ? undefined
-            : status?.canAskAgain === false
+            : permissionStatus?.canAskAgain === false
               ? handleOpenLocationSettings
               : handleRequestPermission
         }
@@ -222,21 +250,21 @@ export default function Profile() {
         </Body>
       )}
 
-     <Button
-  variant="outline"
-  icon="log-out-outline"
-  label="Logout"
-  className="mt-8"
-  onPress={async () => {
-    try {
-      await logout();
-      router.replace("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      alert("Unable to log out. Please try again.");
-    }
-  }}
-/>
+      <Button
+        variant="outline"
+        icon="log-out-outline"
+        label="Logout"
+        className="mt-8"
+        onPress={async () => {
+          try {
+            await logout();
+            router.replace("/");
+          } catch (error) {
+            console.error("Logout error:", error);
+            alert("Unable to log out. Please try again.");
+          }
+        }}
+      />
       <Label className="mt-8 text-center">
         Illustrations by Storyset. Animations by LottieFiles and Lordicon.
       </Label>

@@ -42,11 +42,13 @@ const questions: Question[] = [
     correctAnswer: 1,
     explanation:
       "Moving toward people and visibility gives you more options to seek help and reduces the chance of being isolated.",
-    remember: "You don't need absolute proof before taking a reasonable step toward safety.",
+    remember:
+      "You don't need absolute proof before taking a reasonable step toward safety.",
   },
   {
     title: "Someone blocks your path",
-    situation: "Someone you don't know deliberately stands in your way and makes you uncomfortable.",
+    situation:
+      "Someone you don't know deliberately stands in your way and makes you uncomfortable.",
     question: "What should you prioritize?",
     choices: [
       "Arguing with them",
@@ -57,7 +59,8 @@ const questions: Question[] = [
     correctAnswer: 2,
     explanation:
       "If someone is blocking your movement, creating distance and getting toward other people can give you a safer opportunity to leave and seek help.",
-    remember: "Your priority is getting to safety, not winning a confrontation.",
+    remember:
+      "Your priority is getting to safety, not winning a confrontation.",
   },
   {
     title: "The isolated shortcut",
@@ -73,7 +76,8 @@ const questions: Question[] = [
     correctAnswer: 1,
     explanation:
       "A route with people and visibility can give you more opportunities to get help if something unexpected happens.",
-    remember: "When choosing between routes, think about visibility, people and access to help, not just distance.",
+    remember:
+      "When choosing between routes, think about visibility, people and access to help, not just distance.",
   },
   {
     title: "Don't tell anyone",
@@ -89,11 +93,13 @@ const questions: Question[] = [
     correctAnswer: 1,
     explanation:
       "Pressure to keep a concerning situation secret can make it harder to get support. A trusted person can help you understand the situation and decide what to do next.",
-    remember: "Someone else's demand for secrecy does not take away your right to seek help.",
+    remember:
+      "Someone else's demand for secrecy does not take away your right to seek help.",
   },
   {
     title: "Pressure for private photos",
-    situation: "Someone repeatedly asks you for private photos even after you have said no.",
+    situation:
+      "Someone repeatedly asks you for private photos even after you have said no.",
     question: "What is the safest response?",
     choices: [
       "Send one so they stop asking",
@@ -119,7 +125,8 @@ const questions: Question[] = [
     correctAnswer: 2,
     explanation:
       "Giving someone your password can give them access to private information and accounts. Healthy trust does not require giving up account security.",
-    remember: "Trust does not require giving someone access to your private accounts.",
+    remember:
+      "Trust does not require giving someone access to your private accounts.",
   },
   {
     title: "Live location request",
@@ -139,7 +146,8 @@ const questions: Question[] = [
   },
   {
     title: "New accounts after blocking",
-    situation: "You block someone because their messages are unwanted. They start contacting you through new accounts.",
+    situation:
+      "You block someone because their messages are unwanted. They start contacting you through new accounts.",
     question: "What does this pattern tell you?",
     choices: [
       "It is automatically harmless",
@@ -150,7 +158,8 @@ const questions: Question[] = [
     correctAnswer: 1,
     explanation:
       "Continuing unwanted contact through new accounts after being blocked shows that the person's behaviour is not respecting your boundary. The repeated pattern is important.",
-    remember: "Repeated unwanted contact through different accounts can be a warning sign.",
+    remember:
+      "Repeated unwanted contact through different accounts can be a warning sign.",
   },
   {
     title: "Going somewhere unfamiliar",
@@ -165,11 +174,13 @@ const questions: Question[] = [
     correctAnswer: 1,
     explanation:
       "Knowing your route and having a way to communicate can give you more options if your plans change or you need assistance.",
-    remember: "A little preparation before leaving can give you more options if something goes wrong.",
+    remember:
+      "A little preparation before leaving can give you more options if something goes wrong.",
   },
   {
     title: "Your phone is almost dead",
-    situation: "You are going somewhere unfamiliar and notice your phone battery is almost empty.",
+    situation:
+      "You are going somewhere unfamiliar and notice your phone battery is almost empty.",
     question: "What should you think about?",
     choices: [
       "It doesn't matter",
@@ -184,7 +195,8 @@ const questions: Question[] = [
   },
   {
     title: "Nobody knows where you are",
-    situation: "You are going somewhere unfamiliar, and nobody you trust knows your plans.",
+    situation:
+      "You are going somewhere unfamiliar, and nobody you trust knows your plans.",
     question: "What is a useful safety habit?",
     choices: [
       "Tell everyone online",
@@ -195,11 +207,13 @@ const questions: Question[] = [
     correctAnswer: 1,
     explanation:
       "Having a trusted person know your general plans can make it easier for them to notice if something is wrong and support you when needed.",
-    remember: "A trusted person knowing your plans can make it easier to get help if you need it.",
+    remember:
+      "A trusted person knowing your plans can make it easier to get help if you need it.",
   },
   {
     title: "Something feels wrong",
-    situation: "You are in a situation that suddenly makes you feel unsafe, but you cannot explain exactly why.",
+    situation:
+      "You are in a situation that suddenly makes you feel unsafe, but you cannot explain exactly why.",
     question: "What should you do?",
     choices: [
       "Stay because you cannot prove there is danger",
@@ -210,11 +224,13 @@ const questions: Question[] = [
     correctAnswer: 1,
     explanation:
       "You do not have to investigate or prove a threat before choosing a safer option. If you can safely move away from a concerning situation, you can do so.",
-    remember: "You don't need to prove that something is dangerous before choosing a safer option.",
+    remember:
+      "You don't need to prove that something is dangerous before choosing a safer option.",
   },
   {
     title: "Safe places are closed",
-    situation: "You are outside later than expected. The places you normally rely on for help are closed.",
+    situation:
+      "You are outside later than expected. The places you normally rely on for help are closed.",
     question: "What should you look for?",
     choices: [
       "A completely empty route home",
@@ -229,7 +245,8 @@ const questions: Question[] = [
   },
   {
     title: "You cannot leave immediately",
-    situation: "You are in a situation that feels unsafe, but you cannot immediately get away.",
+    situation:
+      "You are in a situation that feels unsafe, but you cannot immediately get away.",
     question: "What should your priority be?",
     choices: [
       "Prove that you are stronger",
@@ -271,7 +288,10 @@ function ProgressBar({ progress }: { progress: number }) {
   const style = useAnimatedStyle(() => ({ width: `${width.value * 100}%` }));
   return (
     <View className="h-2 overflow-hidden rounded-full bg-dusk-100">
-      <Animated.View style={style} className="h-full rounded-full bg-dusk-600" />
+      <Animated.View
+        style={style}
+        className="h-full rounded-full bg-dusk-600"
+      />
     </View>
   );
 }
@@ -313,7 +333,11 @@ export default function PrepareYourself() {
       <Screen>
         <View className="items-center rounded-[32px] bg-midnight px-6 py-10">
           <View className="mb-3 h-16 w-16 items-center justify-center rounded-full bg-haven-soft">
-            <Ionicons name="checkmark-circle" size={42} color={colors.havenDark} />
+            <Ionicons
+              name="checkmark-circle"
+              size={42}
+              color={colors.havenDark}
+            />
           </View>
           <Label tone="marigold" className="mt-1">
             QUIZ COMPLETE
@@ -340,7 +364,12 @@ export default function PrepareYourself() {
           </Body>
         </View>
 
-        <Button label="Start again" icon="refresh" className="mt-5" onPress={restartQuiz} />
+        <Button
+          label="Start again"
+          icon="refresh"
+          className="mt-5"
+          onPress={restartQuiz}
+        />
         <Button
           variant="outline"
           label="Back to Learn & Prepare"
@@ -361,7 +390,11 @@ export default function PrepareYourself() {
       </Body>
       <ProgressBar progress={questionIndex / questions.length} />
 
-      <Animated.View key={questionIndex} entering={FadeInRight.duration(280)} className="mt-5">
+      <Animated.View
+        key={questionIndex}
+        entering={FadeInRight.duration(280)}
+        className="mt-5"
+      >
         <Display size="md" className="mb-3">
           {currentQuestion.title}
         </Display>
@@ -393,7 +426,10 @@ export default function PrepareYourself() {
                 : isSelected
                   ? "bg-dusk-600"
                   : "bg-dusk-50";
-            const badgeTextClass = isAnswer || isWrong || isSelected ? "text-white" : "text-dusk-600";
+            const badgeTextClass =
+              isAnswer || isWrong || isSelected
+                ? "text-white"
+                : "text-dusk-600";
 
             return (
               <Pressable
@@ -404,16 +440,32 @@ export default function PrepareYourself() {
                 accessibilityState={{ selected: isSelected, disabled: checked }}
                 className={`flex-row items-center rounded-2xl border-[1.5px] p-3.5 ${rowClass}`}
               >
-                <View className={`mr-3 h-8 w-8 items-center justify-center rounded-full ${badgeClass}`}>
-                  <Text className={`font-bodyBold text-[14px] ${badgeTextClass}`}>{letters[index]}</Text>
+                <View
+                  className={`mr-3 h-8 w-8 items-center justify-center rounded-full ${badgeClass}`}
+                >
+                  <Text
+                    className={`font-bodyBold text-[14px] ${badgeTextClass}`}
+                  >
+                    {letters[index]}
+                  </Text>
                 </View>
                 <Body tone="ink" size="sm" className="flex-1">
                   {choice}
                 </Body>
                 {isAnswer ? (
-                  <Ionicons name="checkmark-circle" size={20} color={colors.havenDark} />
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={20}
+                    color={colors.havenDark}
+                  />
                 ) : null}
-                {isWrong ? <Ionicons name="close-circle" size={20} color={colors.beaconDark} /> : null}
+                {isWrong ? (
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={colors.beaconDark}
+                  />
+                ) : null}
               </Pressable>
             );
           })}
@@ -433,28 +485,52 @@ export default function PrepareYourself() {
           >
             <View className="flex-row items-center">
               {isCorrect ? (
-                <LottieAnim source={lottie.successCheck} size={30} loop={false} />
+                <LottieAnim
+                  source={lottie.successCheck}
+                  size={30}
+                  loop={false}
+                />
               ) : (
-                <Ionicons name="alert-circle" size={26} color={colors.marigoldDark} />
+                <Ionicons
+                  name="alert-circle"
+                  size={26}
+                  color={colors.marigoldDark}
+                />
               )}
-              <Heading size="lg" tone={isCorrect ? "haven" : "marigold"} className="ml-2 flex-1">
-                {isCorrect ? "Correct" : `The safest answer is ${letters[currentQuestion.correctAnswer]}`}
+              <Heading
+                size="lg"
+                tone={isCorrect ? "haven" : "marigold"}
+                className="ml-2 flex-1"
+              >
+                {isCorrect
+                  ? "Correct"
+                  : `The safest answer is ${letters[currentQuestion.correctAnswer]}`}
               </Heading>
             </View>
-            <Label tone={isCorrect ? "haven" : "marigold"} className="mb-1 mt-4">
+            <Label
+              tone={isCorrect ? "haven" : "marigold"}
+              className="mb-1 mt-4"
+            >
               EXPLANATION
             </Label>
             <Body size="sm" tone="ink">
               {currentQuestion.explanation}
             </Body>
-            <Label tone={isCorrect ? "haven" : "marigold"} className="mb-1 mt-4">
+            <Label
+              tone={isCorrect ? "haven" : "marigold"}
+              className="mb-1 mt-4"
+            >
               REMEMBER
             </Label>
             <Body size="sm" tone="ink">
               {currentQuestion.remember}
             </Body>
             <Button
-              label={questionIndex === questions.length - 1 ? "See results" : "Next question"}
+              label={
+                questionIndex === questions.length - 1
+                  ? "See results"
+                  : "Next question"
+              }
               icon="arrow-forward"
               className="mt-5"
               onPress={nextQuestion}

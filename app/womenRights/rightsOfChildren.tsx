@@ -13,20 +13,19 @@ export default function RightsOfChildren() {
 
       <Callout tone="dusk" title="Who is a child?">
         Different laws can use different age definitions for particular
-        purposes. For example, POCSO treats a person below eighteen as a
-        child, while the Prohibition of Child Marriage Act uses different age
+        purposes. For example, POCSO treats a person below eighteen as a child,
+        while the Prohibition of Child Marriage Act uses different age
         thresholds for males and females.
       </Callout>
 
       <Callout tone="marigold" title="Important">
         The exact protection available depends on the situation and the law
-        involved. This section gives simplified information and does not
-        replace case-specific legal advice.
+        involved. This section gives simplified information and does not replace
+        case-specific legal advice.
       </Callout>
 
       <Body tone="ink" className="mb-1 mt-2">
-        Learn about important legal protections available to children in
-        India.
+        Learn about important legal protections available to children in India.
       </Body>
       <Body size="sm" className="mb-4">
         Tap a card to understand the right and the law connected with it.
@@ -37,7 +36,8 @@ export default function RightsOfChildren() {
         accent="haven"
         items={[
           {
-            label: "Right of Children to Free and Compulsory Education Act, 2009",
+            label:
+              "Right of Children to Free and Compulsory Education Act, 2009",
             title: "Right to Free & Compulsory Education",
             meaning:
               "The RTE Act provides free and compulsory elementary education to children in the age group covered by the Act, generally from six to fourteen years.",
@@ -65,10 +65,12 @@ export default function RightsOfChildren() {
             title: "Protection from Child Marriage",
             meaning:
               "Under the central Act, a child means a male who has not completed twenty-one years or a female who has not completed eighteen years. The Act provides legal remedies and penalties relating to child marriage.",
-            whyItMatters: "The law protects children from being subjected to marriage before the legally defined age.",
+            whyItMatters:
+              "The law protects children from being subjected to marriage before the legally defined age.",
           },
           {
-            label: "Juvenile Justice (Care and Protection of Children) Act, 2015",
+            label:
+              "Juvenile Justice (Care and Protection of Children) Act, 2015",
             title: "Right to Care & Protection",
             meaning:
               "The Juvenile Justice framework provides care, protection, treatment, development and rehabilitation mechanisms for children who are in need of care and protection or are involved in the child-justice system.",
@@ -76,7 +78,8 @@ export default function RightsOfChildren() {
               "A child who is abandoned, abused, neglected, vulnerable or otherwise in need of protection can come within a dedicated child-protection system.",
           },
           {
-            label: "Juvenile Justice (Care and Protection of Children) Act, 2015",
+            label:
+              "Juvenile Justice (Care and Protection of Children) Act, 2015",
             title: "Right to Be Heard",
             meaning:
               "The child-protection system is based on child-sensitive principles and provides for participation of children in matters affecting them, according to their age and maturity and the applicable procedure.",
@@ -84,11 +87,13 @@ export default function RightsOfChildren() {
               "Children are not simply objects of protection; their views and needs can be considered in decisions concerning them.",
           },
           {
-            label: "Child and Adolescent Labour (Prohibition and Regulation) Act, 1986",
+            label:
+              "Child and Adolescent Labour (Prohibition and Regulation) Act, 1986",
             title: "Protection from Child Labour",
             meaning:
               "The law prohibits the employment of children and prohibits adolescents from employment in hazardous occupations and processes, subject to the provisions and exceptions of the Act.",
-            whyItMatters: "Children are legally protected from being put into work that the law prohibits because of their age.",
+            whyItMatters:
+              "Children are legally protected from being put into work that the law prohibits because of their age.",
           },
           {
             label: "POCSO Act, 2012 — privacy protections",

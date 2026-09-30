@@ -8,9 +8,13 @@ import type { LottieSource } from "@/components/Media";
 /* ------------------------------------------------------------------ */
 export const lottie = {
   sosPulse: require("../assets/lottie/sos-pulse.json") as LottieSource,
-  emergencyPulse: require("../assets/lottie/emergency-pulse.json") as LottieSource,
-  locationPulse: require("../assets/lottie/location-pulse.json") as LottieSource,
+  emergencyPulse:
+    require("../assets/lottie/emergency-pulse.json") as LottieSource,
+  locationPulse:
+    require("../assets/lottie/location-pulse.json") as LottieSource,
   successCheck: require("../assets/lottie/success-check.json") as LottieSource,
+  mailOpenDocument:
+    require("../assets/lottie/mail-open-document.json") as LottieSource,
 };
 
 /* ------------------------------------------------------------------ */
@@ -20,12 +24,7 @@ export const lottie = {
 /* Until then a matching vector icon is shown, so nothing looks empty. */
 /* ------------------------------------------------------------------ */
 type LordiconName =
-  | "profile"
-  | "assistant"
-  | "learn"
-  | "rights"
-  | "contacts"
-  | "location";
+  "profile" | "assistant" | "learn" | "rights" | "contacts" | "location";
 
 export const lordicon: Record<LordiconName, LottieSource | undefined> = {
   profile: undefined, // require("../assets/lordicon/profile.json"),
@@ -42,10 +41,13 @@ export const lordicon: Record<LordiconName, LottieSource | undefined> = {
 /* ------------------------------------------------------------------ */
 type IllustrationName = "login" | "signup" | "learn" | "rights" | "contacts";
 
-export const illustrations: Record<IllustrationName, ImageSourcePropType | undefined> = {
+export const illustrations: Record<
+  IllustrationName,
+  ImageSourcePropType | undefined
+> = {
   login: undefined, // require("../assets/illustrations/login.png"),
   signup: undefined, // require("../assets/illustrations/signup.png"),
   learn: undefined, // require("../assets/illustrations/learn.png"),
+  contacts: undefined,
   rights: undefined, // require("../assets/illustrations/rights.png"),
-  contacts: undefined, // require("../assets/illustrations/contacts.png"),
 };

@@ -65,7 +65,8 @@ const accordionItems: Item[] = [
   {
     heading: "Safety Comes Before Evidence",
     title1: "What should you know?",
-    content: "Evidence can be useful, but collecting it should never put you in greater danger.",
+    content:
+      "Evidence can be useful, but collecting it should never put you in greater danger.",
     title2: "Real-life situation 💡",
     content2:
       "You think someone is following you and consider stopping to take a photograph so you can prove what happened.",
@@ -106,7 +107,8 @@ const accordionItems: Item[] = [
     content2:
       "You're somewhere unfamiliar and suddenly feel unsafe. Instead of trying to figure everything out yourself, you already know which trusted person you can contact.",
     title3: "Remember",
-    content3: "Think beforehand about people you trust and keep their contact information accessible.",
+    content3:
+      "Think beforehand about people you trust and keep their contact information accessible.",
   },
   {
     heading: "Take Escalation Seriously",
@@ -117,7 +119,8 @@ const accordionItems: Item[] = [
     content2:
       "Someone has been repeatedly bothering you. Over time, their behaviour becomes more aggressive and they begin appearing in places where you regularly go.",
     title3: "Remember",
-    content3: "Don't dismiss a growing pattern. Prioritize your safety, tell someone you trust, and seek appropriate help.",
+    content3:
+      "Don't dismiss a growing pattern. Prioritize your safety, tell someone you trust, and seek appropriate help.",
   },
 ];
 
@@ -127,9 +130,9 @@ export default function SafetyEssentials() {
   return (
     <Screen>
       <Body tone="ink" className="mb-5">
-        Learn simple safety principles that can help you stay aware, protect your
-        boundaries, and make safer decisions. You can seek help whenever you feel
-        unsafe, uncomfortable, or unsure about a situation.
+        Learn simple safety principles that can help you stay aware, protect
+        your boundaries, and make safer decisions. You can seek help whenever
+        you feel unsafe, uncomfortable, or unsure about a situation.
       </Body>
 
       {accordionItems.map((item, index) => (

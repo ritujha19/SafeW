@@ -10,7 +10,11 @@ export default function ConstitutionRights() {
         liberty and freedom from exploitation.
       </Body>
 
-      <Display size="md" tone="white" className="mb-5 rounded-[26px] bg-midnight p-6 text-center">
+      <Display
+        size="md"
+        tone="white"
+        className="mb-5 rounded-[26px] bg-midnight p-6 text-center"
+      >
         Equality → Dignity → Liberty → Protection
       </Display>
 
@@ -24,7 +28,8 @@ export default function ConstitutionRights() {
             title: "Equality Before the Law",
             meaning:
               "Every person is equal before the law and is entitled to equal protection of the laws.",
-            whyItMatters: "It supports equal treatment and protection under the law.",
+            whyItMatters:
+              "It supports equal treatment and protection under the law.",
           },
           {
             label: "Article 15",
@@ -37,8 +42,10 @@ export default function ConstitutionRights() {
           {
             label: "Article 16",
             title: "Equal Opportunity in Public Employment",
-            meaning: "Citizens have equality of opportunity in matters of public employment.",
-            whyItMatters: "It protects equal opportunity in government employment.",
+            meaning:
+              "Citizens have equality of opportunity in matters of public employment.",
+            whyItMatters:
+              "It protects equal opportunity in government employment.",
           },
           {
             label: "Article 21",
@@ -53,7 +60,8 @@ export default function ConstitutionRights() {
             title: "Protection Against Exploitation",
             meaning:
               "Traffic in human beings, begar and other similar forms of forced labour are prohibited.",
-            whyItMatters: "It protects people from trafficking and forced labour.",
+            whyItMatters:
+              "It protects people from trafficking and forced labour.",
           },
         ]}
       />
@@ -74,7 +82,8 @@ export default function ConstitutionRights() {
           {
             label: "Article 39(d)",
             title: "Equal Pay for Equal Work",
-            meaning: "The State should work toward equal pay for equal work for both women and men.",
+            meaning:
+              "The State should work toward equal pay for equal work for both women and men.",
             whyItMatters:
               "It supports the principle of equal pay for women and men performing equal work.",
           },

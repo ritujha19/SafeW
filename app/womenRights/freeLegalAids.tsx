@@ -6,8 +6,8 @@ export default function FreeLegalAid() {
   return (
     <Screen>
       <Callout tone="dusk" title="Legal help can be available at no cost">
-        India has a legal-services system that provides free legal assistance
-        to eligible people through Legal Services Authorities.
+        India has a legal-services system that provides free legal assistance to
+        eligible people through Legal Services Authorities.
       </Callout>
 
       <Callout tone="dusk" title="👩 Women and children">
@@ -22,8 +22,8 @@ export default function FreeLegalAid() {
 
       <Callout tone="marigold" title="Important">
         Free legal aid does not mean that every legal dispute is automatically
-        decided in your favour. The legal-services authority assesses the
-        matter according to the applicable law and procedure.
+        decided in your favour. The legal-services authority assesses the matter
+        according to the applicable law and procedure.
       </Callout>
 
       <Body tone="ink" className="mb-1 mt-2">
@@ -53,7 +53,8 @@ export default function FreeLegalAid() {
             title: "Women & Children Are Eligible",
             meaning:
               "Women and children are specifically included among the categories entitled to legal services under Section 12(c). NALSA states that a woman is eligible for free legal aid irrespective of her income or financial status.",
-            whyItMatters: "A woman does not have to prove that she is poor before she can apply for legal aid on the basis of being a woman.",
+            whyItMatters:
+              "A woman does not have to prove that she is poor before she can apply for legal aid on the basis of being a woman.",
           },
           {
             label: "Legal Services Authorities Act, 1987",
@@ -68,7 +69,8 @@ export default function FreeLegalAid() {
             title: "Where to Apply",
             meaning:
               "A person can approach Legal Services Institutions established at different levels, including State Legal Services Authorities, District Legal Services Authorities and Taluka or equivalent Legal Services Committees.",
-            whyItMatters: "You do not necessarily have to start at a High Court or Supreme Court to ask for legal aid.",
+            whyItMatters:
+              "You do not necessarily have to start at a High Court or Supreme Court to ask for legal aid.",
           },
           {
             label: "Legal Services Authorities Act, 1987",
@@ -83,35 +85,40 @@ export default function FreeLegalAid() {
             title: "District & Taluka Legal Services",
             meaning:
               "District Legal Services Authorities and Taluka or equivalent Legal Services Committees help provide legal services and organize legal-awareness and dispute-resolution activities at local levels.",
-            whyItMatters: "Local legal-services offices can be a practical first point of contact for someone seeking legal assistance.",
+            whyItMatters:
+              "Local legal-services offices can be a practical first point of contact for someone seeking legal assistance.",
           },
           {
             label: "Legal Services Institutions",
             title: "Legal Advice Before Going to Court",
             meaning:
               "Legal Services Institutions can provide legal advice and assistance. A person can seek information about available legal remedies before deciding what legal step to take.",
-            whyItMatters: "Getting legal information early can help a person understand the available options before starting a case.",
+            whyItMatters:
+              "Getting legal information early can help a person understand the available options before starting a case.",
           },
           {
             label: "Legal Services Authorities Act, 1987",
             title: "Free Legal Representation",
             meaning:
               "Where legal representation is provided through the legal-services system, an eligible person may receive assistance from a legal practitioner in accordance with the Act and applicable rules.",
-            whyItMatters: "An eligible person may be able to obtain representation without paying the lawyer's normal private fee.",
+            whyItMatters:
+              "An eligible person may be able to obtain representation without paying the lawyer's normal private fee.",
           },
           {
             label: "Legal Services Authorities Act, 1987",
             title: "Lok Adalat & Settlement",
             meaning:
               "Lok Adalats provide a mechanism for amicable settlement of certain disputes at pre-litigation or pending-case stages. Settlements made through a Lok Adalat have the legal effect provided by the Act.",
-            whyItMatters: "Some disputes can be resolved through a settlement process rather than continuing through a full court trial.",
+            whyItMatters:
+              "Some disputes can be resolved through a settlement process rather than continuing through a full court trial.",
           },
           {
             label: "NALSA / Legal Services Institutions",
             title: "How to Apply for Legal Aid",
             meaning:
               "A person can approach the nearest Legal Services Institution or use the legal-aid channels provided by NALSA and the relevant State Legal Services Authority. The authority considers the application under the applicable legal-services framework.",
-            whyItMatters: "Knowing where to apply makes free legal assistance easier to access when you need it.",
+            whyItMatters:
+              "Knowing where to apply makes free legal assistance easier to access when you need it.",
           },
         ]}
       />

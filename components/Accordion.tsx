@@ -16,7 +16,11 @@ import { Body, Heading, Label } from "./Typography";
 
 const accents = {
   dusk: { chip: "bg-dusk-50", icon: colors.dusk[600], open: "border-dusk-200" },
-  haven: { chip: "bg-haven-soft", icon: colors.havenDark, open: "border-haven" },
+  haven: {
+    chip: "bg-haven-soft",
+    icon: colors.havenDark,
+    open: "border-haven",
+  },
   marigold: {
     chip: "bg-marigold-soft",
     icon: colors.marigoldDark,
@@ -142,7 +146,9 @@ export function Block({
   return (
     <View className={`mt-3 rounded-2xl ${t.box}`}>
       {label ? (
-        <Text className={`mb-1.5 font-bodyBold text-[14px] ${t.label}`}>{label}</Text>
+        <Text className={`mb-1.5 font-bodyBold text-[14px] ${t.label}`}>
+          {label}
+        </Text>
       ) : null}
       {typeof children === "string" ? (
         <Body size="sm" tone={t.text}>
@@ -167,7 +173,9 @@ export function Bullets({
     <View>
       {items.map((item, i) => (
         <View key={i} className="mb-1.5 flex-row">
-          <View className={`mr-2.5 mt-[9px] h-1.5 w-1.5 rounded-full ${t.dot}`} />
+          <View
+            className={`mr-2.5 mt-[9px] h-1.5 w-1.5 rounded-full ${t.dot}`}
+          />
           <Body size="sm" tone={t.text} className="flex-1">
             {item.trim()}
           </Body>

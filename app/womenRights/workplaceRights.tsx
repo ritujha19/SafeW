@@ -44,7 +44,8 @@ export default function WorkplaceRights() {
             title: "Who Can File a Complaint",
             meaning:
               "An aggrieved woman may make a written complaint of sexual harassment to the Internal Committee or Local Committee, as applicable, within the period provided by the Act.",
-            whyItMatters: "It establishes a formal route for reporting workplace sexual harassment.",
+            whyItMatters:
+              "It establishes a formal route for reporting workplace sexual harassment.",
           },
           {
             label: "POSH Act, 2013 — Sections 10–13",
@@ -75,7 +76,8 @@ export default function WorkplaceRights() {
             title: "Maternity Leave",
             meaning:
               "An eligible woman with fewer than two surviving children can receive maternity benefit for up to 26 weeks, with not more than 8 weeks taken before the expected delivery date. For a woman with two or more surviving children, the maximum is 12 weeks, with not more than 6 weeks before the expected delivery date.",
-            whyItMatters: "It provides statutory maternity benefits and time away from work around childbirth.",
+            whyItMatters:
+              "It provides statutory maternity benefits and time away from work around childbirth.",
           },
           {
             label: "Maternity Benefit Act, 1961 — Section 5(5)",
@@ -99,8 +101,8 @@ export default function WorkplaceRights() {
       <Block label="Remember" tone="remember">
         Maternity leave is available to eligible women, but the amount of leave
         can depend on where they work. Under the Maternity Benefit Act, eligible
-        women can get up to 26 weeks of maternity leave. Government employees may
-        have different leave rules.
+        women can get up to 26 weeks of maternity leave. Government employees
+        may have different leave rules.
       </Block>
     </Screen>
   );

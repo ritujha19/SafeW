@@ -11,13 +11,41 @@ import { colors } from "@/constants/theme";
 type Route = Parameters<ReturnType<typeof useRouter>["navigate"]>[0];
 
 const rights: { title: string; icon: IconName; route: string }[] = [
-  { title: "Constitutional Rights", icon: "document-text-outline", route: "/womenRights/constitutionRights" },
-  { title: "Protection from Violence", icon: "shield-checkmark-outline", route: "/womenRights/protectionFromViolence" },
-  { title: "Workplace Rights", icon: "briefcase-outline", route: "/womenRights/workplaceRights" },
-  { title: "Family & Marriage Rights", icon: "home-outline", route: "/womenRights/familyMarriageRights" },
-  { title: "Digital Rights", icon: "phone-portrait-outline", route: "/womenRights/digitalRights" },
-  { title: "Rights When Seeking Help", icon: "help-buoy-outline", route: "/womenRights/rightsSeekingHelp" },
-  { title: "Rights of Children", icon: "happy-outline", route: "/womenRights/rightsOfChildren" },
+  {
+    title: "Constitutional Rights",
+    icon: "document-text-outline",
+    route: "/womenRights/constitutionRights",
+  },
+  {
+    title: "Protection from Violence",
+    icon: "shield-checkmark-outline",
+    route: "/womenRights/protectionFromViolence",
+  },
+  {
+    title: "Workplace Rights",
+    icon: "briefcase-outline",
+    route: "/womenRights/workplaceRights",
+  },
+  {
+    title: "Family & Marriage Rights",
+    icon: "home-outline",
+    route: "/womenRights/familyMarriageRights",
+  },
+  {
+    title: "Digital Rights",
+    icon: "phone-portrait-outline",
+    route: "/womenRights/digitalRights",
+  },
+  {
+    title: "Rights When Seeking Help",
+    icon: "help-buoy-outline",
+    route: "/womenRights/rightsSeekingHelp",
+  },
+  {
+    title: "Rights of Children",
+    icon: "happy-outline",
+    route: "/womenRights/rightsOfChildren",
+  },
 ];
 
 export default function WomenRights() {
@@ -26,11 +54,16 @@ export default function WomenRights() {
 
   return (
     <Screen>
-      <Illustration source={illustrations.rights} fallback="scale-outline" tint="marigold" height={150} />
+      <Illustration
+        source={illustrations.rights}
+        fallback="scale-outline"
+        tint="marigold"
+        height={150}
+      />
 
       <Body tone="ink" className="mb-5 mt-2">
-        Understanding your legal rights can help you know what protections and remedies
-        are available to you.
+        Understanding your legal rights can help you know what protections and
+        remedies are available to you.
       </Body>
 
       <PressableScale
@@ -48,7 +81,11 @@ export default function WomenRights() {
             Get free legal help if you can&apos;t afford a lawyer.
           </Body>
         </View>
-        <Ionicons name="chevron-forward" size={22} color={colors.marigoldDark} />
+        <Ionicons
+          name="chevron-forward"
+          size={22}
+          color={colors.marigoldDark}
+        />
       </PressableScale>
 
       <Heading size="lg" className="mb-3">

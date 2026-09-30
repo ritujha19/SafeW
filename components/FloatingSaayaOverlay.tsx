@@ -240,7 +240,8 @@ function createQuickPatrolSirenWavBytes(): Uint8Array {
 }
 
 function wavBytesToDataUri(bytes: Uint8Array): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   let base64 = "";
   for (let i = 0; i < bytes.length; i += 3) {
     const b1 = bytes[i];
@@ -248,8 +249,7 @@ function wavBytesToDataUri(bytes: Uint8Array): string {
     const b3 = i + 2 < bytes.length ? bytes[i + 2] : 0;
     base64 += chars[b1 >> 2];
     base64 += chars[((b1 & 3) << 4) | (b2 >> 4)];
-    base64 +=
-      i + 1 < bytes.length ? chars[((b2 & 15) << 2) | (b3 >> 6)] : "=";
+    base64 += i + 1 < bytes.length ? chars[((b2 & 15) << 2) | (b3 >> 6)] : "=";
     base64 += i + 2 < bytes.length ? chars[b3 & 63] : "=";
   }
 
@@ -331,7 +331,10 @@ export function FloatingSaayaOverlay() {
         nativePlayerRef.current = player;
         player.play();
         setIsQuickSirenActive(true);
-        Alert.alert("Patrol Siren Active", "Playing distant police patrol siren.");
+        Alert.alert(
+          "Patrol Siren Active",
+          "Playing distant police patrol siren.",
+        );
         return;
       }
 
@@ -356,7 +359,10 @@ export function FloatingSaayaOverlay() {
         try {
           nativePlayerRef.current.remove();
         } catch (cleanupError) {
-          console.warn("Unable to remove the failed patrol siren player:", cleanupError);
+          console.warn(
+            "Unable to remove the failed patrol siren player:",
+            cleanupError,
+          );
         }
         nativePlayerRef.current = null;
       }
@@ -499,6 +505,7 @@ export function FloatingSaayaOverlay() {
                   value={quickPrompt}
                   onChangeText={setQuickPrompt}
                   placeholder="Ask Saaya anything..."
+                  placeholderTextColor={colors.muted}
                   onSubmitEditing={handleQuickAskSubmit}
                   className="mr-2 flex-1 font-body text-[13px] text-midnight"
                 />
@@ -523,7 +530,7 @@ export function FloatingSaayaOverlay() {
                     isQuickSirenActive ? "bg-beacon" : "bg-marigold-soft"
                   }`}
                 >
-                  <View className="flex-row items-center">
+                  <View className="min-w-0 flex-1 flex-row items-center">
                     <Ionicons
                       name={isQuickSirenActive ? "stop-circle" : "volume-high"}
                       size={17}
@@ -532,21 +539,19 @@ export function FloatingSaayaOverlay() {
                       }
                     />
                     <Text
-                      className={`ml-2 font-bodyBold text-[13px] ${
-                        isQuickSirenActive
-                          ? "text-white"
-                          : "text-marigold-dark"
+                      className={`ml-2 flex-1 font-bodyBold text-[13px] ${
+                        isQuickSirenActive ? "text-white" : "text-marigold-dark"
                       }`}
                     >
                       {isStartingQuickSiren
-                        ? "Starting Police Siren…"
+                        ? "Starting…"
                         : isQuickSirenActive
-                          ? "Stop Distant Patrol Siren"
-                          : "Play Distant Police Patrol Siren"}
+                          ? "Stop Patrol Siren"
+                          : "Play Patrol Siren"}
                     </Text>
                   </View>
                   <Text
-                    className={`font-bodyBold text-[11px] ${
+                    className={`ml-2 flex-shrink-0 font-bodyBold text-[11px] ${
                       isQuickSirenActive ? "text-white" : "text-marigold-dark"
                     }`}
                   >

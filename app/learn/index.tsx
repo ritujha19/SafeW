@@ -18,11 +18,16 @@ const topics: {
   title: string;
   description: string;
   icon: IconName;
-  route: "/learn/whatCounts" | "/learn/warningSigns" | "/learn/safetyEssentials" | "/learn/prepareYourself";
+  route:
+    | "/learn/whatCounts"
+    | "/learn/warningSigns"
+    | "/learn/safetyEssentials"
+    | "/learn/prepareYourself";
 }[] = [
   {
     title: "Know what counts",
-    description: "What harassment, abuse and violence look like, and what to do.",
+    description:
+      "What harassment, abuse and violence look like, and what to do.",
     icon: "alert-circle-outline",
     route: "/learn/whatCounts",
   },
@@ -51,11 +56,16 @@ export default function Learn() {
 
   return (
     <Screen>
-      <Illustration source={illustrations.learn} fallback="school-outline" tint="haven" height={150} />
+      <Illustration
+        source={illustrations.learn}
+        fallback="school-outline"
+        tint="haven"
+        height={150}
+      />
 
       <Body tone="ink" className="mt-2">
-        Knowing what to look for can help you recognize risks earlier, make informed
-        decisions, and feel more prepared to protect yourself.
+        Knowing what to look for can help you recognize risks earlier, make
+        informed decisions, and feel more prepared to protect yourself.
       </Body>
       <Heading size="md" className="mb-5 mt-3">
         Learn these principles now, so you can remember them when you need them.
@@ -67,13 +77,22 @@ export default function Learn() {
           Notice → Move → Tell
         </Display>
         {steps.map((step, i) => (
-          <View key={step.word} className={`flex-row items-center ${i > 0 ? "mt-4" : ""}`}>
+          <View
+            key={step.word}
+            className={`flex-row items-center ${i > 0 ? "mt-4" : ""}`}
+          >
             <View className="mr-4 h-9 w-9 items-center justify-center rounded-full bg-marigold">
-              <Text className="font-display text-[17px] text-midnight">{i + 1}</Text>
+              <Text className="font-display text-[17px] text-midnight">
+                {i + 1}
+              </Text>
             </View>
             <View className="flex-1">
-              <Text className="font-bodyBold text-[17px] text-white">{step.word}</Text>
-              <Text className="font-body text-[14px] leading-5 text-white/75">{step.line}</Text>
+              <Text className="font-bodyBold text-[17px] text-white">
+                {step.word}
+              </Text>
+              <Text className="font-body text-[14px] leading-5 text-white/75">
+                {step.line}
+              </Text>
             </View>
           </View>
         ))}
