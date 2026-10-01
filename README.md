@@ -193,6 +193,8 @@ SAFE-W has been built as an **Android application** and an APK is provided for d
 
 The APK allows reviewers to experience the actual application rather than only viewing screenshots or source code.
 
+https://safew.expo.app/download - download apk from here
+
 > **Note:** SAFE-W is currently provided as a demonstration/prototype Android application and should not be treated as a replacement for emergency services.
 
 ---
@@ -271,3 +273,7 @@ The project focuses on using technology to build a practical safety solution tha
 Built with **React Native, Expo, Firebase, Node.js, Express, and Google Gemini.**
 
 ---
+
+# Auhor 
+
+Ritu Jha 
