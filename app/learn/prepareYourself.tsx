@@ -31,218 +31,224 @@ const questions: Question[] = [
   {
     title: "Being followed",
     situation:
-      "You are walking home and notice the same person has been behind you for several minutes. You are not sure whether they are actually following you.",
-    question: "What is the safest choice?",
+      "You notice the same person following you for several minutes while you are walking home.",
+    question: "What is the safest response?",
     choices: [
-      "Continue walking directly home",
-      "Move toward a safer, populated or visible place and contact someone you trust",
-      "Stop and confront the person",
-      "Ignore the feeling completely",
+      "Confront the person and demand an explanation",
+      "Move toward a busy, well-lit place and contact someone you trust",
+      "Continue walking normally so they do not know you noticed",
+      "Take a shortcut through a quiet area",
     ],
     correctAnswer: 1,
     explanation:
-      "Moving toward people and visibility gives you more options to seek help and reduces the chance of being isolated.",
-    remember:
-      "You don't need absolute proof before taking a reasonable step toward safety.",
+      "Moving toward people and getting help can reduce your isolation and give you safer options.",
+    remember: "Notice → Move → Tell.",
   },
+
   {
     title: "Someone blocks your path",
     situation:
-      "Someone you don't know deliberately stands in your way and makes you uncomfortable.",
-    question: "What should you prioritize?",
+      "Someone suddenly blocks your path and refuses to let you pass.",
+    question: "What should you focus on first?",
     choices: [
-      "Arguing with them",
-      "Staying there until they move",
-      "Creating distance and getting toward a safer place or other people",
-      "Trying to prove that they are doing something wrong",
+      "Creating distance and looking for a safe way to leave",
+      "Arguing until they move",
+      "Proving that you are not afraid",
+      "Staying there to understand their intention",
+    ],
+    correctAnswer: 0,
+    explanation:
+      "Your priority is creating an opportunity to reach safety rather than winning an argument.",
+    remember: "Your safety comes before proving a point.",
+  },
+
+  {
+    title: "An isolated shortcut",
+    situation:
+      "You are travelling home and someone suggests taking an isolated shortcut because it will save ten minutes.",
+    question: "What should you consider?",
+    choices: [
+      "Take it because reaching home faster is always safer",
+      "Follow the person because they know the area",
+      "Choose a route with people, lighting, and accessible help",
+      "Take the shortcut but avoid using your phone",
     ],
     correctAnswer: 2,
     explanation:
-      "If someone is blocking your movement, creating distance and getting toward other people can give you a safer opportunity to leave and seek help.",
-    remember:
-      "Your priority is getting to safety, not winning a confrontation.",
+      "A slightly longer route can provide more access to people and help if something goes wrong.",
+    remember: "Choose safer surroundings over a shorter route.",
   },
+
   {
-    title: "The isolated shortcut",
+    title: "A secret that feels unsafe",
     situation:
-      "You are going somewhere familiar. One route is a shortcut but is mostly empty. Another route takes longer but has more people and visibility.",
-    question: "Which is the safer choice when you are already uncomfortable?",
-    choices: [
-      "Always take the shortest route",
-      "Choose the route with better visibility and access to help",
-      "Take the empty route because it is faster",
-      "Stay where you are",
-    ],
-    correctAnswer: 1,
-    explanation:
-      "A route with people and visibility can give you more opportunities to get help if something unexpected happens.",
-    remember:
-      "When choosing between routes, think about visibility, people and access to help, not just distance.",
-  },
-  {
-    title: "Don't tell anyone",
-    situation:
-      "Someone is making you uncomfortable and tells you: 'Don't tell your parents or anyone else. This stays between us.'",
+      "Someone tells you to keep a threatening or uncomfortable incident secret from your family and friends.",
     question: "What should you do?",
     choices: [
-      "Keep it secret",
-      "Tell a trusted person anyway",
+      "Keep it secret unless the situation becomes serious",
+      "Delete all messages so nobody finds out",
       "Promise not to tell anyone",
-      "Wait until the situation becomes worse",
+      "Tell a trusted person and explain what happened",
     ],
-    correctAnswer: 1,
+    correctAnswer: 3,
     explanation:
-      "Pressure to keep a concerning situation secret can make it harder to get support. A trusted person can help you understand the situation and decide what to do next.",
-    remember:
-      "Someone else's demand for secrecy does not take away your right to seek help.",
+      "Pressure to keep a safety-related incident secret can make it harder to get support.",
+    remember: "You do not have to handle an unsafe situation alone.",
   },
+
   {
     title: "Pressure for private photos",
     situation:
-      "Someone repeatedly asks you for private photos even after you have said no.",
+      "Someone you know repeatedly pressures you to send private photos and says they will become angry if you refuse.",
     question: "What is the safest response?",
     choices: [
-      "Send one so they stop asking",
-      "Keep explaining yourself until they understand",
-      "Stop engaging if possible, protect your account, and tell someone you trust",
-      "Meet them to discuss it",
+      "Send one photo so they stop asking",
+      "Keep negotiating with them",
+      "Do not send the photos and seek help from someone you trust",
+      "Threaten them with the same thing",
     ],
     correctAnswer: 2,
     explanation:
-      "Repeated requests after you have said no ignore your boundary. You can stop engaging, protect your account, and involve someone you trust.",
-    remember: '"No" is enough. You do not owe anyone private images.',
+      "Pressure or threats do not make sharing private material safe. Getting support can help you handle the situation.",
+    remember: "Pressure is not consent.",
   },
+
   {
-    title: "Someone wants your password",
-    situation: 'Someone says: "If you really trust me, give me your password."',
-    question: "What should you remember?",
+    title: "A suspicious social-media account",
+    situation:
+      "A new social-media account uses your name and photos and starts contacting people you know.",
+    question: "What should you do first?",
     choices: [
-      "People you trust should have your passwords",
-      "Sharing passwords proves trust",
-      "Your passwords and private accounts should remain protected",
+      "Collect evidence, report the account, and tell a trusted person",
+      "Create another fake account to confront them",
+      "Give the account your personal details to verify who they are",
+      "Meet the person behind the account",
+    ],
+    correctAnswer: 0,
+    explanation:
+      "Keeping evidence and using platform reporting and trusted support are safer than confronting an unknown person.",
+    remember: "Save evidence before blocking or reporting when possible.",
+  },
+
+  {
+    title: "Someone asks for your password",
+    situation:
+      "Someone you know asks for your social-media password and says they need it because they care about you.",
+    question: "What is the safer choice?",
+    choices: [
       "Give it to them temporarily",
+      "Share it only if they promise not to change anything",
+      "Give them your recovery email instead",
+      "Keep your password private and use strong account security",
+    ],
+    correctAnswer: 3,
+    explanation:
+      "Passwords should remain private. Account security should not depend on another person's promises.",
+    remember: "Keep passwords private.",
+  },
+
+  {
+    title: "Pressure to share live location",
+    situation:
+      "Someone you recently met online keeps demanding your live location and becomes angry when you refuse.",
+    question: "What should you do?",
+    choices: [
+      "Send it so they do not become suspicious",
+      "Stop sharing your location and seek support if the pressure continues",
+      "Share it only when you are outside",
+      "Meet them in person to discuss it",
+    ],
+    correctAnswer: 1,
+    explanation:
+      "You do not need to share your live location with someone who pressures or intimidates you.",
+    remember: "Location sharing should be your choice.",
+  },
+
+  {
+    title: "Morphed or fake images",
+    situation:
+      "You discover that an edited or morphed image using your face has been shared online without your permission.",
+    question: "What is the safest next step?",
+    choices: [
+      "Meet the person responsible and demand that they delete it",
+      "Share the image publicly to expose them",
+      "Preserve relevant evidence and report the account or incident",
+      "Ignore it because online posts disappear quickly",
     ],
     correctAnswer: 2,
     explanation:
-      "Giving someone your password can give them access to private information and accounts. Healthy trust does not require giving up account security.",
-    remember:
-      "Trust does not require giving someone access to your private accounts.",
+      "Preserving evidence and reporting the incident can help when dealing with online abuse or impersonation.",
+    remember: "Document → Report → Seek support.",
   },
+
   {
-    title: "Live location request",
+    title: "Threatening online messages",
     situation:
-      "Someone you met online asks you to keep your live location turned on so they can always see where you are.",
-    question: "What should you consider?",
+      "A person repeatedly sends threatening messages from different accounts after you stop responding to them.",
+    question: "What should you prioritize?",
     choices: [
-      "Give them access immediately",
-      "Think carefully about who can see your location and whether sharing it is necessary",
-      "Share it because they asked politely",
-      "Post your location publicly instead",
+      "Keep replying so you know what they want",
+      "Threaten them back",
+      "Arrange a meeting to settle the issue",
+      "Preserve the messages and tell a trusted person",
     ],
-    correctAnswer: 1,
+    correctAnswer: 3,
     explanation:
-      "Location information can reveal where you are and where you regularly go. Before sharing it, consider who has access and whether they actually need it.",
-    remember: "Know who has access to your location before sharing it.",
+      "Repeated threats from multiple accounts should not be handled through escalating online arguments.",
+    remember: "Do not escalate. Preserve evidence and seek help.",
   },
+
   {
-    title: "New accounts after blocking",
+    title: "An unexpected ride",
     situation:
-      "You block someone because their messages are unwanted. They start contacting you through new accounts.",
-    question: "What does this pattern tell you?",
+      "A person you know offers you a ride home, but they suddenly change the route and you become uncomfortable.",
+    question: "What should you do?",
     choices: [
-      "It is automatically harmless",
-      "It may be a concerning pattern, so keep yourself safe and tell someone you trust",
-      "You should meet them and ask why",
-      "You should respond to every account",
+      "Stay silent because you know the person",
+      "Ask them to stop somewhere safe and contact someone you trust",
+      "Wait until you reach the destination",
+      "Argue with them while the vehicle is moving",
     ],
     correctAnswer: 1,
     explanation:
-      "Continuing unwanted contact through new accounts after being blocked shows that the person's behaviour is not respecting your boundary. The repeated pattern is important.",
-    remember:
-      "Repeated unwanted contact through different accounts can be a warning sign.",
+      "If you become uncomfortable during a journey, focus on reaching a safer location and getting support.",
+    remember: "Trust your warning signs and seek a safer place.",
   },
-  {
-    title: "Going somewhere unfamiliar",
-    situation: "You are going somewhere you have never been before.",
-    question: "Which preparation is most useful?",
-    choices: [
-      "Tell nobody where you are going",
-      "Know your route, keep your phone accessible, and know who you can contact",
-      "Turn your phone off",
-      "Choose the most isolated route",
-    ],
-    correctAnswer: 1,
-    explanation:
-      "Knowing your route and having a way to communicate can give you more options if your plans change or you need assistance.",
-    remember:
-      "A little preparation before leaving can give you more options if something goes wrong.",
-  },
+
   {
     title: "Your phone is almost dead",
     situation:
-      "You are going somewhere unfamiliar and notice your phone battery is almost empty.",
-    question: "What should you think about?",
-    choices: [
-      "It doesn't matter",
-      "Make sure you have a practical way to communicate or reach help if needed",
-      "Turn the phone off immediately",
-      "Continue without considering it",
-    ],
-    correctAnswer: 1,
-    explanation:
-      "A phone can help you communicate with trusted people or access assistance. A low battery can reduce those options, so it is worth planning ahead.",
-    remember: "Communication can be an important part of your safety plan.",
-  },
-  {
-    title: "Nobody knows where you are",
-    situation:
-      "You are going somewhere unfamiliar, and nobody you trust knows your plans.",
-    question: "What is a useful safety habit?",
-    choices: [
-      "Tell everyone online",
-      "Let an appropriate trusted person know where you are going when practical",
-      "Keep everything secret",
-      "Share your exact location publicly",
-    ],
-    correctAnswer: 1,
-    explanation:
-      "Having a trusted person know your general plans can make it easier for them to notice if something is wrong and support you when needed.",
-    remember:
-      "A trusted person knowing your plans can make it easier to get help if you need it.",
-  },
-  {
-    title: "Something feels wrong",
-    situation:
-      "You are in a situation that suddenly makes you feel unsafe, but you cannot explain exactly why.",
+      "You are travelling alone and your phone battery is almost dead while you are still some distance from home.",
     question: "What should you do?",
     choices: [
-      "Stay because you cannot prove there is danger",
-      "Move toward safety if you reasonably can",
-      "Ignore your instincts",
-      "Wait until something happens",
+      "Continue without telling anyone because your phone may last",
+      "Turn off your phone immediately and walk through a shortcut",
+      "Use the remaining battery to contact someone and plan a safer route",
+      "Give your phone to a stranger for charging",
     ],
-    correctAnswer: 1,
+    correctAnswer: 2,
     explanation:
-      "You do not have to investigate or prove a threat before choosing a safer option. If you can safely move away from a concerning situation, you can do so.",
-    remember:
-      "You don't need to prove that something is dangerous before choosing a safer option.",
+      "When your battery is low, use the remaining power strategically to communicate and reach safety.",
+    remember: "Use limited battery for essential communication.",
   },
+
   {
-    title: "Safe places are closed",
+    title: "Someone shares your personal details",
     situation:
-      "You are outside later than expected. The places you normally rely on for help are closed.",
-    question: "What should you look for?",
+      "You discover that someone has posted your phone number and other personal details online without your permission.",
+    question: "What should you do?",
     choices: [
-      "A completely empty route home",
-      "People, visible buildings, security personnel, traffic, or another accessible source of help",
-      "A darker and quieter area",
-      "Somewhere completely isolated",
+      "Publicly post their personal details in return",
+      "Save evidence, report the content, and tell someone you trust",
+      "Contact every person who viewed the post",
+      "Ignore it because the information is already public",
     ],
     correctAnswer: 1,
     explanation:
-      "Safety does not depend on one particular shop or location. Look for people, visibility, security, and other accessible sources of assistance.",
-    remember: "Look for visibility and people, not just familiar shops.",
+      "Sharing personal details without permission can create safety and privacy risks. Preserve evidence and seek support.",
+    remember: "Do not retaliate. Document and report.",
   },
+
   {
     title: "You cannot leave immediately",
     situation:
@@ -259,22 +265,22 @@ const questions: Question[] = [
       "When you cannot leave immediately, the priority is still safety. Look for an opportunity to reach a safer place or get help rather than trying to win a confrontation.",
     remember: "The goal is to get safe, not to win a fight.",
   },
+
   {
     title: "The final SAFEW test",
     situation:
-      "You are walking home in an unfamiliar area. You notice someone repeatedly following you. Your usual route is becoming quiet and there are fewer people around.",
-    question: "What should you think first?",
+      "You notice a situation becoming uncomfortable or unsafe.",
+    question: "Which SAFEW approach best matches what you have learned?",
     choices: [
-      "I should continue home because I don't know for certain.",
-      "NOTICE -> MOVE -> TELL.",
-      "I should confront them and ask why they are following me.",
-      "I should ignore it unless they approach me.",
+      "Ignore warning signs and wait for the situation to improve",
+      "Notice the warning signs, move toward safety, and tell someone you trust",
+      "Confront the person immediately to show confidence",
+      "Handle everything alone so nobody worries",
     ],
     correctAnswer: 1,
     explanation:
-      "This situation combines several warning signs: repeated following, isolation, and decreasing access to people. You do not need to wait for the situation to become more serious before choosing a safer direction and contacting someone you trust.",
-    remember:
-      "NOTICE: Recognize a concerning situation. MOVE: Move toward safety when possible. TELL: Contact someone you trust or seek help. You don't have to wait for a situation to become an emergency before taking a safer step.",
+      "SAFEW focuses on recognizing warning signs early, moving toward safer surroundings, and getting support.",
+    remember: "Notice → Move → Tell.",
   },
 ];
 
@@ -374,7 +380,7 @@ export default function PrepareYourself() {
           variant="outline"
           label="Back to Learn & Prepare"
           className="mt-3"
-          onPress={() => router.navigate("/learn")}
+          onPress={() => router.dismissTo("/learn")}
         />
       </Screen>
     );

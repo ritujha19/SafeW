@@ -258,7 +258,7 @@ export default function Profile() {
         onPress={async () => {
           try {
             await logout();
-            router.replace("/");
+            router.dismissTo("/");
           } catch (error) {
             console.error("Logout error:", error);
             alert("Unable to log out. Please try again.");
