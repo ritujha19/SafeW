@@ -212,6 +212,17 @@ Safety-critical information should never be omitted just to meet the word limit.
           },
         },
       });
+      console.log("Saaya response diagnostics:", {
+        model: "gemini-3.8-flash",
+        hasText: Boolean(response.text?.trim()),
+        promptFeedback: response.promptFeedback,
+        candidates: response.candidates?.map((candidate) => ({
+          finishReason: candidate.finishReason,
+          safetyRatings: candidate.safetyRatings,
+          content: candidate.content,
+        })),
+        usageMetadata: response.usageMetadata,
+      });
 
       if (!response.text?.trim()) {
         throw new Error("gemini-3.8-flash returned an empty response");
@@ -234,11 +245,22 @@ Safety-critical information should never be omitted just to meet the word limit.
             },
           },
         });
+        console.log("Saaya response diagnostics:", {
+          model: "gemini-3.1-flash-lite",
+          hasText: Boolean(response.text?.trim()),
+          promptFeedback: response.promptFeedback,
+          candidates: response.candidates?.map((candidate) => ({
+            finishReason: candidate.finishReason,
+            safetyRatings: candidate.safetyRatings,
+            content: candidate.content,
+          })),
+          usageMetadata: response.usageMetadata,
+        });
 
         console.log("Saaya: gemini-3.1-flash-lite succeeded");
         if (!response.text?.trim()) {
-  throw new Error("gemini-3.1-flash-lite returned an empty response");
-}
+          throw new Error("gemini-3.1-flash-lite returned an empty response");
+        }
       } catch (error) {
         console.error("Saaya: gemini-3.1-flash-lite failed", error);
 
@@ -258,10 +280,21 @@ Safety-critical information should never be omitted just to meet the word limit.
             },
           });
 
+          console.log("Saaya response diagnostics:", {
+            model: "gemini-2.5-flash",
+            hasText: Boolean(response.text?.trim()),
+            promptFeedback: response.promptFeedback,
+            candidates: response.candidates?.map((candidate) => ({
+              finishReason: candidate.finishReason,
+              safetyRatings: candidate.safetyRatings,
+              content: candidate.content,
+            })),
+            usageMetadata: response.usageMetadata,
+          });
           console.log("Saaya: gemini-2.5-flash succeeded");
           if (!response.text?.trim()) {
-  throw new Error("gemini-2.5-flash returned an empty response");
-}
+            throw new Error("gemini-2.5-flash returned an empty response");
+          }
         } catch (error) {
           console.error("Saaya: gemini-2.5-flash failed", error);
         }
