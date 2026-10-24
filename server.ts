@@ -212,6 +212,16 @@ Safety-critical information should never be omitted just to meet the word limit.
           },
         },
       });
+      if (response.promptFeedback?.blockReason) {
+        console.warn("Saaya request blocked:", {
+          model: "gemini-3.8-flash",
+          blockReason: response.promptFeedback.blockReason,
+        });
+
+        throw new Error(
+          `Gemini blocked request: ${response.promptFeedback.blockReason}`,
+        );
+      }
       console.log("Saaya response diagnostics:", {
         model: "gemini-3.8-flash",
         hasText: Boolean(response.text?.trim()),
@@ -245,6 +255,16 @@ Safety-critical information should never be omitted just to meet the word limit.
             },
           },
         });
+        if (response.promptFeedback?.blockReason) {
+          console.warn("Saaya request blocked:", {
+            model: "gemini-3.1-flash-lite",
+            blockReason: response.promptFeedback.blockReason,
+          });
+
+          throw new Error(
+            `Gemini blocked request: ${response.promptFeedback.blockReason}`,
+          );
+        }
         console.log("Saaya response diagnostics:", {
           model: "gemini-3.1-flash-lite",
           hasText: Boolean(response.text?.trim()),
@@ -279,7 +299,16 @@ Safety-critical information should never be omitted just to meet the word limit.
               },
             },
           });
+          if (response.promptFeedback?.blockReason) {
+            console.warn("Saaya request blocked:", {
+              model: "gemini-2.5-flash",
+              blockReason: response.promptFeedback.blockReason,
+            });
 
+            throw new Error(
+              `Gemini blocked request: ${response.promptFeedback.blockReason}`,
+            );
+          }
           console.log("Saaya response diagnostics:", {
             model: "gemini-2.5-flash",
             hasText: Boolean(response.text?.trim()),
