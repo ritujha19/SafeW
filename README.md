@@ -193,7 +193,7 @@ SAFE-W has been built as an **Android application** and an APK is provided for d
 
 The APK allows reviewers to experience the actual application rather than only viewing screenshots or source code.
 
-https://safew.expo.app/download - download apk from here
+[https://safew.expo.app/download ](https://safew.expo.app/download)- download apk from here
 
 > **Note:** SAFE-W is currently provided as a demonstration/prototype Android application and should not be treated as a replacement for emergency services.
 
@@ -253,6 +253,8 @@ Possible future development includes:
 A demonstration video of SAFE-W is provided as part of the project submission.
 
 The demo showcases the application's main safety flow, preparation features, trusted contacts, location support, Saaya, women's rights information, and emergency tools.
+
+https://vimeo.com/1231766502?fl=ip&fe=ec 
 
 ---
 
