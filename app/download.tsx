@@ -30,7 +30,8 @@ const features = [
 
 export default function Download() {
   const APK_URL =
-  "https://github.com/ritujha19/SafeW/releases/download/v1.0.0/application-cb1fd097-6848-40a7-b1e9-4d4e7362e20f.apk";
+    "https://github.com/ritujha19/SafeW/releases/download/v1.0.0/application-cb1fd097-6848-40a7-b1e9-4d4e7362e20f.apk";
+
   return (
     <ScrollView
       className="flex-1 bg-paper"
@@ -99,7 +100,13 @@ export default function Download() {
 
           <Pressable
             accessibilityRole="link"
-            onPress={() => Linking.openURL(APK_URL)}
+            onPress={async () => {
+              try {
+                await Linking.openURL(APK_URL);
+              } catch (error) {
+                console.error("Failed to open APK download link:", error);
+              }
+            }}
             className="mt-5 min-h-14 flex-row items-center justify-center rounded-2xl bg-marigold px-5"
           >
             <Ionicons
