@@ -30,7 +30,7 @@ const features = [
 
 export default function Download() {
   const APK_URL =
-  "https://github.com/ritujha19/SafeW/releases/download/v1.0.0/application-8456ed0d-3456-424a-9408-4aa3d7527166.apk";
+  "https://github.com/ritujha19/SafeW/releases/download/v1.0.0/application-cb1fd097-6848-40a7-b1e9-4d4e7362e20f.apk";
   return (
     <ScrollView
       className="flex-1 bg-paper"
