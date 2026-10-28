@@ -60,6 +60,24 @@ const safetySettings = [
   threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
 }));
 
+// Without a timeout, a hung request can wait minutes (your log showed
+// UND_ERR_HEADERS_TIMEOUT). Fail fast so we can move on to another model.
+const REQUEST_TIMEOUT_MS = 15_000;
+
+// When a model is overloaded (503) or hangs, skip it for a while instead of
+// paying the timeout on every request. Lives in memory, resets on restart.
+const COOLDOWN_MS = 60_000;
+const unavailableUntil = new Map<string, number>();
+
+function isTransientError(error: unknown): boolean {
+  const e = error as { status?: number; message?: string; cause?: { code?: string } };
+  return (
+    [429, 500, 503, 504].includes(e?.status ?? 0) ||
+    e?.cause?.code === "UND_ERR_HEADERS_TIMEOUT" ||
+    /fetch failed|timeout|timed out|aborted/i.test(e?.message ?? "")
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 /* Prompts                                                                     */
 /* -------------------------------------------------------------------------- */
@@ -128,6 +146,7 @@ async function callGemini(
       systemInstruction,
       maxOutputTokens,
       safetySettings,
+      httpOptions: { timeout: REQUEST_TIMEOUT_MS },
     },
   });
 
@@ -136,6 +155,23 @@ async function callGemini(
     text: response.text?.trim() || "",
     blockReason: response.promptFeedback?.blockReason,
   };
+}
+
+// One quick retry for 503/429 (a temporary spike). Timeouts are NOT retried,
+// because waiting another 15s is worse than trying the next model.
+async function callWithRetry(
+  model: ModelDef,
+  contents: Content[],
+  systemInstruction: string | undefined,
+) {
+  try {
+    return await callGemini(model, contents, systemInstruction);
+  } catch (error) {
+    const status = (error as { status?: number })?.status;
+    if (status !== 503 && status !== 429) throw error;
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    return await callGemini(model, contents, systemInstruction);
+  }
 }
 
 // Dev-only: find WHICH part of the request is blocked.
@@ -208,14 +244,20 @@ app.post("/api/chat", async (req, res) => {
     let wasBlocked = false;
 
     variantLoop: for (const variant of variants) {
-      for (const model of MODELS) {
+      // Skip models that failed recently, unless that would leave none.
+      const healthy = MODELS.filter(
+        (m) => (unavailableUntil.get(m.name) ?? 0) <= Date.now(),
+      );
+      const candidates = healthy.length > 0 ? healthy : MODELS;
+
+      for (const model of candidates) {
         try {
           console.log(`Saaya: ${model.name} / ${variant.label}`);
-          const r = await callGemini(model, variant.contents, variant.system);
+          const r = await callWithRetry(model, variant.contents, variant.system);
 
           if (r.blockReason) {
             // Blocks come from the prompt, so other models will block it too.
-            // Skip to the next prompt variant instead of wasting 2 more calls.
+            // Skip to the next prompt variant instead of wasting more calls.
             wasBlocked = true;
             console.warn("Saaya blocked:", {
               model: model.name,
@@ -228,17 +270,24 @@ app.post("/api/chat", async (req, res) => {
           if (!r.text) {
             console.warn("Saaya empty reply:", {
               model: model.name,
+              variant: variant.label,
               finishReason: r.response.candidates?.[0]?.finishReason,
             });
             continue; // model-specific problem, try the next model
           }
 
+          console.log(`Saaya: SUCCESS with ${model.name} / ${variant.label}`);
           rawReply = r.text;
           wasBlocked = false;
           break variantLoop;
         } catch (error) {
-          // Network / 503 / quota: model-specific, try the next model.
-          console.error(`Saaya: ${model.name} failed`, error);
+          if (isTransientError(error)) {
+            unavailableUntil.set(model.name, Date.now() + COOLDOWN_MS);
+          }
+          console.error(
+            `Saaya: ${model.name} failed`,
+            (error as { status?: number })?.status ?? (error as Error)?.message,
+          );
         }
       }
     }
