@@ -121,10 +121,22 @@ const LEAN_SYSTEM_INSTRUCTION = `You are Saaya, a calm, caring safety and awaren
 - You are an AI awareness companion, not a lawyer, doctor or emergency service.
 - Be warm and practical. Give complete, specific steps rather than a one-line answer.`;
 
+// Your own test showed that adding "What should I do?" stops the block.
+// The safety filter reads the WHOLE text, and a bare description of harm looks
+// worse than the same text followed by a request for help. This states the
+// user's real purpose (getting help), so it is honest context, not a trick.
+// It is not guaranteed: the filter is a classifier, so it works most of the time.
+const HELP_INTENT_SUFFIX =
+  "\n\nWhat should be done here? Please share safe, practical guidance.";
+
+function withHelpIntent(message: string): string {
+  return `${message}${HELP_INTENT_SUFFIX}`;
+}
+
 // Wrapping the message gives the model context that this is someone asking for
 // help. This is why adding "What should I do?" fixed your blocked message.
 function frameMessage(message: string): string {
-  return `A user of the SAFE-W women's safety app sent the message below. Reply as Saaya, giving helpful safety guidance.\n\nUser message: ${message}`;
+  return `A user of the SAFE-W women's safety app sent the message below. Reply as Saaya, giving helpful safety guidance.\n\nUser message: ${withHelpIntent(message)}`;
 }
 
 // Shown only if every variant is blocked. It is the SAME text for every
@@ -190,6 +202,7 @@ async function diagnoseBlock(
   const lastUser: Content[] = [{ role: "user", parts: [{ text: message }] }];
   const probes: { label: string; contents: Content[]; system?: string }[] = [
     { label: "message only", contents: lastUser },
+    { label: "message + help suffix", contents: [{ role: "user", parts: [{ text: withHelpIntent(message) }] }] },
     { label: "system prompt only ('hi')", contents: [{ role: "user", parts: [{ text: "hi" }] }], system: systemInstruction },
     { label: "message + system (no history)", contents: lastUser, system: systemInstruction },
     { label: "history + message (no system)", contents },
@@ -244,7 +257,7 @@ app.post("/api/chat", async (req, res) => {
     const fullSystem = `${SAAYA_SYSTEM_INSTRUCTION}\n${buildContextInstruction(fastReplyMode)}`;
     const leanSystem = `${LEAN_SYSTEM_INSTRUCTION}\n${buildContextInstruction(fastReplyMode)}`;
 
-    const plainUser: Content = { role: "user", parts: [{ text: message }] };
+    const plainUser: Content = { role: "user", parts: [{ text: withHelpIntent(message) }] };
     const framedUser: Content = { role: "user", parts: [{ text: frameMessage(message) }] };
 
     // Each variant is a different PROMPT. Safety blocks depend on the prompt,
@@ -320,9 +333,15 @@ app.post("/api/chat", async (req, res) => {
     if (!rawReply) {
       if (wasBlocked) {
         // Safe, generic help instead of an error screen.
+        // Pages are curated in-app links, not generated advice. Set to false
+        // if you want NO message-based matching when Gemini fails.
+        const RECOMMEND_PAGES_WHEN_BLOCKED = true;
+        const pages = RECOMMEND_PAGES_WHEN_BLOCKED
+          ? extractAndRecommendPages("", message).recommendedPages
+          : [];
         return res.json({
           reply: BLOCKED_FALLBACK_REPLY,
-          recommendedPages: [],
+          recommendedPages: pages,
           degraded: true,
         });
       }
