@@ -64,6 +64,12 @@ const safetySettings = [
 // UND_ERR_HEADERS_TIMEOUT). Fail fast so we can move on to another model.
 const REQUEST_TIMEOUT_MS = 15_000;
 
+// ---- Reply length: change these two numbers to tune answer size ----
+const NORMAL_WORD_TARGET = "150 to 220";
+const URGENT_WORD_TARGET = "180 to 250";
+// Token budget must be comfortably above the word target (1 word is about 1.4 tokens).
+const MAX_OUTPUT_TOKENS = 900;
+
 // When a model is overloaded (503) or hangs, skip it for a while instead of
 // paying the timeout on every request. Lives in memory, resets on restart.
 const COOLDOWN_MS = 60_000;
@@ -97,7 +103,7 @@ CONTEXT RULES:
 ${
   fastReplyMode
     ? `
-FAST MODE: be concise. Usually under 120 words (under 150 for urgent safety). Use short bullets for actions. Start with the most important action. Never drop safety-critical information to save words.`
+FAST MODE: keep it focused but complete. Aim for about ${NORMAL_WORD_TARGET} words (${URGENT_WORD_TARGET} for urgent safety). Give specific, practical steps in short bullets, with a short caring opening line. Start with the most important action. Never drop safety-critical information to save words.`
     : ""
 }`;
 }
@@ -113,7 +119,7 @@ const LEAN_SYSTEM_INSTRUCTION = `You are Saaya, a calm, caring safety and awaren
 - For emergencies in India: 112 (emergency), 181 (Women Helpline), 1091 (Women in Distress), 1930 (Cybercrime).
 - If the user is helping another person, support them as a helper, not as the person at risk.
 - You are an AI awareness companion, not a lawyer, doctor or emergency service.
-- Be warm and brief.`;
+- Be warm and practical. Give complete, specific steps rather than a one-line answer.`;
 
 // Wrapping the message gives the model context that this is someone asking for
 // help. This is why adding "What should I do?" fixed your blocked message.
@@ -136,7 +142,7 @@ async function callGemini(
   model: ModelDef,
   contents: Content[],
   systemInstruction: string | undefined,
-  maxOutputTokens = 512,
+  maxOutputTokens = MAX_OUTPUT_TOKENS,
 ) {
   const response = await ai.models.generateContent({
     model: model.name,
@@ -179,6 +185,7 @@ async function diagnoseBlock(
   message: string,
   contents: Content[],
   systemInstruction: string,
+  history: Content[] = [],
 ) {
   const lastUser: Content[] = [{ role: "user", parts: [{ text: message }] }];
   const probes: { label: string; contents: Content[]; system?: string }[] = [
@@ -188,6 +195,14 @@ async function diagnoseBlock(
     { label: "history + message (no system)", contents },
     { label: "message + LEAN system", contents: lastUser, system: LEAN_SYSTEM_INSTRUCTION },
   ];
+
+  // Test each earlier turn alone to find the one that is blocked.
+  history.forEach((turn, i) => {
+    probes.push({
+      label: `history turn ${i} (${turn.role}) alone`,
+      contents: [{ role: "user", parts: [{ text: turn.parts?.[0]?.text ?? "" }] }],
+    });
+  });
 
   for (const probe of probes) {
     try {
@@ -236,12 +251,13 @@ app.post("/api/chat", async (req, res) => {
     // so changing the prompt (not just the model) is what gets us past them.
     const variants = [
       { label: "full prompt", system: fullSystem, contents: [...validHistory, plainUser] },
-      { label: "lean prompt + history", system: leanSystem, contents: [...validHistory, framedUser] },
+      { label: "lean prompt + last 2 turns", system: leanSystem, contents: [...validHistory.slice(-2), framedUser] },
       { label: "lean prompt, no history", system: leanSystem, contents: [framedUser] },
     ];
 
     let rawReply = "";
     let wasBlocked = false;
+    let anyBlocked = false;
 
     variantLoop: for (const variant of variants) {
       // Skip models that failed recently, unless that would leave none.
@@ -259,6 +275,7 @@ app.post("/api/chat", async (req, res) => {
             // Blocks come from the prompt, so other models will block it too.
             // Skip to the next prompt variant instead of wasting more calls.
             wasBlocked = true;
+            anyBlocked = true;
             console.warn("Saaya blocked:", {
               model: model.name,
               variant: variant.label,
@@ -276,7 +293,10 @@ app.post("/api/chat", async (req, res) => {
             continue; // model-specific problem, try the next model
           }
 
-          console.log(`Saaya: SUCCESS with ${model.name} / ${variant.label}`);
+          console.log(`Saaya: SUCCESS with ${model.name} / ${variant.label}`, {
+            finishReason: r.response.candidates?.[0]?.finishReason, // MAX_TOKENS = cut off
+            words: r.text.split(/\s+/).length,
+          });
           rawReply = r.text;
           wasBlocked = false;
           break variantLoop;
@@ -292,9 +312,13 @@ app.post("/api/chat", async (req, res) => {
       }
     }
 
+    // Dev only: run in the background so the user's reply is not delayed.
+    if (DEBUG_BLOCKS && anyBlocked) {
+      void diagnoseBlock(message, variants[0].contents, fullSystem, validHistory);
+    }
+
     if (!rawReply) {
       if (wasBlocked) {
-        if (DEBUG_BLOCKS) await diagnoseBlock(message, variants[0].contents, fullSystem);
         // Safe, generic help instead of an error screen.
         return res.json({
           reply: BLOCKED_FALLBACK_REPLY,
