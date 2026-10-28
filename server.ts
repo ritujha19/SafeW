@@ -1,4 +1,10 @@
-import { GoogleGenAI, ThinkingLevel } from "@google/genai";
+import {
+  GoogleGenAI,
+  HarmBlockThreshold,
+  HarmCategory,
+  ThinkingLevel,
+  type Content,
+} from "@google/genai";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -10,33 +16,166 @@ import {
 dotenv.config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
-
 const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) throw new Error("Missing GEMINI_API_KEY in .env");
 
-if (!apiKey) {
-  throw new Error("Missing GEMINI_API_KEY in .env");
+const ai = new GoogleGenAI({ apiKey });
+
+/* -------------------------------------------------------------------------- */
+/* Config                                                                      */
+/* -------------------------------------------------------------------------- */
+
+// Set DEBUG_BLOCKS=true in .env to run the "which part is blocked?" probes.
+const DEBUG_BLOCKS = process.env.DEBUG_BLOCKS === "true";
+
+const MODELS = [
+  {
+    name: "gemini-3.8-flash",
+    config: { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } },
+  },
+  {
+    name: "gemini-3.1-flash-lite",
+    config: { thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } },
+  },
+  {
+    name: "gemini-2.5-flash",
+    config: { temperature: 0.25, thinkingConfig: { thinkingBudget: 0 } },
+  },
+];
+
+// These only affect the 4 ADJUSTABLE categories. They do NOT affect
+// PROHIBITED_CONTENT, which is a fixed filter you cannot turn off.
+// A safety app talks about violence/harassment, so we loosen the adjustable ones.
+const safetySettings = [
+  HarmCategory.HARM_CATEGORY_HARASSMENT,
+  HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+  HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+  HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+].map((category) => ({
+  category,
+  threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+}));
+
+/* -------------------------------------------------------------------------- */
+/* Prompts                                                                     */
+/* -------------------------------------------------------------------------- */
+
+// Shorter version of your old CONTEXTUAL REASONING block. Same rules (work out
+// WHO is affected, how urgent it is, what the user wants) but without the long
+// violent example sentences, which add "trigger" text to EVERY request.
+function buildContextInstruction(fastReplyMode: boolean): string {
+  return `
+CONTEXT RULES:
+- First work out who the situation is about: the user, another person (user is a helper/bystander), or a general question.
+- Keep roles consistent. If the user is helping someone else, never address the user as the one at risk, and do not tell them to "leave the house" or "document your injuries". Focus on the other person's safety: call 112 if safe to do so, do not confront the aggressor, help the person reach a safer place if possible.
+- If it is a legal-information question, give clear general legal information and say it is not personal legal advice.
+- If it is not an emergency, do not answer as if it were one.
+- Use empathy naturally, without exaggerating.
+- Answer the actual question first. Do not repeat the question or the same advice.
+${
+  fastReplyMode
+    ? `
+FAST MODE: be concise. Usually under 120 words (under 150 for urgent safety). Use short bullets for actions. Start with the most important action. Never drop safety-critical information to save words.`
+    : ""
+}`;
 }
 
-const ai = new GoogleGenAI({
-  apiKey,
-});
+// Minimal prompt used when the full one gets blocked. It keeps the persona and
+// the safety rules, but has no statute lists, no child-related pages and no
+// page-tag catalogue (extractAndRecommendPages already picks pages from the
+// user's message, so the tags are optional).
+const LEAN_SYSTEM_INSTRUCTION = `You are Saaya, a calm, caring safety and awareness assistant inside the SAFE-W app, which helps women and their allies stay safe.
+- Answer the user's actual situation directly and practically.
+- Put immediate physical safety first. Never encourage confronting someone dangerous.
+- Use the idea: notice, move to a safe populated place, tell someone you trust.
+- For emergencies in India: 112 (emergency), 181 (Women Helpline), 1091 (Women in Distress), 1930 (Cybercrime).
+- If the user is helping another person, support them as a helper, not as the person at risk.
+- You are an AI awareness companion, not a lawyer, doctor or emergency service.
+- Be warm and brief.`;
+
+// Wrapping the message gives the model context that this is someone asking for
+// help. This is why adding "What should I do?" fixed your blocked message.
+function frameMessage(message: string): string {
+  return `A user of the SAFE-W women's safety app sent the message below. Reply as Saaya, giving helpful safety guidance.\n\nUser message: ${message}`;
+}
+
+// Shown only if every variant is blocked. It is the SAME text for every
+// message (no keyword matching), so it never gives a wrong, situation-specific answer.
+const BLOCKED_FALLBACK_REPLY =
+  "I couldn't process that message, but I don't want to leave you without help. If you or someone else is in danger right now, call 112 (emergency) or 181 (Women Helpline), and move to a safe, populated place if you can. You can also try rewording your message and sending it again.";
+
+/* -------------------------------------------------------------------------- */
+/* Gemini helper                                                               */
+/* -------------------------------------------------------------------------- */
+
+type ModelDef = (typeof MODELS)[number];
+
+async function callGemini(
+  model: ModelDef,
+  contents: Content[],
+  systemInstruction: string | undefined,
+  maxOutputTokens = 512,
+) {
+  const response = await ai.models.generateContent({
+    model: model.name,
+    contents,
+    config: {
+      ...model.config,
+      systemInstruction,
+      maxOutputTokens,
+      safetySettings,
+    },
+  });
+
+  return {
+    response,
+    text: response.text?.trim() || "",
+    blockReason: response.promptFeedback?.blockReason,
+  };
+}
+
+// Dev-only: find WHICH part of the request is blocked.
+async function diagnoseBlock(
+  message: string,
+  contents: Content[],
+  systemInstruction: string,
+) {
+  const lastUser: Content[] = [{ role: "user", parts: [{ text: message }] }];
+  const probes: { label: string; contents: Content[]; system?: string }[] = [
+    { label: "message only", contents: lastUser },
+    { label: "system prompt only ('hi')", contents: [{ role: "user", parts: [{ text: "hi" }] }], system: systemInstruction },
+    { label: "message + system (no history)", contents: lastUser, system: systemInstruction },
+    { label: "history + message (no system)", contents },
+    { label: "message + LEAN system", contents: lastUser, system: LEAN_SYSTEM_INSTRUCTION },
+  ];
+
+  for (const probe of probes) {
+    try {
+      const r = await callGemini(MODELS[0], probe.contents, probe.system, 16);
+      console.log(`[block-probe] ${probe.label}:`, r.blockReason ?? "OK");
+    } catch (error) {
+      console.log(`[block-probe] ${probe.label}: error`, error);
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Route                                                                       */
+/* -------------------------------------------------------------------------- */
 
 app.post("/api/chat", async (req, res) => {
   try {
     const { message, history, fastReplyMode = true } = req.body;
 
     if (!message || typeof message !== "string") {
-      return res.status(400).json({
-        error: "Message is required",
-      });
+      return res.status(400).json({ error: "Message is required" });
     }
 
-    const validHistory = Array.isArray(history)
+    const validHistory: Content[] = Array.isArray(history)
       ? history
           .filter(
             (turn) =>
@@ -45,324 +184,83 @@ app.post("/api/chat", async (req, res) => {
               typeof turn.text === "string",
           )
           .slice(-6)
+          .map((turn) => ({
+            role: turn.role as "user" | "model",
+            parts: [{ text: turn.text as string }],
+          }))
       : [];
 
-    const contents = [
-      ...validHistory.map((turn) => ({
-        role: turn.role as "user" | "model",
-        parts: [{ text: turn.text as string }],
-      })),
-      {
-        role: "user" as const,
-        parts: [{ text: message }],
-      },
+    const fullSystem = `${SAAYA_SYSTEM_INSTRUCTION}\n${buildContextInstruction(fastReplyMode)}`;
+    const leanSystem = `${LEAN_SYSTEM_INSTRUCTION}\n${buildContextInstruction(fastReplyMode)}`;
+
+    const plainUser: Content = { role: "user", parts: [{ text: message }] };
+    const framedUser: Content = { role: "user", parts: [{ text: frameMessage(message) }] };
+
+    // Each variant is a different PROMPT. Safety blocks depend on the prompt,
+    // so changing the prompt (not just the model) is what gets us past them.
+    const variants = [
+      { label: "full prompt", system: fullSystem, contents: [...validHistory, plainUser] },
+      { label: "lean prompt + history", system: leanSystem, contents: [...validHistory, framedUser] },
+      { label: "lean prompt, no history", system: leanSystem, contents: [framedUser] },
     ];
 
-    const systemInstruction = `
-${SAAYA_SYSTEM_INSTRUCTION}
+    let rawReply = "";
+    let wasBlocked = false;
 
-CONTEXTUAL REASONING REQUIREMENT:
-
-Do not treat the user's message as a keyword-triggered FAQ.
-
-Before answering, understand the situation described by the user.
-
-Identify internally:
-
-1. WHO is experiencing the situation:
-   - the user themselves
-   - another woman/person
-   - a friend/family member
-   - a general/educational question
-
-2. URGENCY:
-   - immediate/current danger
-   - concerning but not immediately dangerous
-   - past experience
-   - general information
-
-3. USER'S INTENT:
-   - practical safety guidance
-   - emotional support
-   - legal/rights information
-   - preparation/education
-   - helping another person
-
-4. RESPONSE PRIORITY:
-   - immediate safety first when relevant
-   - practical next steps
-   - legal information when specifically relevant
-   - educational information when appropriate
-
-Do not automatically assume that the user is the victim.
-
-For example:
-
-If the user says:
-"My husband is hurting me and I am scared. What should I do?"
-
-Understand that the user is describing their own situation and respond directly to their safety needs.
-
-If the user says:
-"On the road a person is beating his wife in front of people. How can I help that woman?"
-
-Understand that the user is a bystander asking how to help another person. Do not respond as though the user is the victim.
-
-If the user asks:
-"What rights does a woman have if she faces domestic violence in India?"
-
-Understand that this is primarily a legal-information question and provide relevant factual information rather than generic emergency instructions.
-
-Do not force every answer into the same structure.
-
-Use empathy naturally when someone describes fear, distress, or concern, but do not exaggerate emotions or make assumptions about what the user feels.
-
-When the situation is not an immediate emergency, do not unnecessarily turn the response into an emergency response.
-
-When the user asks for legal information, provide legal information clearly and distinguish general information from personalized legal advice.
-
-When the user is describing violence happening to another person,
-consistently treat the other person as the victim and the user as
-the bystander/helper.
-
-Do NOT address the user as though they are the victim.
-
-For example, if the user says:
-"One person in my home is being abused right now. What can I do?"
-
-Use language such as:
-- "The person's immediate safety is the priority."
-- "If it is safe for you to do so, call 112."
-- "Avoid physically confronting the abuser."
-- "If you can safely help the person reach a safer place, do so."
-
-Avoid language such as:
-- "Your safety is at risk" unless referring to the user's own risk.
-- "Move away from the abuser."
-- "Leave the house."
-- "Document your injuries."
-- "You are not alone."
-
-Do not switch between "you" and "the victim" as if they are the same person.
-Maintain the identified roles throughout the entire response.
-
-When immediate danger is genuinely present, prioritize practical safety actions and appropriate emergency support.
-
-Keep responses practical, clear, and conversational.
-
-RESPONSE STYLE:
-
-Prefer short, useful responses over comprehensive explanations.
-
-Answer the user's actual question first.
-
-Only expand when the situation requires it or the user asks for more detail.
-
-Do not repeat the user's question.
-
-Do not repeat the same advice in different words.
-
-Do not add unnecessary background information.
-
-Do not turn a simple question into a long educational explanation.
-
-${
-  fastReplyMode
-    ? `
-FAST RESPONSE MODE:
-
-Be concise.
-
-For most questions, respond in no more than 120 words.
-
-For urgent safety situations, respond in no more than 150 words unless additional information is genuinely necessary for immediate safety.
-
-Use short bullets when giving actions.
-
-Do not add:
-- motivational speeches
-- repeated reassurance
-- long introductions
-- unnecessary legal background
-- information that does not directly help with the user's situation.
-
-Start with the most important action.
-
-The response should feel like a short, natural conversation with an AI assistant, not an article.
-
-Safety-critical information should never be omitted just to meet the word limit.
-`
-    : ""
-}
-`;
-
-    let response;
-
-    try {
-      console.log("Saaya: trying gemini-3.8-flash");
-
-      response = await ai.models.generateContent({
-        model: "gemini-3.8-flash",
-        contents,
-        config: {
-          systemInstruction,
-          maxOutputTokens: 512,
-          thinkingConfig: {
-            thinkingLevel: ThinkingLevel.LOW,
-          },
-        },
-      });
-      if (response.promptFeedback?.blockReason) {
-        console.warn("Saaya request blocked:", {
-          model: "gemini-3.8-flash",
-          blockReason: response.promptFeedback.blockReason,
-        });
-
-        throw new Error(
-          `Gemini blocked request: ${response.promptFeedback.blockReason}`,
-        );
-      }
-      console.log("Saaya response diagnostics:", {
-        model: "gemini-3.8-flash",
-        hasText: Boolean(response.text?.trim()),
-        promptFeedback: response.promptFeedback,
-        candidates: response.candidates?.map((candidate) => ({
-          finishReason: candidate.finishReason,
-          safetyRatings: candidate.safetyRatings,
-          content: candidate.content,
-        })),
-        usageMetadata: response.usageMetadata,
-      });
-
-      if (!response.text?.trim()) {
-        throw new Error("gemini-3.8-flash returned an empty response");
-      }
-      console.log("Saaya: gemini-3.8-flash succeeded");
-    } catch (error) {
-      console.error("Saaya: gemini-3.8-flash failed", error);
-
-      try {
-        console.log("Saaya: trying gemini-3.1-flash-lite");
-
-        response = await ai.models.generateContent({
-          model: "gemini-3.1-flash-lite",
-          contents,
-          config: {
-            systemInstruction,
-            maxOutputTokens: 512,
-            thinkingConfig: {
-              thinkingLevel: ThinkingLevel.MINIMAL,
-            },
-          },
-        });
-        if (response.promptFeedback?.blockReason) {
-          console.warn("Saaya request blocked:", {
-            model: "gemini-3.1-flash-lite",
-            blockReason: response.promptFeedback.blockReason,
-          });
-
-          throw new Error(
-            `Gemini blocked request: ${response.promptFeedback.blockReason}`,
-          );
-        }
-        console.log("Saaya response diagnostics:", {
-          model: "gemini-3.1-flash-lite",
-          hasText: Boolean(response.text?.trim()),
-          promptFeedback: response.promptFeedback,
-          candidates: response.candidates?.map((candidate) => ({
-            finishReason: candidate.finishReason,
-            safetyRatings: candidate.safetyRatings,
-            content: candidate.content,
-          })),
-          usageMetadata: response.usageMetadata,
-        });
-
-        console.log("Saaya: gemini-3.1-flash-lite succeeded");
-        if (!response.text?.trim()) {
-          throw new Error("gemini-3.1-flash-lite returned an empty response");
-        }
-      } catch (error) {
-        console.error("Saaya: gemini-3.1-flash-lite failed", error);
-
+    variantLoop: for (const variant of variants) {
+      for (const model of MODELS) {
         try {
-          console.log("Saaya: trying gemini-2.5-flash");
+          console.log(`Saaya: ${model.name} / ${variant.label}`);
+          const r = await callGemini(model, variant.contents, variant.system);
 
-          response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents,
-            config: {
-              systemInstruction,
-              temperature: 0.25,
-              maxOutputTokens: 512,
-              thinkingConfig: {
-                thinkingBudget: 0,
-              },
-            },
-          });
-          if (response.promptFeedback?.blockReason) {
-            console.warn("Saaya request blocked:", {
-              model: "gemini-2.5-flash",
-              blockReason: response.promptFeedback.blockReason,
+          if (r.blockReason) {
+            // Blocks come from the prompt, so other models will block it too.
+            // Skip to the next prompt variant instead of wasting 2 more calls.
+            wasBlocked = true;
+            console.warn("Saaya blocked:", {
+              model: model.name,
+              variant: variant.label,
+              blockReason: r.blockReason,
             });
+            break;
+          }
 
-            throw new Error(
-              `Gemini blocked request: ${response.promptFeedback.blockReason}`,
-            );
+          if (!r.text) {
+            console.warn("Saaya empty reply:", {
+              model: model.name,
+              finishReason: r.response.candidates?.[0]?.finishReason,
+            });
+            continue; // model-specific problem, try the next model
           }
-          console.log("Saaya response diagnostics:", {
-            model: "gemini-2.5-flash",
-            hasText: Boolean(response.text?.trim()),
-            promptFeedback: response.promptFeedback,
-            candidates: response.candidates?.map((candidate) => ({
-              finishReason: candidate.finishReason,
-              safetyRatings: candidate.safetyRatings,
-              content: candidate.content,
-            })),
-            usageMetadata: response.usageMetadata,
-          });
-          console.log("Saaya: gemini-2.5-flash succeeded");
-          if (!response.text?.trim()) {
-            throw new Error("gemini-2.5-flash returned an empty response");
-          }
+
+          rawReply = r.text;
+          wasBlocked = false;
+          break variantLoop;
         } catch (error) {
-          console.error("Saaya: gemini-2.5-flash failed", error);
+          // Network / 503 / quota: model-specific, try the next model.
+          console.error(`Saaya: ${model.name} failed`, error);
         }
       }
     }
 
-    if (!response) {
+    if (!rawReply) {
+      if (wasBlocked) {
+        if (DEBUG_BLOCKS) await diagnoseBlock(message, variants[0].contents, fullSystem);
+        // Safe, generic help instead of an error screen.
+        return res.json({
+          reply: BLOCKED_FALLBACK_REPLY,
+          recommendedPages: [],
+          degraded: true,
+        });
+      }
       throw new Error("All Saaya AI models failed.");
     }
 
-    console.log("Saaya finish reason:", response.candidates?.[0]?.finishReason);
-
-    console.log("Saaya token count:", response.candidates?.[0]?.tokenCount);
-
-    const rawReply = response.text?.trim();
-    console.log("Saaya raw reply length:", rawReply?.length);
-    console.log("Saaya raw reply:", rawReply);
-
-    if (!rawReply) {
-      throw new Error("Gemini returned an empty response.");
-    }
-
-    const { cleanReply, recommendedPages } = extractAndRecommendPages(
-      rawReply,
-      message,
-    );
-
-    return res.json({
-      reply: cleanReply,
-      recommendedPages,
-    });
+    const { cleanReply, recommendedPages } = extractAndRecommendPages(rawReply, message);
+    return res.json({ reply: cleanReply, recommendedPages });
   } catch (error) {
     console.error("Gemini error:", error);
-
-    // Do not route failed Gemini requests through keyword-based SAFE-W answers.
-    // The client will show a neutral connection error instead.
-    return res.status(502).json({
-      error: "Saaya AI is temporarily unavailable",
-    });
+    return res.status(502).json({ error: "Saaya AI is temporarily unavailable" });
   }
 });
 
